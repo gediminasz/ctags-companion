@@ -1,1 +1,1 @@
-# ctags-companion
+# Ctags Companion

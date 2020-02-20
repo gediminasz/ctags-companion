@@ -1,0 +1,25 @@
+{
+    "name": "ctags-companion",
+    "displayName": "Ctags Companion",
+    "description": "Visual Studio Code symbols provider based on Ctags",
+    "publisher": "gediminaszlatkus",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.42.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:extension.helloWorld"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.helloWorld",
+                "title": "Hello World"
+            }
+        ]
+    }
+}
