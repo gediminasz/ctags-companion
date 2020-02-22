@@ -2,7 +2,12 @@ const vscode = require('vscode');
 const fs = require('fs');
 const readline = require('readline');
 
+// TODO
 // [2020-02-22 17:34:57.024] [exthost] [warning] [Deprecation Warning] 'workspace.rootPath' is deprecated. Please use 'workspace.workspaceFolders' instead. More details: https://aka.ms/vscode-eliminating-rootpath
+// DocumentSymbolProvider
+// WorkspaceSymbolProvider
+// ctags on save
+// enable for languages
 
 function activate(context) {
     context.subscriptions.push(
@@ -28,6 +33,24 @@ function activate(context) {
             }
         )
     );
+
+    context.subscriptions.push(
+        vscode.tasks.registerTaskProvider("shell", {
+            provideTasks: () => {
+                const task = new vscode.Task(
+                    { type: "shell" },
+                    vscode.TaskScope.Workspace,
+                    "ctags",
+                    "Ctags Companion",
+                    new vscode.ShellExecution("ctags -R --python-kinds=-i --fields=+n -f .tags"),
+                    []
+                );
+                task.presentationOptions.reveal = false;
+                return [task];
+            },
+            resolveTask: (task) => task
+        })
+    );
 }
 
 async function getIndex(context) {
@@ -39,7 +62,7 @@ async function getIndex(context) {
 function reindex(context) {
     return new Promise(resolve => {
         const input = fs.createReadStream(vscode.workspace.rootPath + "/.tags");
-        const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity })
+        const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity });
         const index = {};
 
         reader.on("line", (line) => {
@@ -65,4 +88,4 @@ exports.activate = activate;
 
 module.exports = {
     activate
-}
+};
