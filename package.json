@@ -11,7 +11,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:ctags-companion.reindex"
+        "*"
     ],
     "main": "./extension.js",
     "contributes": {
