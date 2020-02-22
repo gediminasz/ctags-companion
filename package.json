@@ -11,14 +11,14 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.helloWorld"
+        "onCommand:ctags-companion.reindex"
     ],
     "main": "./extension.js",
     "contributes": {
         "commands": [
             {
-                "command": "extension.helloWorld",
-                "title": "Hello World"
+                "command": "ctags-companion.reindex",
+                "title": "Ctags Companion: reindex"
             }
         ]
     }
