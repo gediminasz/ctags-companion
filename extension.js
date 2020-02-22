@@ -6,57 +6,58 @@ const readline = require('readline');
 
 function activate(context) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('ctags-companion.reindex', function () {
-            vscode.window.showInformationMessage("Ctags Companion: reindexing...");
-            reindex(context);
-        })
+        vscode.commands.registerCommand('ctags-companion.reindex', () => reindex(context))
     );
 
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
             { scheme: "file" },
             {
-                provideDefinition: (document, position) => {
+                provideDefinition: async (document, position) => {
                     const symbol = document.getText(document.getWordRangeAtPosition(position));
-                    const index = context.workspaceState.get("index");  // TODO handle index undefined
+                    const index = await getIndex(context);
                     const results = index[symbol];
-                    console.log({ document, position, symbol, results });
-                    if (results) {
+                    if (results)
                         return results.map(({ file, line }) =>
                             new vscode.Location(
                                 vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
                                 new vscode.Position(line, 0)
                             )
-                        )
-                    }
+                        );
                 }
             }
         )
     );
 }
 
+async function getIndex(context) {
+    const index = context.workspaceState.get("index");
+    if (!index) await reindex(context);
+    return context.workspaceState.get("index");
+}
+
 function reindex(context) {
-    const input = fs.createReadStream(vscode.workspace.rootPath + "/.tags");
-    const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity })
+    return new Promise(resolve => {
+        const input = fs.createReadStream(vscode.workspace.rootPath + "/.tags");
+        const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity })
+        const index = {};
 
-    const index = {};
+        reader.on("line", (line) => {
+            if (line.startsWith("!")) return;
 
-    reader.on("line", (line) => {
-        if (line.startsWith("!"))
-            return;
+            const [name, file, ...rest] = line.split("\t");
+            const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
+            const lineNumber = parseInt(lineNumberStr, 10) - 1;
 
-        const [name, file, ...rest] = line.split("\t");
-        const lineNumber = rest.find(value => value.startsWith("line:")).substring(5);
+            if (!index.hasOwnProperty(name)) index[name] = [];
+            index[name].push({ file, line: lineNumber });
+        });
 
-        if (!index.hasOwnProperty(name))
-            index[name] = [];
-        index[name].push({ file, line: parseInt(lineNumber, 10) - 1 });
-    });
-
-    reader.on("close", () => {
-        vscode.window.showInformationMessage("Ctags Companion: reindex complete!");
-        console.log(`Index size: ${Object.keys(index).length}`);
-        context.workspaceState.update("index", index);
+        reader.on("close", () => {
+            vscode.window.showInformationMessage("Ctags Companion: reindex complete!");
+            context.workspaceState.update("index", index);
+            resolve();
+        });
     });
 }
 
