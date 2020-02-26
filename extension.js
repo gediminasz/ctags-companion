@@ -5,9 +5,10 @@ const readline = require('readline');
 // TODO
 // [2020-02-22 17:34:57.024] [exthost] [warning] [Deprecation Warning] 'workspace.rootPath' is deprecated. Please use 'workspace.workspaceFolders' instead. More details: https://aka.ms/vscode-eliminating-rootpath
 // DocumentSymbolProvider
-// WorkspaceSymbolProvider
 // ctags on save
 // enable for languages
+// maintain multiple tag files: one for .venv (slow, ctagged once) and one for project (fast, ctagged on every file save), and merge them into a single index
+// SymbolInformation kind and containerName
 
 function activate(context) {
     context.subscriptions.push(
@@ -22,11 +23,39 @@ function activate(context) {
                     const symbol = document.getText(document.getWordRangeAtPosition(position));
                     const index = await getIndex(context);
                     const results = index[symbol];
-                    if (results)
-                        return results.map(({ file, line }) =>
-                            new vscode.Location(
-                                vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
-                                new vscode.Position(line, 0)
+
+                    if (!results) return;
+
+                    return results.map(({ file, line }) =>
+                        new vscode.Location(
+                            vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
+                            new vscode.Position(line, 0)
+                        )
+                    );
+                }
+            }
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.languages.registerWorkspaceSymbolProvider(
+            {
+                provideWorkspaceSymbols: async (query) => {
+                    if (!query) return;
+
+                    const index = await getIndex(context);
+                    return Object.entries(index)
+                        .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
+                        .flatMap(([_, definitions]) => definitions)
+                        .map(({ symbol, file, line }) =>
+                            new vscode.SymbolInformation(
+                                symbol,
+                                null,
+                                null,
+                                new vscode.Location(
+                                    vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
+                                    new vscode.Position(line, 0)
+                                )
                             )
                         );
                 }
@@ -68,12 +97,12 @@ function reindex(context) {
         reader.on("line", (line) => {
             if (line.startsWith("!")) return;
 
-            const [name, file, ...rest] = line.split("\t");
+            const [symbol, file, ...rest] = line.split("\t");
             const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
             const lineNumber = parseInt(lineNumberStr, 10) - 1;
 
-            if (!index.hasOwnProperty(name)) index[name] = [];
-            index[name].push({ file, line: lineNumber });
+            if (!index.hasOwnProperty(symbol)) index[symbol] = [];
+            index[symbol].push({ symbol, file, line: lineNumber });
         });
 
         reader.on("close", () => {
