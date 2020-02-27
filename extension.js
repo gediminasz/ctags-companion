@@ -7,7 +7,8 @@ const readline = require('readline');
 // ctags on save
 // maintain multiple tag files: one for .venv (slow, ctagged once) and one for project (fast, ctagged on every file save), and merge them into a single index
 // enable for languages
-// SymbolInformation kind and containerName
+// SymbolInformation containerName
+// non-python specific symbol kinds
 
 function activate(context) {
     context.subscriptions.push(
@@ -44,10 +45,10 @@ function activate(context) {
                     const relativePath = vscode.workspace.asRelativePath(document.uri);
                     const definitions = (await getDocumentIndex(context))[relativePath];
                     if (!definitions) return;
-                    return definitions.map(({ symbol, file, line }) =>
+                    return definitions.map(({ symbol, file, line, kind }) =>
                         new vscode.SymbolInformation(
                             symbol,
-                            null,
+                            toSymbolKind(kind),
                             null,
                             new vscode.Location(
                                 vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
@@ -71,10 +72,10 @@ function activate(context) {
                     return Object.entries(index)
                         .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
                         .flatMap(([_, definitions]) => definitions)
-                        .map(({ symbol, file, line }) =>
+                        .map(({ symbol, file, line, kind }) =>
                             new vscode.SymbolInformation(
                                 symbol,
-                                null,
+                                toSymbolKind(kind),
                                 null,
                                 new vscode.Location(
                                     vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
@@ -95,7 +96,7 @@ function activate(context) {
                     vscode.TaskScope.Workspace,
                     "ctags",
                     "Ctags Companion",
-                    new vscode.ShellExecution("ctags -R --python-kinds=-i --fields=+n -f .tags"),
+                    new vscode.ShellExecution("ctags -R --python-kinds=-i --fields=+nKz -f .tags"),
                     []
                 );
                 task.presentationOptions.reveal = false;
@@ -132,7 +133,8 @@ function reindex(context) {
             const [symbol, file, ...rest] = line.split("\t");
             const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
             const lineNumber = parseInt(lineNumberStr, 10) - 1;
-            const definition = { symbol, file, line: lineNumber };
+            const kind = rest.find(value => value.startsWith("kind:")).substring(5);
+            const definition = { symbol, file, line: lineNumber, kind };
 
             if (!index.hasOwnProperty(symbol)) index[symbol] = [];
             index[symbol].push(definition);
@@ -148,6 +150,15 @@ function reindex(context) {
             resolve();
         });
     });
+}
+
+function toSymbolKind(kind) {
+    switch (kind) {
+        case "class": return vscode.SymbolKind.Class;
+        case "function": return vscode.SymbolKind.Function;
+        case "member": return vscode.SymbolKind.Method;
+        case "variable": return vscode.SymbolKind.Variable;
+    }
 }
 
 exports.activate = activate;
