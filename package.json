@@ -15,6 +15,17 @@
     ],
     "main": "./extension.js",
     "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "Ctags Companion",
+            "properties": {
+                "ctags-companion.command": {
+                    "type": "string",
+                    "default": "ctags -R --fields=+nKz -f .tags",
+                    "description": "Command to generate the tags file"
+                }
+            }
+        },
         "commands": [
             {
                 "command": "ctags-companion.reindex",

@@ -10,9 +10,12 @@ const readline = require('readline');
 // SymbolInformation containerName
 // non-python specific symbol kinds
 
+const EXTENSION_NAME = "Ctags Companion";
+const EXTENSION_ID = "ctags-companion";
+
 function activate(context) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('ctags-companion.reindex', () => reindex(context))
+        vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindex(context))
     );
 
     context.subscriptions.push(
@@ -58,7 +61,7 @@ function activate(context) {
                     );
                 }
             },
-            { label: "Ctags Companion" }
+            { label: EXTENSION_NAME }
         )
     );
 
@@ -91,12 +94,13 @@ function activate(context) {
     context.subscriptions.push(
         vscode.tasks.registerTaskProvider("shell", {
             provideTasks: () => {
+                const command = vscode.workspace.getConfiguration(EXTENSION_ID).get("command");
                 const task = new vscode.Task(
                     { type: "shell" },
                     vscode.TaskScope.Workspace,
                     "ctags",
-                    "Ctags Companion",
-                    new vscode.ShellExecution("ctags -R --python-kinds=-i --fields=+nKz -f .tags"),
+                    EXTENSION_NAME,
+                    new vscode.ShellExecution(command),
                     []
                 );
                 task.presentationOptions.reveal = false;
@@ -144,7 +148,7 @@ function reindex(context) {
         });
 
         reader.on("close", () => {
-            vscode.window.showInformationMessage("Ctags Companion: reindex complete!");
+            vscode.window.showInformationMessage(`${EXTENSION_NAME}: reindex complete!`);
             context.workspaceState.update("index", index);
             context.workspaceState.update("documentIndex", documentIndex);
             resolve();
