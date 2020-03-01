@@ -5,7 +5,6 @@ const readline = require('readline');
 // TODO
 // [2020-02-22 17:34:57.024] [exthost] [warning] [Deprecation Warning] 'workspace.rootPath' is deprecated. Please use 'workspace.workspaceFolders' instead. More details: https://aka.ms/vscode-eliminating-rootpath
 // ctags on save
-// maintain multiple tag files: one for .venv (slow, ctagged once) and one for project (fast, ctagged on every file save), and merge them into a single index
 // enable for languages
 // SymbolInformation containerName
 // non-python specific symbol kinds
@@ -109,6 +108,11 @@ function activate(context) {
             resolveTask: (task) => task
         })
     );
+
+    vscode.tasks.onDidEndTask(event => {
+        const { source, name } = event.execution.task;
+        if (source == EXTENSION_NAME && name == "ctags") reindex(context);
+    });
 }
 
 async function getIndex(context) {
