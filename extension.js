@@ -8,6 +8,7 @@ const readline = require('readline');
 // enable for languages
 // SymbolInformation containerName
 // non-python specific symbol kinds
+// .tags file in .vscode directory (but make it configurable)
 
 const EXTENSION_NAME = "Ctags Companion";
 const EXTENSION_ID = "ctags-companion";
