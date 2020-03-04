@@ -4,9 +4,9 @@ const readline = require('readline');
 const vscode = require('vscode');
 
 // TODO
+// convert SymbolInformation to DocumentSymbol https://code.visualstudio.com/api/references/vscode-api#DocumentSymbol
 // [2020-02-22 17:34:57.024] [exthost] [warning] [Deprecation Warning] 'workspace.rootPath' is deprecated. Please use 'workspace.workspaceFolders' instead. More details: https://aka.ms/vscode-eliminating-rootpath
 // ctags on save
-// SymbolInformation containerName
 // non-python specific symbol kinds
 
 const EXTENSION_NAME = "Ctags Companion";
@@ -50,11 +50,11 @@ function activate(context) {
                     const relativePath = vscode.workspace.asRelativePath(document.uri);
                     const definitions = (await getDocumentIndex(context))[relativePath];
                     if (!definitions) return;
-                    return definitions.map(({ symbol, file, line, kind }) =>
+                    return definitions.map(({ symbol, file, line, kind, container }) =>
                         new vscode.SymbolInformation(
                             symbol,
                             toSymbolKind(kind),
-                            null,
+                            container,
                             new vscode.Location(
                                 vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
                                 new vscode.Position(line, 0)
@@ -77,11 +77,11 @@ function activate(context) {
                     return Object.entries(index)
                         .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
                         .flatMap(([_, definitions]) => definitions)
-                        .map(({ symbol, file, line, kind }) =>
+                        .map(({ symbol, file, line, kind, container }) =>
                             new vscode.SymbolInformation(
                                 symbol,
                                 toSymbolKind(kind),
-                                null,
+                                container,
                                 new vscode.Location(
                                     vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
                                     new vscode.Position(line, 0)
@@ -151,7 +151,11 @@ function reindex(context) {
             const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
             const lineNumber = parseInt(lineNumberStr, 10) - 1;
             const kind = rest.find(value => value.startsWith("kind:")).substring(5);
-            const definition = { symbol, file, line: lineNumber, kind };
+
+            const container = rest.find(value => value.startsWith("class:"));
+            const containerName = container && container.substring(6);
+
+            const definition = { symbol, file, line: lineNumber, kind, container: containerName };
 
             if (!index.hasOwnProperty(symbol)) index[symbol] = [];
             index[symbol].push(definition);
