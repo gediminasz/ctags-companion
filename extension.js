@@ -9,10 +9,10 @@ const vscode = require('vscode');
 // enable for languages
 // SymbolInformation containerName
 // non-python specific symbol kinds
-// show indexing activity in status bar
 
 const EXTENSION_NAME = "Ctags Companion";
 const EXTENSION_ID = "ctags-companion";
+const TASK_NAME = "rebuild ctags";
 
 function activate(context) {
     context.subscriptions.push(
@@ -99,7 +99,7 @@ function activate(context) {
                 const task = new vscode.Task(
                     { type: "shell" },
                     vscode.TaskScope.Workspace,
-                    "ctags",
+                    TASK_NAME,
                     EXTENSION_NAME,
                     new vscode.ShellExecution(command),
                     []
@@ -113,7 +113,7 @@ function activate(context) {
 
     vscode.tasks.onDidEndTask(event => {
         const { source, name } = event.execution.task;
-        if (source == EXTENSION_NAME && name == "ctags") reindex(context);
+        if (source == EXTENSION_NAME && name == TASK_NAME) reindex(context);
     });
 }
 
@@ -131,6 +131,8 @@ async function getDocumentIndex(context) {
 
 function reindex(context) {
     return new Promise(resolve => {
+        const statusBarMessage = vscode.window.setStatusBarMessage("Ctags Companion: reindexing...");
+
         const tagsPath = path.join(
             vscode.workspace.rootPath,
             vscode.workspace.getConfiguration(EXTENSION_ID).get("path")
@@ -158,9 +160,10 @@ function reindex(context) {
         });
 
         reader.on("close", () => {
-            vscode.window.showInformationMessage(`${EXTENSION_NAME}: reindex complete!`);
             context.workspaceState.update("index", index);
             context.workspaceState.update("documentIndex", documentIndex);
+
+            statusBarMessage.dispose();
             resolve();
         });
     });
