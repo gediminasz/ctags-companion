@@ -1,6 +1,7 @@
-const vscode = require('vscode');
 const fs = require('fs');
+const path = require('path');
 const readline = require('readline');
+const vscode = require('vscode');
 
 // TODO
 // [2020-02-22 17:34:57.024] [exthost] [warning] [Deprecation Warning] 'workspace.rootPath' is deprecated. Please use 'workspace.workspaceFolders' instead. More details: https://aka.ms/vscode-eliminating-rootpath
@@ -8,7 +9,7 @@ const readline = require('readline');
 // enable for languages
 // SymbolInformation containerName
 // non-python specific symbol kinds
-// .tags file in .vscode directory (but make it configurable)
+// show indexing activity in status bar
 
 const EXTENSION_NAME = "Ctags Companion";
 const EXTENSION_ID = "ctags-companion";
@@ -130,7 +131,11 @@ async function getDocumentIndex(context) {
 
 function reindex(context) {
     return new Promise(resolve => {
-        const input = fs.createReadStream(vscode.workspace.rootPath + "/.tags");
+        const tagsPath = path.join(
+            vscode.workspace.rootPath,
+            vscode.workspace.getConfiguration(EXTENSION_ID).get("path")
+        );
+        const input = fs.createReadStream(tagsPath);
         const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity });
 
         const index = {};
