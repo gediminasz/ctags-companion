@@ -3,12 +3,6 @@ const path = require('path');
 const readline = require('readline');
 const vscode = require('vscode');
 
-// TODO
-// convert SymbolInformation to DocumentSymbol https://code.visualstudio.com/api/references/vscode-api#DocumentSymbol
-// [2020-02-22 17:34:57.024] [exthost] [warning] [Deprecation Warning] 'workspace.rootPath' is deprecated. Please use 'workspace.workspaceFolders' instead. More details: https://aka.ms/vscode-eliminating-rootpath
-// ctags on save
-// non-python specific symbol kinds
-
 const EXTENSION_NAME = "Ctags Companion";
 const EXTENSION_ID = "ctags-companion";
 const TASK_NAME = "rebuild ctags";
