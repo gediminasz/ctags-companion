@@ -6,7 +6,6 @@ const vscode = require('vscode');
 // TODO
 // [2020-02-22 17:34:57.024] [exthost] [warning] [Deprecation Warning] 'workspace.rootPath' is deprecated. Please use 'workspace.workspaceFolders' instead. More details: https://aka.ms/vscode-eliminating-rootpath
 // ctags on save
-// enable for languages
 // SymbolInformation containerName
 // non-python specific symbol kinds
 
@@ -15,13 +14,15 @@ const EXTENSION_ID = "ctags-companion";
 const TASK_NAME = "rebuild ctags";
 
 function activate(context) {
+    const documentSelector = vscode.workspace.getConfiguration(EXTENSION_ID).get("documentSelector");
+
     context.subscriptions.push(
         vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindex(context))
     );
 
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
-            { scheme: "file" },
+            documentSelector,
             {
                 provideDefinition: async (document, position) => {
                     const symbol = document.getText(document.getWordRangeAtPosition(position));
@@ -43,7 +44,7 @@ function activate(context) {
 
     context.subscriptions.push(
         vscode.languages.registerDocumentSymbolProvider(
-            { scheme: "file" },
+            documentSelector,
             {
                 provideDocumentSymbols: async (document) => {
                     const relativePath = vscode.workspace.asRelativePath(document.uri);
