@@ -1,7 +1,7 @@
 {
     "name": "ctags-companion",
     "displayName": "Ctags Companion",
-    "description": "Visual Studio Code symbols provider based on Ctags",
+    "description": "A Visual Studio Code symbols provider based on Ctags",
     "publisher": "gediminaszlatkus",
     "repository": {
         "type": "git",
@@ -37,7 +37,7 @@
                     "default": {
                         "scheme": "file"
                     },
-                    "description": "Document selector used for for registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector"
+                    "description": "Document selector object used when registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector"
                 }
             }
         },
