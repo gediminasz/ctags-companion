@@ -125,13 +125,17 @@ async function getDocumentIndex(context) {
 }
 
 function reindex(context) {
+    const relativeTagsPath = vscode.workspace.getConfiguration(EXTENSION_ID).get("path");
+    const tagsPath = path.join(vscode.workspace.rootPath, relativeTagsPath);
+
+    if (!fs.existsSync(tagsPath)) {
+        vscode.window.showErrorMessage(`Ctags Companion reindex failed: file ${relativeTagsPath} not found`);
+        return;
+    }
+
     return new Promise(resolve => {
         const statusBarMessage = vscode.window.setStatusBarMessage("Ctags Companion: reindexing...");
 
-        const tagsPath = path.join(
-            vscode.workspace.rootPath,
-            vscode.workspace.getConfiguration(EXTENSION_ID).get("path")
-        );
         const input = fs.createReadStream(tagsPath);
         const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity });
 
