@@ -39,34 +39,36 @@ function activate(context) {
         )
     );
 
-    // todo
-    // context.subscriptions.push(
-    //     vscode.languages.registerDocumentSymbolProvider(
-    //         documentSelector,
-    //         {
-    //             provideDocumentSymbols: async (document) => {
-    //                 const relativePath = vscode.workspace.asRelativePath(document.uri);
-    //                 const documentIndex = await getDocumentIndex(context);
-    //                 const definitions = documentIndex[relativePath];
+    context.subscriptions.push(
+        vscode.languages.registerDocumentSymbolProvider(
+            documentSelector,
+            {
+                provideDocumentSymbols: async (document) => {
+                    const relativePath = vscode.workspace.asRelativePath(document.uri, false);
 
-    //                 if (!definitions) return;
+                    const indexes = await getIndexes(context);
+                    const scope = determineScope(document);
+                    const documentIndex = indexes[scope.uri.fsPath].documentIndex;
 
-    //                 return definitions.map(({ symbol, file, line, kind, container }) =>
-    //                     new vscode.SymbolInformation(
-    //                         symbol,
-    //                         toSymbolKind(kind),
-    //                         container,
-    //                         new vscode.Location(
-    //                             vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
-    //                             new vscode.Position(line, 0)
-    //                         )
-    //                     )
-    //                 );
-    //             }
-    //         },
-    //         { label: EXTENSION_NAME }
-    //     )
-    // );
+                    const definitions = documentIndex[relativePath];
+                    if (!definitions) return;
+
+                    return definitions.map(({ symbol, file, line, kind, container }) =>
+                        new vscode.SymbolInformation(
+                            symbol,
+                            toSymbolKind(kind),
+                            container,
+                            new vscode.Location(
+                                vscode.Uri.file(path.join(scope.uri.fsPath, file)),
+                                new vscode.Position(line, 0)
+                            )
+                        )
+                    );
+                }
+            },
+            { label: EXTENSION_NAME }
+        )
+    );
 
     // todo
     // context.subscriptions.push(
