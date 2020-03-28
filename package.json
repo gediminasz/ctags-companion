@@ -39,8 +39,7 @@
                     "default": {
                         "scheme": "file"
                     },
-                    "description": "Document selector object used when registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector",
-                    "scope": "resource"
+                    "description": "Document selector object used when registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector"
                 }
             }
         },
