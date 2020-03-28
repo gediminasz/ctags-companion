@@ -8,6 +8,8 @@ const EXTENSION_ID = "ctags-companion";
 const TASK_NAME = "rebuild ctags";
 
 function activate(context) {
+    console.log(vscode.workspace.workspaceFolders);
+
     const documentSelector = vscode.workspace.getConfiguration(EXTENSION_ID).get("documentSelector");
 
     context.subscriptions.push(
@@ -21,11 +23,11 @@ function activate(context) {
                 provideDefinition: async (document, position) => {
                     const symbol = document.getText(document.getWordRangeAtPosition(position));
                     const index = await getIndex(context);
-                    const results = index[symbol];
+                    const definitions = index[symbol];
 
-                    if (!results) return;
+                    if (!definitions) return;
 
-                    return results.map(({ file, line }) =>
+                    return definitions.map(({ file, line }) =>
                         new vscode.Location(
                             vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
                             new vscode.Position(line, 0)
@@ -42,8 +44,11 @@ function activate(context) {
             {
                 provideDocumentSymbols: async (document) => {
                     const relativePath = vscode.workspace.asRelativePath(document.uri);
-                    const definitions = (await getDocumentIndex(context))[relativePath];
+                    const documentIndex = await getDocumentIndex(context);
+                    const definitions = documentIndex[relativePath];
+
                     if (!definitions) return;
+
                     return definitions.map(({ symbol, file, line, kind, container }) =>
                         new vscode.SymbolInformation(
                             symbol,
@@ -87,28 +92,29 @@ function activate(context) {
         )
     );
 
-    context.subscriptions.push(
-        vscode.tasks.registerTaskProvider("shell", {
-            provideTasks: () => {
-                const command = vscode.workspace.getConfiguration(EXTENSION_ID).get("command");
-                const task = new vscode.Task(
-                    { type: "shell" },
-                    vscode.TaskScope.Workspace,
-                    TASK_NAME,
-                    EXTENSION_NAME,
-                    new vscode.ShellExecution(command),
-                    []
-                );
-                task.presentationOptions.reveal = false;
-                return [task];
-            },
-            resolveTask: (task) => task
-        })
-    );
+    vscode.workspace.workspaceFolders.forEach(scope =>
+        context.subscriptions.push(
+            vscode.tasks.registerTaskProvider("shell", {
+                provideTasks: () => {
+                    const command = getConfiguration(scope).get("command");
+                    const task = new vscode.Task(
+                        { type: "shell" },
+                        scope,
+                        TASK_NAME,
+                        EXTENSION_NAME,
+                        new vscode.ShellExecution(command),
+                        []
+                    );
+                    task.presentationOptions.reveal = false;
+                    return [task];
+                },
+                resolveTask: (task) => task
+            })
+        ));
 
     vscode.tasks.onDidEndTask(event => {
-        const { source, name } = event.execution.task;
-        if (source == EXTENSION_NAME && name == TASK_NAME) reindex(context);
+        const { source, name, scope } = event.execution.task;
+        if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(context, scope);
     });
 }
 
@@ -172,6 +178,12 @@ function reindex(context) {
     });
 }
 
+function reindexScope(context, scope) {
+    console.log({ reindexScope: scope });
+    const relativeTagsPath = getConfiguration(scope).get("path");
+    console.log({ relativeTagsPath });
+}
+
 function toSymbolKind(kind) {
     switch (kind) {
         case "class": return vscode.SymbolKind.Class;
@@ -179,6 +191,10 @@ function toSymbolKind(kind) {
         case "member": return vscode.SymbolKind.Method;
         case "variable": return vscode.SymbolKind.Variable;
     }
+}
+
+function getConfiguration(scope) {
+    return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
 }
 
 exports.activate = activate;
