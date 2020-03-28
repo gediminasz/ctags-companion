@@ -70,32 +70,34 @@ function activate(context) {
         )
     );
 
-    // todo
-    // context.subscriptions.push(
-    //     vscode.languages.registerWorkspaceSymbolProvider(
-    //         {
-    //             provideWorkspaceSymbols: async (query) => {
-    //                 if (!query) return;
+    context.subscriptions.push(
+        vscode.languages.registerWorkspaceSymbolProvider(
+            {
+                provideWorkspaceSymbols: async (query) => {
+                    if (!query) return;
 
-    //                 const index = await getIndex(context);
-    //                 return Object.entries(index)
-    //                     .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
-    //                     .flatMap(([_, definitions]) => definitions)
-    //                     .map(({ symbol, file, line, kind, container }) =>
-    //                         new vscode.SymbolInformation(
-    //                             symbol,
-    //                             toSymbolKind(kind),
-    //                             container,
-    //                             new vscode.Location(
-    //                                 vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
-    //                                 new vscode.Position(line, 0)
-    //                             )
-    //                         )
-    //                     );
-    //             }
-    //         }
-    //     )
-    // );
+                    const indexes = await getIndexes(context);
+
+                    return Object.entries(indexes).flatMap(([rootPath, { workspaceIndex }]) =>
+                        Object.entries(workspaceIndex)
+                            .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
+                            .flatMap(([_, definitions]) => definitions)
+                            .map(({ symbol, file, line, kind, container }) =>
+                                new vscode.SymbolInformation(
+                                    symbol,
+                                    toSymbolKind(kind),
+                                    container,
+                                    new vscode.Location(
+                                        vscode.Uri.file(path.join(rootPath, file)),
+                                        new vscode.Position(line, 0)
+                                    )
+                                )
+                            )
+                    );
+                }
+            }
+        )
+    );
 
     vscode.workspace.workspaceFolders.forEach(scope =>
         context.subscriptions.push(
