@@ -4,6 +4,7 @@ const readline = require('readline');
 const vscode = require('vscode');
 
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
+const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 
 const EXTENSION_NAME = "Ctags Companion";
 const EXTENSION_ID = "ctags-companion";
@@ -26,28 +27,7 @@ function activate(context) {
     context.subscriptions.push(
         vscode.languages.registerDocumentSymbolProvider(
             documentSelector,
-            {
-                provideDocumentSymbols: async (document) => {
-                    const relativePath = vscode.workspace.asRelativePath(document.uri, false);
-                    const scope = determineScope(document);
-                    const { documentIndex } = await getIndexForScope(context, scope);
-
-                    const definitions = documentIndex[relativePath];
-                    if (!definitions) return;
-
-                    return definitions.map(({ symbol, file, line, kind, container }) =>
-                        new vscode.SymbolInformation(
-                            symbol,
-                            toSymbolKind(kind),
-                            container,
-                            new vscode.Location(
-                                vscode.Uri.file(path.join(scope.uri.fsPath, file)),
-                                new vscode.Position(line, 0)
-                            )
-                        )
-                    );
-                }
-            },
+            new CtagsDocumentSymbolProvider(context),
             { label: EXTENSION_NAME }
         )
     );
@@ -178,10 +158,6 @@ function toSymbolKind(kind) {
 
 function getConfiguration(scope) {
     return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
-}
-
-function determineScope(document) {
-    return vscode.workspace.workspaceFolders.find(scope => document.uri.fsPath.includes(scope.uri.fsPath));
 }
 
 exports.activate = activate;

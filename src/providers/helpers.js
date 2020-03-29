@@ -12,4 +12,13 @@ async function getIndexForScope(context, scope) {
     return context.workspaceState.get("indexes")[path];
 }
 
-module.exports = { determineScope, getIndexForScope };
+function toSymbolKind(kind) {
+    switch (kind) {
+        case "class": return vscode.SymbolKind.Class;
+        case "function": return vscode.SymbolKind.Function;
+        case "member": return vscode.SymbolKind.Method;
+        case "variable": return vscode.SymbolKind.Variable;
+    }
+}
+
+module.exports = { determineScope, getIndexForScope, toSymbolKind };
