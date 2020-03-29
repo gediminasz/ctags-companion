@@ -26,12 +26,14 @@
                 "ctags-companion.command": {
                     "type": "string",
                     "default": "ctags -R --fields=+nKz -f .vscode/.tags",
-                    "description": "Command to generate the tags file"
+                    "description": "Command to generate the tags file",
+                    "scope": "resource"
                 },
                 "ctags-companion.path": {
                     "type": "string",
                     "default": ".vscode/.tags",
-                    "description": "Location of the ctags file"
+                    "description": "Location of the ctags file",
+                    "scope": "resource"
                 },
                 "ctags-companion.documentSelector": {
                     "default": {

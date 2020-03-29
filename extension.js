@@ -20,14 +20,15 @@ function activate(context) {
             {
                 provideDefinition: async (document, position) => {
                     const symbol = document.getText(document.getWordRangeAtPosition(position));
-                    const index = await getIndex(context);
-                    const results = index[symbol];
+                    const scope = determineScope(document);
+                    const { symbolIndex } = await getIndexForScope(context, scope);
 
-                    if (!results) return;
+                    const definitions = symbolIndex[symbol];
+                    if (!definitions) return;
 
-                    return results.map(({ file, line }) =>
+                    return definitions.map(({ file, line }) =>
                         new vscode.Location(
-                            vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
+                            vscode.Uri.file(path.join(scope.uri.fsPath, file)),
                             new vscode.Position(line, 0)
                         )
                     );
@@ -41,16 +42,20 @@ function activate(context) {
             documentSelector,
             {
                 provideDocumentSymbols: async (document) => {
-                    const relativePath = vscode.workspace.asRelativePath(document.uri);
-                    const definitions = (await getDocumentIndex(context))[relativePath];
+                    const relativePath = vscode.workspace.asRelativePath(document.uri, false);
+                    const scope = determineScope(document);
+                    const { documentIndex } = await getIndexForScope(context, scope);
+
+                    const definitions = documentIndex[relativePath];
                     if (!definitions) return;
+
                     return definitions.map(({ symbol, file, line, kind, container }) =>
                         new vscode.SymbolInformation(
                             symbol,
                             toSymbolKind(kind),
                             container,
                             new vscode.Location(
-                                vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
+                                vscode.Uri.file(path.join(scope.uri.fsPath, file)),
                                 new vscode.Position(line, 0)
                             )
                         )
@@ -67,79 +72,82 @@ function activate(context) {
                 provideWorkspaceSymbols: async (query) => {
                     if (!query) return;
 
-                    const index = await getIndex(context);
-                    return Object.entries(index)
-                        .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
-                        .flatMap(([_, definitions]) => definitions)
-                        .map(({ symbol, file, line, kind, container }) =>
-                            new vscode.SymbolInformation(
-                                symbol,
-                                toSymbolKind(kind),
-                                container,
-                                new vscode.Location(
-                                    vscode.Uri.file(vscode.workspace.rootPath + "/" + file),
-                                    new vscode.Position(line, 0)
+                    const indexes = await Promise.all(
+                        vscode.workspace.workspaceFolders.map(
+                            async scope => [scope, await getIndexForScope(context, scope)]
+                        )
+                    );
+
+                    return indexes.flatMap(([scope, { symbolIndex }]) => {
+                        return Object.entries(symbolIndex)
+                            .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
+                            .flatMap(([_, definitions]) => definitions)
+                            .map(({ symbol, file, line, kind, container }) =>
+                                new vscode.SymbolInformation(
+                                    symbol,
+                                    toSymbolKind(kind),
+                                    container,
+                                    new vscode.Location(
+                                        vscode.Uri.file(path.join(scope.uri.fsPath, file)),
+                                        new vscode.Position(line, 0)
+                                    )
                                 )
-                            )
-                        );
+                            );
+                    });
                 }
             }
         )
     );
 
-    context.subscriptions.push(
-        vscode.tasks.registerTaskProvider("shell", {
-            provideTasks: () => {
-                const command = vscode.workspace.getConfiguration(EXTENSION_ID).get("command");
-                const task = new vscode.Task(
-                    { type: "shell" },
-                    vscode.TaskScope.Workspace,
-                    TASK_NAME,
-                    EXTENSION_NAME,
-                    new vscode.ShellExecution(command),
-                    []
-                );
-                task.presentationOptions.reveal = false;
-                return [task];
-            },
-            resolveTask: (task) => task
-        })
-    );
+    vscode.workspace.workspaceFolders.forEach(scope =>
+        context.subscriptions.push(
+            vscode.tasks.registerTaskProvider("shell", {
+                provideTasks: () => {
+                    const command = getConfiguration(scope).get("command");
+                    const task = new vscode.Task(
+                        { type: "shell" },
+                        scope,
+                        TASK_NAME,
+                        EXTENSION_NAME,
+                        new vscode.ShellExecution(command),
+                        []
+                    );
+                    task.presentationOptions.reveal = false;
+                    return [task];
+                },
+                resolveTask: (task) => task
+            })
+        ));
 
     vscode.tasks.onDidEndTask(event => {
-        const { source, name } = event.execution.task;
-        if (source == EXTENSION_NAME && name == TASK_NAME) reindex(context);
+        const { source, name, scope } = event.execution.task;
+        if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(context, scope);
     });
 }
 
-async function getIndex(context) {
-    const index = context.workspaceState.get("index");
-    if (!index) await reindex(context);
-    return context.workspaceState.get("index");
+async function getIndexForScope(context, scope) {
+    const indexes = context.workspaceState.get("indexes");
+    const path = scope.uri.fsPath;
+    const isScopeIndexed = indexes && indexes.hasOwnProperty(path);
+    if (!isScopeIndexed) await reindexScope(context, scope);
+    return context.workspaceState.get("indexes")[path];
 }
 
-async function getDocumentIndex(context) {
-    const index = context.workspaceState.get("documentIndex");
-    if (!index) await reindex(context);
-    return context.workspaceState.get("documentIndex");
-}
-
-function reindex(context) {
-    const relativeTagsPath = vscode.workspace.getConfiguration(EXTENSION_ID).get("path");
-    const tagsPath = path.join(vscode.workspace.rootPath, relativeTagsPath);
+function reindexScope(context, scope) {
+    const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
-        vscode.window.showErrorMessage(`Ctags Companion reindex failed: file ${relativeTagsPath} not found`);
+        vscode.window.showErrorMessage(`Ctags Companion: file ${tagsPath} not found`);
         return;
     }
 
     return new Promise(resolve => {
-        const statusBarMessage = vscode.window.setStatusBarMessage("Ctags Companion: reindexing...");
+        const statusBarMessage = vscode.window.setStatusBarMessage(`Ctags Companion: reindexing ${scope.name}...`);
 
         const input = fs.createReadStream(tagsPath);
         const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity });
 
-        const index = {};
+        const symbolIndex = {};
         const documentIndex = {};
 
         reader.on("line", (line) => {
@@ -155,16 +163,17 @@ function reindex(context) {
 
             const definition = { symbol, file, line: lineNumber, kind, container: containerName };
 
-            if (!index.hasOwnProperty(symbol)) index[symbol] = [];
-            index[symbol].push(definition);
+            if (!symbolIndex.hasOwnProperty(symbol)) symbolIndex[symbol] = [];
+            symbolIndex[symbol].push(definition);
 
             if (!documentIndex.hasOwnProperty(file)) documentIndex[file] = [];
             documentIndex[file].push(definition);
         });
 
         reader.on("close", () => {
-            context.workspaceState.update("index", index);
-            context.workspaceState.update("documentIndex", documentIndex);
+            const indexes = context.workspaceState.get("indexes") || {};
+            indexes[scope.uri.fsPath] = { symbolIndex, documentIndex };
+            context.workspaceState.update("indexes", indexes);
 
             statusBarMessage.dispose();
             resolve();
@@ -181,8 +190,13 @@ function toSymbolKind(kind) {
     }
 }
 
-exports.activate = activate;
+function getConfiguration(scope) {
+    return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
+}
 
-module.exports = {
-    activate
-};
+function determineScope(document) {
+    return vscode.workspace.workspaceFolders.find(scope => document.uri.fsPath.includes(scope.uri.fsPath));
+}
+
+exports.activate = activate;
+module.exports = { activate };
