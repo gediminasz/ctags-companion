@@ -3,6 +3,8 @@ const path = require('path');
 const readline = require('readline');
 const vscode = require('vscode');
 
+const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
+
 const EXTENSION_NAME = "Ctags Companion";
 const EXTENSION_ID = "ctags-companion";
 const TASK_NAME = "rebuild ctags";
@@ -17,23 +19,7 @@ function activate(context) {
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
             documentSelector,
-            {
-                provideDefinition: async (document, position) => {
-                    const symbol = document.getText(document.getWordRangeAtPosition(position));
-                    const scope = determineScope(document);
-                    const { symbolIndex } = await getIndexForScope(context, scope);
-
-                    const definitions = symbolIndex[symbol];
-                    if (!definitions) return;
-
-                    return definitions.map(({ file, line }) =>
-                        new vscode.Location(
-                            vscode.Uri.file(path.join(scope.uri.fsPath, file)),
-                            new vscode.Position(line, 0)
-                        )
-                    );
-                }
-            }
+            new CtagsDefinitionProvider(context)
         )
     );
 

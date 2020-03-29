@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/gediminasz/ctags-companion"
     },
-    "version": "2020.3.2",
+    "version": "2020.4.0-beta",
     "engines": {
         "vscode": "^1.42.0"
     },
@@ -17,7 +17,7 @@
     "activationEvents": [
         "*"
     ],
-    "main": "./extension.js",
+    "main": "./src/extension.js",
     "contributes": {
         "configuration": {
             "type": "object",
