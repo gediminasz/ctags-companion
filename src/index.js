@@ -1,3 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+const readline = require('readline');
+const vscode = require('vscode');
+
+const { getConfiguration } = require("./helpers");
+
 async function getIndexForScope(context, scope) {
     const indexes = context.workspaceState.get("indexes");
     const path = scope.uri.fsPath;

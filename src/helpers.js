@@ -1,7 +1,13 @@
 const vscode = require("vscode");
 
+const { EXTENSION_ID } = require("./constants");
+
 function determineScope(document) {
     return vscode.workspace.workspaceFolders.find(scope => document.uri.fsPath.includes(scope.uri.fsPath));
+}
+
+function getConfiguration(scope) {
+    return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
 }
 
 function toSymbolKind(kind) {
@@ -13,4 +19,4 @@ function toSymbolKind(kind) {
     }
 }
 
-module.exports = { determineScope, toSymbolKind };
+module.exports = { determineScope, getConfiguration, toSymbolKind };

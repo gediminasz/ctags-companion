@@ -1,7 +1,7 @@
 const path = require('path');
 const vscode = require("vscode");
 
-const { determineScope } = require("./helpers");
+const { determineScope } = require("../helpers");
 const { getIndexForScope } = require("../index");
 
 class CtagsDefinitionProvider {
