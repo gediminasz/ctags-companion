@@ -1,7 +1,8 @@
 const path = require('path');
 const vscode = require("vscode");
 
-const { getIndexForScope, toSymbolKind } = require("./helpers");
+const { toSymbolKind } = require("./helpers");
+const { getIndexForScope } = require("../index");
 
 class CtagsWorkspaceSymbolProvider {
     constructor(context) {
