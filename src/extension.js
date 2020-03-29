@@ -5,6 +5,7 @@ const vscode = require('vscode');
 
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
+const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
 
 const EXTENSION_NAME = "Ctags Companion";
 const EXTENSION_ID = "ctags-companion";
@@ -34,34 +35,7 @@ function activate(context) {
 
     context.subscriptions.push(
         vscode.languages.registerWorkspaceSymbolProvider(
-            {
-                provideWorkspaceSymbols: async (query) => {
-                    if (!query) return;
-
-                    const indexes = await Promise.all(
-                        vscode.workspace.workspaceFolders.map(
-                            async scope => [scope, await getIndexForScope(context, scope)]
-                        )
-                    );
-
-                    return indexes.flatMap(([scope, { symbolIndex }]) => {
-                        return Object.entries(symbolIndex)
-                            .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
-                            .flatMap(([_, definitions]) => definitions)
-                            .map(({ symbol, file, line, kind, container }) =>
-                                new vscode.SymbolInformation(
-                                    symbol,
-                                    toSymbolKind(kind),
-                                    container,
-                                    new vscode.Location(
-                                        vscode.Uri.file(path.join(scope.uri.fsPath, file)),
-                                        new vscode.Position(line, 0)
-                                    )
-                                )
-                            );
-                    });
-                }
-            }
+            new CtagsWorkspaceSymbolProvider(context)
         )
     );
 
@@ -89,14 +63,6 @@ function activate(context) {
         const { source, name, scope } = event.execution.task;
         if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(context, scope);
     });
-}
-
-async function getIndexForScope(context, scope) {
-    const indexes = context.workspaceState.get("indexes");
-    const path = scope.uri.fsPath;
-    const isScopeIndexed = indexes && indexes.hasOwnProperty(path);
-    if (!isScopeIndexed) await reindexScope(context, scope);
-    return context.workspaceState.get("indexes")[path];
 }
 
 function reindexScope(context, scope) {
@@ -145,15 +111,6 @@ function reindexScope(context, scope) {
             resolve();
         });
     });
-}
-
-function toSymbolKind(kind) {
-    switch (kind) {
-        case "class": return vscode.SymbolKind.Class;
-        case "function": return vscode.SymbolKind.Function;
-        case "member": return vscode.SymbolKind.Method;
-        case "variable": return vscode.SymbolKind.Variable;
-    }
 }
 
 function getConfiguration(scope) {
