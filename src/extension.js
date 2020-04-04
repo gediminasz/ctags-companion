@@ -3,12 +3,14 @@ const vscode = require('vscode');
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
-const { reindexScope } = require("./index");
-const { getConfiguration } = require("./helpers");
 const { EXTENSION_ID, EXTENSION_NAME, TASK_NAME } = require("./constants");
-
+const { getConfiguration } = require("./helpers");
+const { reindexScope } = require("./index");
+const { runTests } = require("./tests");
 
 function activate(context) {
+    if (process.env.CTAGS_COMPANION_TEST) runTests(context);
+
     const documentSelector = vscode.workspace.getConfiguration(EXTENSION_ID).get("documentSelector");
 
     context.subscriptions.push(
