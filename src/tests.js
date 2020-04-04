@@ -3,6 +3,7 @@ const vscode = require("vscode");
 
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
+const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
 
 async function runTests(context) {
     console.log("Running tests...");
@@ -10,6 +11,7 @@ async function runTests(context) {
 
     testCtagsDefinitionProvider(context, document);
     testCtagsDocumentSymbolProvider(context, document);
+    testCtagsWorkspaceSymbolProvider(context);
 }
 
 async function testCtagsDefinitionProvider(context, document) {
@@ -41,8 +43,6 @@ async function testCtagsDocumentSymbolProvider(context, document) {
 
     const definitions = await provider.provideDocumentSymbols(document);
 
-    console.log({ definitions });
-
     assert(() => definitions.length == 4);
 
     assert(() => definitions[0].name === "KONSTANT");
@@ -66,7 +66,32 @@ async function testCtagsDocumentSymbolProvider(context, document) {
     assert(() => definitions[3].location.range.start.line === 8);
 }
 
+async function testCtagsWorkspaceSymbolProvider(context) {
+    const provider = new CtagsWorkspaceSymbolProvider(context);
 
+    const definitionsForBlankQuery = await provider.provideWorkspaceSymbols("");
+    assert(() => definitionsForBlankQuery === undefined);
+
+    const definitionsForExactMatch = await provider.provideWorkspaceSymbols("Klass");
+    assert(() => definitionsForExactMatch.length === 1);
+    assert(() => definitionsForExactMatch[0].name === "Klass");
+    assert(() => definitionsForExactMatch[0].kind === vscode.SymbolKind.Class);
+    assert(() => definitionsForExactMatch[0].location.uri.path.endsWith("source.py"));
+    assert(() => definitionsForExactMatch[0].location.range.start.line === 7);
+
+    const definitionsForPartialMatch = await provider.provideWorkspaceSymbols("kla");
+    assert(() => definitionsForPartialMatch.length === 1);
+    assert(() => definitionsForPartialMatch[0].name === "Klass");
+    assert(() => definitionsForPartialMatch[0].kind === vscode.SymbolKind.Class);
+    assert(() => definitionsForPartialMatch[0].location.uri.path.endsWith("source.py"));
+    assert(() => definitionsForPartialMatch[0].location.range.start.line === 7);
+
+    const definitionsForMultipleMatches = await provider.provideWorkspaceSymbols("k");
+    assert(() => definitionsForMultipleMatches.every(({ name }) => ["KONSTANT", "Klass", "funktion"].includes(name)));
+
+    const definitionsForUnknownMatch = await provider.provideWorkspaceSymbols("unknown");
+    assert(() => definitionsForUnknownMatch.length === 0);
+}
 
 function assert(condition) {
     if (condition()) {
