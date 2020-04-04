@@ -14,24 +14,34 @@ async function testCtagsDefinitionProvider(context, document) {
     const provider = new CtagsDefinitionProvider(context);
 
     // KONSTANT
-    const [konstanceDefinition] = await provider.provideDefinition(document, new vscode.Position(9, 21));
-    console.assert(konstanceDefinition.uri.path.endsWith("source.py"));
-    console.assert(konstanceDefinition.range.start.line === 0);
+    const [konstantDefinition] = await provider.provideDefinition(document, new vscode.Position(9, 21));
+    assert(() => konstantDefinition.uri.path.endsWith("source.py"));
+    assert(() => konstantDefinition.range.start.line === 0);
 
     // funktion
     const [funktionDefinition] = await provider.provideDefinition(document, new vscode.Position(9, 12));
-    console.assert(funktionDefinition.uri.path.endsWith("source.py"));
-    console.assert(funktionDefinition.range.start.line === 3);
+    assert(() => funktionDefinition.uri.path.endsWith("source.py"));
+    assert(() => funktionDefinition.range.start.line === 3);
 
     // Klass
     const [klassDefinition] = await provider.provideDefinition(document, new vscode.Position(12, 3));
-    console.assert(klassDefinition.uri.path.endsWith("source.py"));
-    console.assert(klassDefinition.range.start.line === 7);
+    assert(() => klassDefinition.uri.path.endsWith("source.py"));
+    assert(() => klassDefinition.range.start.line === 7);
 
     // method
     const [methodDefinition] = await provider.provideDefinition(document, new vscode.Position(12, 8));
-    console.assert(methodDefinition.uri.path.endsWith("source.py"));
-    console.assert(methodDefinition.range.start.line === 8);
+    assert(() => methodDefinition.uri.path.endsWith("source.py"));
+    assert(() => methodDefinition.range.start.line === 8);
+}
+
+function assert(condition) {
+    console.count("test");
+    if (condition()) {
+        console.count("pass");
+    } else {
+        console.count("fail");
+        console.error("Assertion failed: ", condition.toString());
+    }
 }
 
 module.exports = {
