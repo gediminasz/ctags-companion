@@ -13,6 +13,19 @@
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ]
+        },
+        {
+            "name": "Test Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "${workspaceFolder}/test_projects/python"
+            ],
+            "env": {
+                "CTAGS_COMPANION_TEST": "1"
+            }
         }
     ]
 }
