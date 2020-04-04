@@ -7,7 +7,10 @@ const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_sy
 
 async function runTests(context) {
     console.log("Running tests...");
-    const document = await vscode.workspace.openTextDocument(path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, "source.py"));
+
+    const document = await vscode.workspace.openTextDocument(
+        path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, "source.py")
+    );
 
     testCtagsDefinitionProvider(context, document);
     testCtagsDocumentSymbolProvider(context, document);
