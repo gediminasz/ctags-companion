@@ -1,5 +1,9 @@
 # Change Log
 
+## 2020.4.2
+
+- Really fixed broken "reindex" command.
+
 ## 2020.4.1
 
 - Fixed broken "reindex" command.

@@ -13,7 +13,7 @@ function activate(context) {
 
     const documentSelector = vscode.workspace.getConfiguration(EXTENSION_ID).get("documentSelector");
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, reindexAll));
+    context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(context)));
 
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
