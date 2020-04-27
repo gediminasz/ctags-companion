@@ -6,5 +6,5 @@
 !_TAG_PROGRAM_VERSION	5.8	//
 KONSTANT	source.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:1
 Klass	source.py	/^class Klass:$/;"	kind:class	line:8
-funktion	source.py	/^def funktion():$/;"	kind:function	line:4
+funktion	source.py	/^def funktion(value):$/;"	kind:function	line:4
 method	source.py	/^    def method(self):$/;"	kind:member	line:9	class:Klass

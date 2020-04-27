@@ -4,6 +4,7 @@ const vscode = require("vscode");
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
+const { reindexAll } = require("./index");
 
 async function runTests(context) {
     console.log("Running tests...");
@@ -15,6 +16,7 @@ async function runTests(context) {
     testCtagsDefinitionProvider(context, document);
     testCtagsDocumentSymbolProvider(context, document);
     testCtagsWorkspaceSymbolProvider(context);
+    testReindexAll(context);
 }
 
 async function testCtagsDefinitionProvider(context, document) {
@@ -93,6 +95,13 @@ async function testCtagsWorkspaceSymbolProvider(context) {
 
     const definitionsForUnknownMatch = await provider.provideWorkspaceSymbols("unknown");
     assert(() => definitionsForUnknownMatch.length === 0);
+}
+
+async function testReindexAll(context) {
+    context.workspaceState.update("indexes", null);
+    assert(() => context.workspaceState.get("indexes") === null);
+    await reindexAll(context);
+    assert(() => context.workspaceState.get("indexes") !== null);
 }
 
 function assert(condition) {

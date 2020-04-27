@@ -13,6 +13,10 @@ async function getIndexForScope(context, scope) {
     return context.workspaceState.get("indexes")[path];
 }
 
+async function reindexAll(context) {
+    await Promise.all(vscode.workspace.workspaceFolders.map(scope => reindexScope(context, scope)));
+}
+
 function reindexScope(context, scope) {
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
@@ -61,4 +65,4 @@ function reindexScope(context, scope) {
     });
 }
 
-module.exports = { getIndexForScope, reindexScope };
+module.exports = { getIndexForScope, reindexAll, reindexScope };

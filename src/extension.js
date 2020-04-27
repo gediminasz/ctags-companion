@@ -5,7 +5,7 @@ const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symb
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
 const { EXTENSION_ID, EXTENSION_NAME, TASK_NAME } = require("./constants");
 const { getConfiguration } = require("./helpers");
-const { reindexScope } = require("./index");
+const { reindexAll, reindexScope } = require("./index");
 const { runTests } = require("./tests");
 
 function activate(context) {
@@ -13,9 +13,7 @@ function activate(context) {
 
     const documentSelector = vscode.workspace.getConfiguration(EXTENSION_ID).get("documentSelector");
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindex(context))
-    );
+    context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, reindexAll));
 
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
