@@ -5,19 +5,19 @@ const vscode = require('vscode');
 
 const { getConfiguration } = require("./helpers");
 
-async function getIndexForScope(context, scope) {
-    const indexes = context.workspaceState.get("indexes");
+async function getIndexForScope(stash, scope) {
+    const indexes = stash.context.workspaceState.get("indexes");
     const path = scope.uri.fsPath;
     const isScopeIndexed = indexes && indexes.hasOwnProperty(path);
-    if (!isScopeIndexed) await reindexScope(context, scope);
-    return context.workspaceState.get("indexes")[path];
+    if (!isScopeIndexed) await reindexScope(stash, scope);
+    return stash.context.workspaceState.get("indexes")[path];
 }
 
-async function reindexAll(context) {
-    await Promise.all(vscode.workspace.workspaceFolders.map(scope => reindexScope(context, scope)));
+async function reindexAll(stash) {
+    await Promise.all(vscode.workspace.workspaceFolders.map(scope => reindexScope(stash, scope)));
 }
 
-function reindexScope(context, scope) {
+function reindexScope(stash, scope) {
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
@@ -55,9 +55,9 @@ function reindexScope(context, scope) {
         });
 
         reader.on("close", () => {
-            const indexes = context.workspaceState.get("indexes") || {};
+            const indexes = stash.context.workspaceState.get("indexes") || {};
             indexes[scope.uri.fsPath] = { symbolIndex, documentIndex };
-            context.workspaceState.update("indexes", indexes);
+            stash.context.workspaceState.update("indexes", indexes);
 
             statusBarMessage.dispose();
             resolve();

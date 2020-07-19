@@ -6,21 +6,21 @@ const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symb
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
 const { reindexAll } = require("./index");
 
-async function runTests(context) {
+async function runTests(stash) {
     console.log("Running tests...");
 
     const document = await vscode.workspace.openTextDocument(
         path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, "source.py")
     );
 
-    testCtagsDefinitionProvider(context, document);
-    testCtagsDocumentSymbolProvider(context, document);
-    testCtagsWorkspaceSymbolProvider(context);
-    testReindexAll(context);
+    testCtagsDefinitionProvider(stash, document);
+    testCtagsDocumentSymbolProvider(stash, document);
+    testCtagsWorkspaceSymbolProvider(stash);
+    testReindexAll(stash);
 }
 
-async function testCtagsDefinitionProvider(context, document) {
-    const provider = new CtagsDefinitionProvider(context);
+async function testCtagsDefinitionProvider(stash, document) {
+    const provider = new CtagsDefinitionProvider(stash);
 
     const [konstantDefinition] = await provider.provideDefinition(document, new vscode.Position(9, 21));
     assert(() => konstantDefinition.uri.path.endsWith("source.py"));
@@ -42,8 +42,8 @@ async function testCtagsDefinitionProvider(context, document) {
     assert(() => printDefinitions === undefined);
 }
 
-async function testCtagsDocumentSymbolProvider(context, document) {
-    const provider = new CtagsDocumentSymbolProvider(context);
+async function testCtagsDocumentSymbolProvider(stash, document) {
+    const provider = new CtagsDocumentSymbolProvider(stash);
 
     const definitions = await provider.provideDocumentSymbols(document);
 
@@ -70,8 +70,8 @@ async function testCtagsDocumentSymbolProvider(context, document) {
     assert(() => definitions[3].location.range.start.line === 8);
 }
 
-async function testCtagsWorkspaceSymbolProvider(context) {
-    const provider = new CtagsWorkspaceSymbolProvider(context);
+async function testCtagsWorkspaceSymbolProvider(stash) {
+    const provider = new CtagsWorkspaceSymbolProvider(stash);
 
     const definitionsForBlankQuery = await provider.provideWorkspaceSymbols("");
     assert(() => definitionsForBlankQuery === undefined);
@@ -97,11 +97,11 @@ async function testCtagsWorkspaceSymbolProvider(context) {
     assert(() => definitionsForUnknownMatch.length === 0);
 }
 
-async function testReindexAll(context) {
-    context.workspaceState.update("indexes", null);
-    assert(() => context.workspaceState.get("indexes") === null);
-    await reindexAll(context);
-    assert(() => context.workspaceState.get("indexes") !== null);
+async function testReindexAll(stash) {
+    stash.context.workspaceState.update("indexes", null);
+    assert(() => stash.context.workspaceState.get("indexes") === null);
+    await reindexAll(stash);
+    assert(() => stash.context.workspaceState.get("indexes") !== null);
 }
 
 function assert(condition) {
@@ -110,6 +110,7 @@ function assert(condition) {
     } else {
         console.count("fail");
         console.error("FAIL: ", condition.toString());
+        vscode.window.showErrorMessage(`FAIL: ${condition.toString()}`);
     }
 }
 
