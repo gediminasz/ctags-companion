@@ -11,6 +11,7 @@ const { runTests } = require("./tests");
 class Stash {
     constructor(context) {
         this.context = context;
+        this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     }
 }
 
@@ -20,6 +21,8 @@ function activate(context) {
     if (process.env.CTAGS_COMPANION_TEST) runTests(stash);
 
     const documentSelector = vscode.workspace.getConfiguration(EXTENSION_ID).get("documentSelector");
+
+    context.subscriptions.push(stash.statusBarItem);
 
     context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(stash)));
 

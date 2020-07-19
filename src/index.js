@@ -21,12 +21,14 @@ function reindexScope(stash, scope) {
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
-        vscode.window.showErrorMessage(`Ctags Companion: file ${tagsPath} not found`);
+        stash.statusBarItem.text = `$(warning) Ctags Companion: file ${getConfiguration(scope).get("path")} not found`;
+        stash.statusBarItem.show();
         return;
     }
 
     return new Promise(resolve => {
-        const statusBarMessage = vscode.window.setStatusBarMessage(`Ctags Companion: reindexing ${scope.name}...`);
+        stash.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
+        stash.statusBarItem.show();
 
         const input = fs.createReadStream(tagsPath);
         const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity });
@@ -59,7 +61,7 @@ function reindexScope(stash, scope) {
             indexes[scope.uri.fsPath] = { symbolIndex, documentIndex };
             stash.context.workspaceState.update("indexes", indexes);
 
-            statusBarMessage.dispose();
+            stash.statusBarItem.hide();
             resolve();
         });
     });

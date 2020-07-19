@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Changed missing ctags file notification to be less annoying.
+
 ## 2020.4.2
 
 - Really fixed broken "reindex" command.
