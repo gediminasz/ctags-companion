@@ -8,31 +8,39 @@ const { getConfiguration } = require("./helpers");
 const { reindexAll, reindexScope } = require("./index");
 const { runTests } = require("./tests");
 
+class Stash {
+    constructor(context) {
+        this.context = context;
+    }
+}
+
 function activate(context) {
-    if (process.env.CTAGS_COMPANION_TEST) runTests(context);
+    const stash = new Stash(context);
+
+    if (process.env.CTAGS_COMPANION_TEST) runTests(stash);
 
     const documentSelector = vscode.workspace.getConfiguration(EXTENSION_ID).get("documentSelector");
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(context)));
+    context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(stash)));
 
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
             documentSelector,
-            new CtagsDefinitionProvider(context)
+            new CtagsDefinitionProvider(stash)
         )
     );
 
     context.subscriptions.push(
         vscode.languages.registerDocumentSymbolProvider(
             documentSelector,
-            new CtagsDocumentSymbolProvider(context),
+            new CtagsDocumentSymbolProvider(stash),
             { label: EXTENSION_NAME }
         )
     );
 
     context.subscriptions.push(
         vscode.languages.registerWorkspaceSymbolProvider(
-            new CtagsWorkspaceSymbolProvider(context)
+            new CtagsWorkspaceSymbolProvider(stash)
         )
     );
 
@@ -58,7 +66,7 @@ function activate(context) {
 
     vscode.tasks.onDidEndTask(event => {
         const { source, name, scope } = event.execution.task;
-        if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(context, scope);
+        if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(stash, scope);
     });
 }
 
