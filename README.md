@@ -10,7 +10,7 @@ A Visual Studio Code symbols provider based on Ctags.
 
 ## Usage
 
-To create a ctags file and index it invoke the "rebuild ctags" task (Terminal > Run Task... and select "Ctags Companion: rebuild ctags"). The task will trigger a "reindex" command which will read the generated file and create a symbol index in memory. After that's done, symbol definitions should become available in the editor.
+To create a ctags file and index it invoke the "rebuild ctags" task (Terminal > Run Task... and select "Ctags Companion: rebuild ctags"). You may need to ensure `.vscode` directory is present in your project. On completion the task will trigger a "reindex" command which will read the tags file and create a symbol index in memory. After that's done, symbol definitions should become available in the editor.
 
 ## Settings
 

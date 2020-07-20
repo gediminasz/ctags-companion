@@ -21,7 +21,10 @@ function reindexScope(stash, scope) {
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
-        stash.statusBarItem.text = `$(warning) Ctags Companion: file ${getConfiguration(scope).get("path")} not found`;
+        stash.statusBarItem.text = (
+            `$(warning) Ctags Companion: file ${getConfiguration(scope).get("path")} not found, ` +
+            'you may need rerun "rebuild ctags" task'
+        );
         stash.statusBarItem.show();
         return;
     }
