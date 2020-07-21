@@ -23,7 +23,7 @@ class CtagsDocumentSymbolProvider {
                 toSymbolKind(kind),
                 container,
                 new vscode.Location(
-                    vscode.Uri.file(path.join(scope.uri.fsPath, file)),
+                    vscode.Uri.joinPath(scope.uri, file),
                     new vscode.Position(line, 0)
                 )
             )

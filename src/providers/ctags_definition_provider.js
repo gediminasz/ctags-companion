@@ -19,7 +19,7 @@ class CtagsDefinitionProvider {
 
         return definitions.map(({ file, line }) =>
             new vscode.Location(
-                vscode.Uri.file(path.join(scope.uri.fsPath, file)),
+                vscode.Uri.joinPath(scope.uri, file),
                 new vscode.Position(line, 0)
             )
         );
