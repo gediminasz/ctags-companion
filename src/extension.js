@@ -47,25 +47,27 @@ function activate(context) {
         )
     );
 
-    vscode.workspace.workspaceFolders.forEach(scope =>
-        context.subscriptions.push(
-            vscode.tasks.registerTaskProvider("shell", {
-                provideTasks: () => {
-                    const command = getConfiguration(scope).get("command");
-                    const task = new vscode.Task(
-                        { type: "shell" },
-                        scope,
-                        TASK_NAME,
-                        EXTENSION_NAME,
-                        new vscode.ShellExecution(command),
-                        []
-                    );
-                    task.presentationOptions.reveal = false;
-                    return [task];
-                },
-                resolveTask: (task) => task
-            })
-        ));
+    if (vscode.workspace.workspaceFolders) {
+        vscode.workspace.workspaceFolders.forEach(scope =>
+            context.subscriptions.push(
+                vscode.tasks.registerTaskProvider("shell", {
+                    provideTasks: () => {
+                        const command = getConfiguration(scope).get("command");
+                        const task = new vscode.Task(
+                            { type: "shell" },
+                            scope,
+                            TASK_NAME,
+                            EXTENSION_NAME,
+                            new vscode.ShellExecution(command),
+                            []
+                        );
+                        task.presentationOptions.reveal = false;
+                        return [task];
+                    },
+                    resolveTask: (task) => task
+                })
+            ));
+    }
 
     vscode.tasks.onDidEndTask(event => {
         const { source, name, scope } = event.execution.task;
