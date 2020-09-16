@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2020.9.0
 
 - Changed missing ctags file notification to be less annoying.
 
