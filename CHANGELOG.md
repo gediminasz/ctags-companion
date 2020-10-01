@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Added fuzzy matching to workspace symbol provider.
+
 ## 2020.9.0
 
 - Changed missing ctags file notification to be less annoying.

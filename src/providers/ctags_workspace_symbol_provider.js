@@ -17,9 +17,11 @@ class CtagsWorkspaceSymbolProvider {
             )
         );
 
+        const regexp = new RegExp('.*' + query.toLowerCase().split('').join('.*') + '.*');
+
         return indexes.flatMap(([scope, { symbolIndex }]) => {
             return Object.entries(symbolIndex)
-                .filter(([symbol]) => symbol.toLowerCase().includes(query.toLowerCase()))
+                .filter(([symbol]) => regexp.test(symbol.toLowerCase()))
                 .flatMap(([_, definitions]) => definitions)
                 .map(({ symbol, file, line, kind, container }) =>
                     new vscode.SymbolInformation(

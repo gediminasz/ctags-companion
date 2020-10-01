@@ -8,3 +8,4 @@ KONSTANT	source.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:1
 Klass	source.py	/^class Klass:$/;"	kind:class	line:8
 funktion	source.py	/^def funktion(value):$/;"	kind:function	line:4
 method	source.py	/^    def method(self):$/;"	kind:member	line:9	class:Klass
+method_with_underscores	source.py	/^    def method_with_underscores(self):$/;"	kind:member	line:12	class:Klass

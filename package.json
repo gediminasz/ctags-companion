@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/gediminasz/ctags-companion"
     },
-    "version": "2020.9.0",
+    "version": "2020.10.0-alpha",
     "engines": {
         "vscode": "^1.42.0"
     },

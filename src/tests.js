@@ -30,13 +30,17 @@ async function testCtagsDefinitionProvider(stash, document) {
     assert(() => funktionDefinition.uri.path.endsWith("source.py"));
     assert(() => funktionDefinition.range.start.line === 3);
 
-    const [klassDefinition] = await provider.provideDefinition(document, new vscode.Position(12, 3));
+    const [klassDefinition] = await provider.provideDefinition(document, new vscode.Position(15, 3));
     assert(() => klassDefinition.uri.path.endsWith("source.py"));
     assert(() => klassDefinition.range.start.line === 7);
 
-    const [methodDefinition] = await provider.provideDefinition(document, new vscode.Position(12, 8));
+    const [methodDefinition] = await provider.provideDefinition(document, new vscode.Position(15, 8));
     assert(() => methodDefinition.uri.path.endsWith("source.py"));
     assert(() => methodDefinition.range.start.line === 8);
+
+    const [methodWithUnderscoresDefinition] = await provider.provideDefinition(document, new vscode.Position(16, 16));
+    assert(() => methodWithUnderscoresDefinition.uri.path.endsWith("source.py"));
+    assert(() => methodWithUnderscoresDefinition.range.start.line === 11);
 
     const printDefinitions = await provider.provideDefinition(document, new vscode.Position(4, 7));
     assert(() => printDefinitions === undefined);
@@ -47,7 +51,7 @@ async function testCtagsDocumentSymbolProvider(stash, document) {
 
     const definitions = await provider.provideDocumentSymbols(document);
 
-    assert(() => definitions.length == 4);
+    assert(() => definitions.length == 5);
 
     assert(() => definitions[0].name === "KONSTANT");
     assert(() => definitions[0].kind === vscode.SymbolKind.Variable);
@@ -68,6 +72,11 @@ async function testCtagsDocumentSymbolProvider(stash, document) {
     assert(() => definitions[3].kind === vscode.SymbolKind.Method);
     assert(() => definitions[3].location.uri.path.endsWith("source.py"));
     assert(() => definitions[3].location.range.start.line === 8);
+
+    assert(() => definitions[4].name === "method_with_underscores");
+    assert(() => definitions[4].kind === vscode.SymbolKind.Method);
+    assert(() => definitions[4].location.uri.path.endsWith("source.py"));
+    assert(() => definitions[4].location.range.start.line === 11);
 }
 
 async function testCtagsWorkspaceSymbolProvider(stash) {
@@ -90,8 +99,15 @@ async function testCtagsWorkspaceSymbolProvider(stash) {
     assert(() => definitionsForPartialMatch[0].location.uri.path.endsWith("source.py"));
     assert(() => definitionsForPartialMatch[0].location.range.start.line === 7);
 
-    const definitionsForMultipleMatches = await provider.provideWorkspaceSymbols("k");
-    assert(() => definitionsForMultipleMatches.every(({ name }) => ["KONSTANT", "Klass", "funktion"].includes(name)));
+    const definitionsForMultipleMatches = (await provider.provideWorkspaceSymbols("k")).map(({ name }) => name);
+    assert(() => definitionsForMultipleMatches.toString() == "KONSTANT,Klass,funktion");
+
+    const definitionsForMethod = (await provider.provideWorkspaceSymbols("method")).map(({ name }) => name);
+    assert(() => definitionsForMethod.toString() == "method,method_with_underscores");
+
+    const definitionsForFuzzyQuery = (await provider.provideWorkspaceSymbols("mwu"));
+    assert(() => definitionsForFuzzyQuery.length === 1);
+    assert(() => definitionsForFuzzyQuery[0].name === "method_with_underscores");
 
     const definitionsForUnknownMatch = await provider.provideWorkspaceSymbols("unknown");
     assert(() => definitionsForUnknownMatch.length === 0);
