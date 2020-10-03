@@ -10,6 +10,15 @@ function getConfiguration(scope) {
     return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
 }
 
+function definitionToSymbolInformation({ symbol, file, line, kind, container }) {
+    return new vscode.SymbolInformation(
+        symbol,
+        toSymbolKind(kind),
+        container,
+        new vscode.Location(file, new vscode.Position(line, 0))
+    );
+}
+
 function toSymbolKind(kind) {
     switch (kind) {
         case "class": return vscode.SymbolKind.Class;
@@ -19,4 +28,4 @@ function toSymbolKind(kind) {
     }
 }
 
-module.exports = { determineScope, getConfiguration, toSymbolKind };
+module.exports = { determineScope, getConfiguration, definitionToSymbolInformation };

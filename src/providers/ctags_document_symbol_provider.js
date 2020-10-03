@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { determineScope, toSymbolKind } = require("../helpers");
+const { determineScope, definitionToSymbolInformation } = require("../helpers");
 const { getIndexForScope } = require("../index");
 
 class CtagsDocumentSymbolProvider {
@@ -14,19 +14,9 @@ class CtagsDocumentSymbolProvider {
         const { documentIndex } = await getIndexForScope(this.stash, scope);
 
         const definitions = documentIndex[relativePath];
-        if (!definitions) return;
-
-        return definitions.map(({ symbol, file, line, kind, container }) =>
-            new vscode.SymbolInformation(
-                symbol,
-                toSymbolKind(kind),
-                container,
-                new vscode.Location(
-                    vscode.Uri.joinPath(scope.uri, file),
-                    new vscode.Position(line, 0)
-                )
-            )
-        );
+        if (definitions) {
+            return definitions.map(definitionToSymbolInformation);
+        }
     }
 }
 
