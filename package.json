@@ -40,6 +40,11 @@
                         "scheme": "file"
                     },
                     "description": "Document selector object used when registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector"
+                },
+                "ctags-companion.fuzzyMatchingEnabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Should fuzzy matching be used in workspace symbols provider"
                 }
             }
         },

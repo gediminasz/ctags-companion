@@ -6,7 +6,7 @@ function determineScope(document) {
     return vscode.workspace.workspaceFolders.find(scope => document.uri.fsPath.includes(scope.uri.fsPath));
 }
 
-function getConfiguration(scope) {
+function getConfiguration(scope = null) {
     return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
 }
 

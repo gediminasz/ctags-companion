@@ -20,7 +20,7 @@ function activate(context) {
 
     if (process.env.CTAGS_COMPANION_TEST) runTests(stash);
 
-    const documentSelector = vscode.workspace.getConfiguration(EXTENSION_ID).get("documentSelector");
+    const documentSelector = getConfiguration().get("documentSelector");
 
     context.subscriptions.push(stash.statusBarItem);
 

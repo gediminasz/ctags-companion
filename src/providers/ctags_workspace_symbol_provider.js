@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { definitionToSymbolInformation } = require("../helpers");
+const { definitionToSymbolInformation, getConfiguration } = require("../helpers");
 const { getIndexForScope } = require("../index");
 
 class CtagsWorkspaceSymbolProvider {
@@ -17,14 +17,23 @@ class CtagsWorkspaceSymbolProvider {
             )
         );
 
-        const regexp = new RegExp('.*' + query.toLowerCase().split('').join('.*') + '.*');
+        const matcher = this.getMatcher(query);
 
         return indexes.flatMap(([_scope, { symbolIndex }]) => {
             return Object.entries(symbolIndex)
-                .filter(([symbol]) => regexp.test(symbol.toLowerCase()))
+                .filter(([symbol]) => matcher(symbol.toLowerCase()))
                 .flatMap(([_, definitions]) => definitions)
                 .map(definitionToSymbolInformation);
         });
+    }
+
+    getMatcher(query) {
+        if (getConfiguration().get("fuzzyMatchingEnabled")) {
+            const regexp = new RegExp('.*' + query.toLowerCase().split('').join('.*') + '.*');
+            return symbol => regexp.test(symbol);
+        } else {
+            return symbol => symbol.includes(query.toLowerCase());
+        }
     }
 }
 

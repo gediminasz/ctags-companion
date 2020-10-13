@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added fuzzy matching to workspace symbol provider.
+- Added fuzzy matching to workspace symbol provider. It can be disabled by setting `"ctags-companion.fuzzyMatchingEnabled"` to `false`.
 
 ## 2020.9.0
 
