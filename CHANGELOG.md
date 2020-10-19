@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2020.10.0
 
 - Added fuzzy matching to workspace symbol provider. It can be disabled by setting `"ctags-companion.fuzzyMatchingEnabled"` to `false`.
 
