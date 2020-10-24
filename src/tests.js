@@ -44,6 +44,10 @@ async function testCtagsDefinitionProvider(stash, document) {
 
     const printDefinitions = await provider.provideDefinition(document, new vscode.Position(4, 7));
     assert(() => printDefinitions === undefined);
+
+    const [externalLibDefinition] = await provider.provideDefinition(document, new vscode.Position(17, 6));
+    assert(() => externalLibDefinition.uri.path === '/usr/lib/pyhon/external_lib.py');
+    assert(() => externalLibDefinition.range.start.line === 21);
 }
 
 async function testCtagsDocumentSymbolProvider(stash, document) {
