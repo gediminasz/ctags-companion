@@ -15,3 +15,4 @@ class Klass:
 
 Klass().method()
 Klass().method_with_underscores()
+ExternalLib()
