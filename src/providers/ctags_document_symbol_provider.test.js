@@ -1,7 +1,7 @@
 const { CtagsDocumentSymbolProvider } = require("./ctags_document_symbol_provider");
 
-function makeDocumentWithUri(uri) {
-    return { uri };
+function makeDocumentWithPath(fsPath) {
+    return { uri: { fsPath }, };
 }
 
 describe(CtagsDocumentSymbolProvider, () => {
@@ -15,7 +15,7 @@ describe(CtagsDocumentSymbolProvider, () => {
                                 return {
                                     "/test": {
                                         documentIndex: {
-                                            emptyListDocument: [],
+                                            empty: [],
                                             foo: [{
                                                 symbol: "foo",
                                                 file: "foo-file",
@@ -33,7 +33,7 @@ describe(CtagsDocumentSymbolProvider, () => {
         };
 
         it("returns nothing when no definitions are found", async () => {
-            const document = makeDocumentWithUri("unknown-uri");
+            const document = makeDocumentWithPath("/test/unknown");
             const provider = new CtagsDocumentSymbolProvider(stash);
 
             const definitions = await provider.provideDocumentSymbols(document);
@@ -42,7 +42,7 @@ describe(CtagsDocumentSymbolProvider, () => {
         });
 
         it("handles empty list", async () => {
-            const document = makeDocumentWithUri("emptyListDocument");
+            const document = makeDocumentWithPath("/test/empty");
             const provider = new CtagsDocumentSymbolProvider(stash);
 
             const definitions = await provider.provideDocumentSymbols(document);
@@ -51,7 +51,7 @@ describe(CtagsDocumentSymbolProvider, () => {
         });
 
         it("returns symbol informations given indexed document", async () => {
-            const document = makeDocumentWithUri("foo");
+            const document = makeDocumentWithPath("/test/foo");
             const provider = new CtagsDocumentSymbolProvider(stash);
 
             const definitions = await provider.provideDocumentSymbols(document);

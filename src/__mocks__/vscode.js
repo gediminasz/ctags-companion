@@ -1,9 +1,7 @@
 const _scope = { uri: { fsPath: "/test" } };
 
 const workspace = {
-    workspaceFolders: {
-        find: () => _scope
-    },
+    workspaceFolders: [_scope],
 
     getConfiguration: () => ({
         get: (key) => {
@@ -14,8 +12,13 @@ const workspace = {
         }
     }),
 
-    asRelativePath: (pathOrUri) => pathOrUri  // TODO
+    asRelativePath: ({ fsPath }) => {
+        return fsPath.replace(/^(\/test\/)/, "");
+    }
 };
+
+console.assert(workspace.asRelativePath({ fsPath: "/test/foo" }) == "foo");
+console.assert(workspace.asRelativePath({ fsPath: "/elsewhere/bar" }) == "/elsewhere/bar");
 
 function Position(line, character) {
     return { line, character };

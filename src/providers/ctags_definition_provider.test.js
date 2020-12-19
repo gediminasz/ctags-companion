@@ -5,6 +5,7 @@ const wordRange = Symbol("wordRange");
 
 function makeDocumentWithSymbol(detectedSymbol) {
     return {
+        uri: { fsPath: "/test/test.txt" },
         getWordRangeAtPosition: (p) => {
             expect(p).toBe(position);
             return wordRange;
