@@ -4,6 +4,7 @@ const workspace = {
     workspaceFolders: {
         find: () => _scope
     },
+
     getConfiguration: () => ({
         get: (key) => {
             switch (key) {
@@ -11,7 +12,9 @@ const workspace = {
                     return "path/to/ctags";
             }
         }
-    })
+    }),
+
+    asRelativePath: (pathOrUri) => pathOrUri  // TODO
 };
 
 function Position(line, character) {
@@ -25,6 +28,5 @@ function Location(uri, rangeOrPosition) {
 function SymbolInformation(name, kind, containerName, location) {
     return { name, kind, containerName, location };
 }
-
 
 module.exports = { workspace, Position, Location, SymbolInformation };

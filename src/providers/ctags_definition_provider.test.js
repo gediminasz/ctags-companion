@@ -2,7 +2,6 @@ const { CtagsDefinitionProvider } = require("./ctags_definition_provider");
 
 const position = Symbol("position");
 const wordRange = Symbol("wordRange");
-const location = Symbol("location");
 
 function makeDocumentWithSymbol(detectedSymbol) {
     return {
@@ -63,7 +62,7 @@ describe(CtagsDefinitionProvider, () => {
             expect(definitions).toEqual([]);
         });
 
-        it("returns location given indexed symbol", async () => {
+        it("returns locations given indexed symbol", async () => {
             const document = makeDocumentWithSymbol("foo");
             const provider = new CtagsDefinitionProvider(stash);
 

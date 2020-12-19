@@ -12,7 +12,6 @@ class CtagsDocumentSymbolProvider {
         const relativePath = vscode.workspace.asRelativePath(document.uri, false);
         const scope = determineScope(document);
         const { documentIndex } = await getIndexForScope(this.stash, scope);
-
         const definitions = documentIndex[relativePath];
         if (definitions) {
             return definitions.map(definitionToSymbolInformation);
