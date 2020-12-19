@@ -2,3 +2,4 @@
 .ignored
 .vscode/.tags
 *.vsix
+coverage
