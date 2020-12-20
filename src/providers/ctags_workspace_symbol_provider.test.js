@@ -1,8 +1,6 @@
-const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provider");
+const vscode = require("vscode");
 
-function makeDocumentWithUri(uri) {
-    return { uri };
-}
+const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provider");
 
 describe(CtagsWorkspaceSymbolProvider, () => {
     describe("provideWorkspaceSymbols", () => {
@@ -20,7 +18,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
                                                 symbol: "foo",
                                                 file: "foo-file",
                                                 line: "foo-line",
-                                                kind: "foo-kind",
+                                                kind: "function",
                                                 container: "foo-container"
                                             }]
                                         }
@@ -64,7 +62,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
             expect(definitions).toEqual([
                 {
                     name: "foo",
-                    kind: undefined,  // TODO
+                    kind: vscode.SymbolKind.Function,
                     containerName: "foo-container",
                     location: {
                         uri: "foo-file",

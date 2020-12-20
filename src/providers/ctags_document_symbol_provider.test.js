@@ -1,3 +1,5 @@
+const vscode = require("vscode");
+
 const { CtagsDocumentSymbolProvider } = require("./ctags_document_symbol_provider");
 
 function makeDocumentWithPath(fsPath) {
@@ -20,7 +22,7 @@ describe(CtagsDocumentSymbolProvider, () => {
                                                 symbol: "foo",
                                                 file: "foo-file",
                                                 line: "foo-line",
-                                                kind: "foo-kind",
+                                                kind: "function",
                                                 container: "foo-container"
                                             }]
                                         }
@@ -59,7 +61,7 @@ describe(CtagsDocumentSymbolProvider, () => {
             expect(definitions).toEqual([
                 {
                     name: "foo",
-                    kind: undefined,  // TODO
+                    kind: vscode.SymbolKind.Function,
                     containerName: "foo-container",
                     location: {
                         uri: "foo-file",

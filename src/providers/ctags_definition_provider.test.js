@@ -33,7 +33,7 @@ describe(CtagsDefinitionProvider, () => {
                                                 symbol: "foo",
                                                 file: "foo-file",
                                                 line: "foo-line",
-                                                kind: "foo-kind",
+                                                kind: "function",
                                                 container: "foo-container"
                                             }]
                                         }

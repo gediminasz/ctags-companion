@@ -1,3 +1,7 @@
+const SymbolKind = {
+    Function: 11
+};
+
 const _scope = { uri: { fsPath: "/test" } };
 
 const workspace = {
@@ -32,4 +36,4 @@ function SymbolInformation(name, kind, containerName, location) {
     return { name, kind, containerName, location };
 }
 
-module.exports = { workspace, Position, Location, SymbolInformation };
+module.exports = { SymbolKind, workspace, Position, Location, SymbolInformation };
