@@ -1,9 +1,13 @@
 # Change Log
 
+## 2020.12.0
+
+- Added support for most of the ctags symbol kinds. Thanks, @hirooih!
+
 ## 2020.10.0
 
 - Added fuzzy matching to workspace symbol provider. It can be disabled by setting `"ctags-companion.fuzzyMatchingEnabled"` to `false`.
-- Added support for absolute paths in the tags file (thanks, @crawler!)
+- Added support for absolute paths in the tags file. Thanks, @crawler!
 
 ## 2020.9.0
 

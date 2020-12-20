@@ -73,12 +73,12 @@ async function testCtagsDocumentSymbolProvider(stash, document) {
     assert(() => definitions[2].location.range.start.line === 3);
 
     assert(() => definitions[3].name === "method");
-    assert(() => definitions[3].kind === vscode.SymbolKind.Method);
+    assert(() => definitions[3].kind === vscode.SymbolKind.Property);
     assert(() => definitions[3].location.uri.path.endsWith("source.py"));
     assert(() => definitions[3].location.range.start.line === 8);
 
     assert(() => definitions[4].name === "method_with_underscores");
-    assert(() => definitions[4].kind === vscode.SymbolKind.Method);
+    assert(() => definitions[4].kind === vscode.SymbolKind.Property);
     assert(() => definitions[4].location.uri.path.endsWith("source.py"));
     assert(() => definitions[4].location.range.start.line === 11);
 }
