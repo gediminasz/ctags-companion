@@ -3,3 +3,4 @@
 .vscode/.tags
 *.vsix
 coverage
+node_modules

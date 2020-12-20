@@ -54,5 +54,12 @@
                 "title": "Ctags Companion: reindex"
             }
         ]
+    },
+    "scripts": {
+        "test": "jest",
+        "test:ci": "jest --coverage"
+    },
+    "devDependencies": {
+        "jest": "^26.6.3"
     }
 }
