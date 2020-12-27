@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs_ = require('fs');
 const path = require('path');
 const readline = require('readline');
 const vscode = require('vscode');
@@ -17,7 +17,7 @@ async function reindexAll(stash) {
     await Promise.all(vscode.workspace.workspaceFolders.map(scope => reindexScope(stash, scope)));
 }
 
-function reindexScope(stash, scope) {
+function reindexScope(stash, scope, { fs = fs_ } = {}) {
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
