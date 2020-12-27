@@ -113,6 +113,43 @@ describe("reindexScope", () => {
                 }
             });
         });
+
+        it.each([
+            [
+                'KONSTANT	test_projects/python/source.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:1',
+                "KONSTANT",
+                {
+                    container: undefined,
+                    file: "/test/test_projects/python/source.py",
+                    kind: "variable",
+                    line: 0,
+                    symbol: "KONSTANT"
+                }
+            ]
+        ])("indexes tags", (line, expectedSymbol, expectedDefinition) => {
+            const stash = {
+                context: { workspaceState: new MockMemento() },
+                statusBarItem: new MockStatusBarItem()
+            };
+            const reader = new MockReader();
+
+            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
+            reader.handlers.line(line);
+            reader.handlers.close();
+
+            expect(stash.context.workspaceState.state).toEqual({
+                indexes: {
+                    "/test": {
+                        symbolIndex: {
+                            [expectedSymbol]: [expectedDefinition]
+                        },
+                        documentIndex: {
+                            "test_projects/python/source.py": [expectedDefinition]
+                        }
+                    }
+                }
+            });
+        });
     });
 });
 
