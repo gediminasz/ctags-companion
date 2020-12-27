@@ -93,19 +93,26 @@ describe("reindexScope", () => {
 
         });
 
-        // it("skips meta lines", () => {
-        //     const stash = {
-        //         context: { workspaceState: new MockMemento() },
-        //         statusBarItem: new MockStatusBarItem()
-        //     };
-        //     const reader = new MockReader();
+        it("skips meta lines", () => {
+            const stash = {
+                context: { workspaceState: new MockMemento() },
+                statusBarItem: new MockStatusBarItem()
+            };
+            const reader = new MockReader();
 
-        //     reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-        //     reader.handlers.line("!_THIS_LINE_SHOULD_BE_IGNORED");
-        //     reader.handlers.close();
+            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
+            reader.handlers.line("!_THIS_LINE_SHOULD_BE_IGNORED");
+            reader.handlers.close();
 
-        //     expect(stash.context.workspaceState.state).toEqual({});
-        // });
+            expect(stash.context.workspaceState.state).toEqual({
+                indexes: {
+                    "/test": {
+                        symbolIndex: {},
+                        documentIndex: {}
+                    }
+                }
+            });
+        });
     });
 });
 
