@@ -43,7 +43,6 @@ function reindexScope(stash, scope, { fs = fs_, readline = readline_ } = {}) {
             if (line.startsWith("!")) return;
 
             const [symbol, path, ...rest] = line.split("\t");
-            console.log({ path, scope });
             const file = path.startsWith('/') ? vscode.Uri.parse(path) : vscode.Uri.joinPath(scope.uri, path);
             const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
             const lineNumber = parseInt(lineNumberStr, 10) - 1;

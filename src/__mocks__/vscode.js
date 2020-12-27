@@ -39,6 +39,7 @@ function SymbolInformation(name, kind, containerName, location) {
 }
 
 const Uri = {
+    parse: (path) => path,
     joinPath: (left, right) => path.join(left.fsPath, right)
 };
 

@@ -118,6 +118,7 @@ describe("reindexScope", () => {
             [
                 'KONSTANT	test_projects/python/source.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:1',
                 "KONSTANT",
+                "test_projects/python/source.py",
                 {
                     container: undefined,
                     file: "/test/test_projects/python/source.py",
@@ -125,8 +126,20 @@ describe("reindexScope", () => {
                     line: 0,
                     symbol: "KONSTANT"
                 }
+            ],
+            [
+                'ExternalLib	/usr/lib/pyhon/external_lib.py	/^class ExternalLib:$/;"	kind:class	line:22',
+                "ExternalLib",
+                "/usr/lib/pyhon/external_lib.py",
+                {
+                    container: undefined,
+                    file: "/usr/lib/pyhon/external_lib.py",
+                    kind: "class",
+                    line: 21,
+                    symbol: "ExternalLib"
+                }
             ]
-        ])("indexes tags", (line, expectedSymbol, expectedDefinition) => {
+        ])("indexes tags", (line, expectedSymbol, expectedPath, expectedDefinition) => {
             const stash = {
                 context: { workspaceState: new MockMemento() },
                 statusBarItem: new MockStatusBarItem()
@@ -144,7 +157,7 @@ describe("reindexScope", () => {
                             [expectedSymbol]: [expectedDefinition]
                         },
                         documentIndex: {
-                            "test_projects/python/source.py": [expectedDefinition]
+                            [expectedPath]: [expectedDefinition]
                         }
                     }
                 }
