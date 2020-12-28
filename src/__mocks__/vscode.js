@@ -1,3 +1,5 @@
+const path = require('path');
+
 const SymbolKind = {
     Function: 11
 };
@@ -36,4 +38,9 @@ function SymbolInformation(name, kind, containerName, location) {
     return { name, kind, containerName, location };
 }
 
-module.exports = { SymbolKind, workspace, Position, Location, SymbolInformation };
+const Uri = {
+    parse: (path) => path,
+    joinPath: (left, right) => path.join(left.fsPath, right)
+};
+
+module.exports = { SymbolKind, workspace, Position, Location, SymbolInformation, Uri };
