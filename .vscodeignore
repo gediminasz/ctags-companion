@@ -1,6 +1,9 @@
 .DS_Store
 .git
+.github
 .gitignore
 .ignored
 .vscode
+**/*.test.js
+coverage
 test_projects
