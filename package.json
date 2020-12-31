@@ -57,7 +57,7 @@
     },
     "scripts": {
         "test": "jest",
-        "test:ci": "jest --coverage --verbose"
+        "test:ci": "jest --ci --coverage --verbose"
     },
     "devDependencies": {
         "jest": "^26.6.3"

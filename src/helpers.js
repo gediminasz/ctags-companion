@@ -10,70 +10,68 @@ function getConfiguration(scope = null) {
     return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
 }
 
+const SYMBOL_KINDS = {
+    class: vscode.SymbolKind.Class,
+    const: vscode.SymbolKind.Constant,
+    constant: vscode.SymbolKind.Constant,
+    constractor: vscode.SymbolKind.Constractor,
+    define: vscode.SymbolKind.Constant,
+    enum: vscode.SymbolKind.Enum,
+    enumConstant: vscode.SymbolKind.EnumMember,
+    enumerator: vscode.SymbolKind.EnumMember,
+    event: vscode.SymbolKind.Event,
+    externvar: vscode.SymbolKind.Variable,
+    field: vscode.SymbolKind.Field,
+    func: vscode.SymbolKind.Function,
+    function: vscode.SymbolKind.Function,
+    functionVar: vscode.SymbolKind.Variable,
+    globalVar: vscode.SymbolKind.Variable,
+    header: vscode.SymbolKind.File,
+    ifclass: vscode.SymbolKind.Interface,
+    instance: vscode.SymbolKind.Object,
+    interface: vscode.SymbolKind.Module,
+    key: vscode.SymbolKind.Key,
+    library: vscode.SymbolKind.Package,
+    local: vscode.SymbolKind.Variable,
+    member: vscode.SymbolKind.Property,
+    method: vscode.SymbolKind.Method,
+    module: vscode.SymbolKind.Module,
+    namespace: vscode.SymbolKind.Namespace,
+    net: vscode.SymbolKind.Variable,
+    nettype: vscode.SymbolKind.Variable,
+    package: vscode.SymbolKind.Package,
+    parameter: vscode.SymbolKind.Constant,
+    port: vscode.SymbolKind.Variable,
+    program: vscode.SymbolKind.Module,
+    procedure: vscode.SymbolKind.Function,
+    property: vscode.SymbolKind.Property,
+    protected: vscode.SymbolKind.Variable,
+    register: vscode.SymbolKind.Variable,
+    RecordField: vscode.SymbolKind.Property,
+    signal: vscode.SymbolKind.Variable,
+    singletonMethod: vscode.SymbolKind.Method,
+    struct: vscode.SymbolKind.Struct,
+    submethod: vscode.SymbolKind.Method,
+    subprogram: vscode.SymbolKind.Function,
+    subroutine: vscode.SymbolKind.Function,
+    subroutineDeclaration: vscode.SymbolKind.Function,
+    subtype: vscode.SymbolKind.TypeParameter,
+    task: vscode.SymbolKind.Function,
+    trait: vscode.SymbolKind.Interface,
+    type: vscode.SymbolKind.TypeParameter,
+    typedef: vscode.SymbolKind.TypeParameter,
+    union: vscode.SymbolKind.Struct,
+    var: vscode.SymbolKind.Variable,
+    variable: vscode.SymbolKind.Variable,
+};
+
 function definitionToSymbolInformation({ symbol, file, line, kind, container }) {
     return new vscode.SymbolInformation(
         symbol,
-        toSymbolKind(kind),
+        SYMBOL_KINDS[kind],
         container,
         new vscode.Location(file, new vscode.Position(line, 0))
     );
-}
-
-function toSymbolKind(kind) {
-    switch (kind) {
-        case "class": return vscode.SymbolKind.Class;
-        case "const": return vscode.SymbolKind.Constant;
-        case "constant": return vscode.SymbolKind.Constant;
-        case "constractor": return vscode.SymbolKind.Constractor;
-        case "define": return vscode.SymbolKind.Constant;
-        case "enum": return vscode.SymbolKind.Enum;
-        case "enumConstant": return vscode.SymbolKind.EnumMember;
-        case "enumerator": return vscode.SymbolKind.EnumMember;
-        case "event": return vscode.SymbolKind.Event;
-        case "externvar": return vscode.SymbolKind.Variable;
-        case "field": return vscode.SymbolKind.Field;
-        case "func": return vscode.SymbolKind.Function;
-        case "function": return vscode.SymbolKind.Function;
-        case "functionVar": return vscode.SymbolKind.Variable;
-        case "globalVar": return vscode.SymbolKind.Variable;
-        case "header": return vscode.SymbolKind.File;
-        case "ifclass": return vscode.SymbolKind.Interface;
-        case "instance": return vscode.SymbolKind.Object;
-        case "interface": return vscode.SymbolKind.Module;
-        case "key": return vscode.SymbolKind.Key;
-        case "library": return vscode.SymbolKind.Package;
-        case "local": return vscode.SymbolKind.Variable;
-        case "member": return vscode.SymbolKind.Property;
-        case "method": return vscode.SymbolKind.Method;
-        case "module": return vscode.SymbolKind.Module;
-        case "namespace": return vscode.SymbolKind.Namespace;
-        case "net": return vscode.SymbolKind.Variable;
-        case "nettype": return vscode.SymbolKind.Variable;
-        case "package": return vscode.SymbolKind.Package;
-        case "parameter": return vscode.SymbolKind.Constant;
-        case "port": return vscode.SymbolKind.Variable;
-        case "program": return vscode.SymbolKind.Module;
-        case "procedure": return vscode.SymbolKind.Function;
-        case "property": return vscode.SymbolKind.Property;
-        case "protected": return vscode.SymbolKind.Variable;
-        case "register": return vscode.SymbolKind.Variable;
-        case "RecordField": return vscode.SymbolKind.Property;
-        case "signal": return vscode.SymbolKind.Variable;
-        case "singletonMethod": return vscode.SymbolKind.Method;
-        case "struct": return vscode.SymbolKind.Struct;
-        case "submethod": return vscode.SymbolKind.Method;
-        case "subprogram": return vscode.SymbolKind.Function;
-        case "subroutine": return vscode.SymbolKind.Function;
-        case "subroutineDeclaration": return vscode.SymbolKind.Function;
-        case "subtype": return vscode.SymbolKind.TypeParameter;
-        case "task": return vscode.SymbolKind.Function;
-        case "trait": return vscode.SymbolKind.Interface;
-        case "type": return vscode.SymbolKind.TypeParameter;
-        case "typedef": return vscode.SymbolKind.TypeParameter;
-        case "union": return vscode.SymbolKind.Struct;
-        case "var": return vscode.SymbolKind.Variable;
-        case "variable": return vscode.SymbolKind.Variable;
-    }
 }
 
 module.exports = { determineScope, getConfiguration, definitionToSymbolInformation };
