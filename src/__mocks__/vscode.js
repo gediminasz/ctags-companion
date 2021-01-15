@@ -28,6 +28,10 @@ const workspace = {
 console.assert(workspace.asRelativePath({ fsPath: "/test/foo" }) == "foo");
 console.assert(workspace.asRelativePath({ fsPath: "/elsewhere/bar" }) == "/elsewhere/bar");
 
+const window = {
+  showErrorMessage: jest.fn(),
+};
+
 function Position(line, character) {
     return { line, character };
 }
@@ -45,4 +49,4 @@ const Uri = {
     joinPath: (left, right) => path.join(left.fsPath, right)
 };
 
-module.exports = { SymbolKind, workspace, Position, Location, SymbolInformation, Uri };
+module.exports = { SymbolKind, workspace, window, Position, Location, SymbolInformation, Uri };

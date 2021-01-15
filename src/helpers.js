@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { EXTENSION_ID } = require("./constants");
+const { EXTENSION_ID, EXTENSION_NAME } = require("./constants");
 
 function determineScope(document) {
     return vscode.workspace.workspaceFolders.find(scope => document.uri.fsPath.includes(scope.uri.fsPath));
@@ -8,6 +8,17 @@ function determineScope(document) {
 
 function getConfiguration(scope = null) {
     return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
+}
+
+function commandGuard(command) {
+    if ( typeof command !== 'string' || command.trim() === '')  {
+        vscode.window.showErrorMessage(
+            `${EXTENSION_NAME}: The "Command" preference is not set. Please check your configuration.`
+        )
+        return true
+    }
+
+    return false
 }
 
 const SYMBOL_KINDS = {
@@ -74,4 +85,4 @@ function definitionToSymbolInformation({ symbol, file, line, kind, container }) 
     );
 }
 
-module.exports = { determineScope, getConfiguration, definitionToSymbolInformation };
+module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation };

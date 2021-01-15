@@ -4,7 +4,7 @@ const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provid
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
 const { EXTENSION_ID, EXTENSION_NAME, TASK_NAME } = require("./constants");
-const { getConfiguration } = require("./helpers");
+const { getConfiguration, commandGuard} = require("./helpers");
 const { reindexAll, reindexScope } = require("./index");
 const { runTests } = require("./tests");
 
@@ -53,6 +53,7 @@ function activate(context) {
                 vscode.tasks.registerTaskProvider("shell", {
                     provideTasks: () => {
                         const command = getConfiguration(scope).get("command");
+                        if (commandGuard(command)) return [];
                         const task = new vscode.Task(
                             { type: "shell" },
                             scope,
