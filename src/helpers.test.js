@@ -1,7 +1,6 @@
 const vscode = require("vscode");
 
-const { definitionToSymbolInformation } = require("./helpers");
-
+const { definitionToSymbolInformation, commandGuard } = require("./helpers");
 
 describe("definitionToSymbolInformation", () => {
     it.each([
@@ -25,3 +24,17 @@ describe("definitionToSymbolInformation", () => {
         expect(symbolInformation.kind).toEqual(vscodeKind);
     });
 });
+
+describe('commandGuard', () => {
+    it('silent when command is present', () => {
+        expect(commandGuard("/bin/ctags")).toEqual(false);
+        expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+    })
+
+    it.each([undefined, '', '  '])("params that cause error message", param => {
+        expect(commandGuard(param)).toEqual(true);
+        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+            'Ctags Companion: The "Command" preference is not set. Please check your configuration.'
+        );
+    })
+})
