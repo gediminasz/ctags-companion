@@ -1,12 +1,16 @@
 # Change Log
 
+## 2021.1.0
+
+- Added a warning message when `ctags-companion.command` setting is blank. Thanks, @crawler!
+
 ## 2020.12.0
 
 - Added support for most of the ctags symbol kinds. Thanks, @hirooih!
 
 ## 2020.10.0
 
-- Added fuzzy matching to workspace symbol provider. It can be disabled by setting `"ctags-companion.fuzzyMatchingEnabled"` to `false`.
+- Added fuzzy matching to workspace symbol provider. It can be disabled by setting `ctags-companion.fuzzyMatchingEnabled` to `false`.
 - Added support for absolute paths in the tags file. Thanks, @crawler!
 
 ## 2020.9.0
