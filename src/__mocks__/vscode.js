@@ -16,6 +16,8 @@ const workspace = {
             switch (key) {
                 case "path":
                     return "path/to/ctags";
+                case "fuzzyMatchingEnabled":
+                    return true;
             }
         }
     }),
@@ -29,7 +31,7 @@ console.assert(workspace.asRelativePath({ fsPath: "/test/foo" }) == "foo");
 console.assert(workspace.asRelativePath({ fsPath: "/elsewhere/bar" }) == "/elsewhere/bar");
 
 const window = {
-  showErrorMessage: jest.fn(),
+    showErrorMessage: jest.fn(),
 };
 
 function Position(line, character) {
