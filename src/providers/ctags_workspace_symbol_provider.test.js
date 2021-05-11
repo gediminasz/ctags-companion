@@ -157,7 +157,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
         });
 
         it.each(
-            ["symbol_with_underscores", "symbolwithunderscores", "swu", "symwithund"]
+            ["symbol_with_underscores", "symbolwithunderscores", "swu", "symwithund", "sym_w_us"]
         )("returns symbol informations given symbol with underscores", async (query) => {
             const provider = new CtagsWorkspaceSymbolProvider(stash);
 
