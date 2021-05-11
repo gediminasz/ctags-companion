@@ -2,6 +2,54 @@ const vscode = require("vscode");
 
 const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provider");
 
+const symbolIndex = {
+    empty: [],
+    fizz: [{
+        symbol: "fizz",
+        file: "fizz-file",
+        line: "fizz-line",
+        kind: "function",
+        container: "fizz-container"
+    }],
+    multi: [
+        {
+            symbol: "multi",
+            file: "multi-file-1",
+            line: "multi-line-1",
+            kind: "function",
+            container: "multi-container-1"
+        },
+        {
+            symbol: "multi",
+            file: "multi-file-2",
+            line: "multi-line-2",
+            kind: "function",
+            container: "multi-container-2"
+        }
+    ],
+    KONSTANT: [{
+        symbol: "KONSTANT",
+        file: "KONSTANT-file",
+        line: "KONSTANT-line",
+        kind: "function",
+        container: "KONSTANT-container"
+    }],
+    Klass: [{
+        symbol: "Klass",
+        file: "Klass-file",
+        line: "Klass-line",
+        kind: "function",
+        container: "Klass-container"
+    }],
+    symbol_with_underscores: [{
+        symbol: "symbol_with_underscores",
+        file: "symbol_with_underscores-file",
+        line: "symbol_with_underscores-line",
+        kind: "function",
+        container: "symbol_with_underscores-container"
+    }],
+};
+
 describe(CtagsWorkspaceSymbolProvider, () => {
     describe("provideWorkspaceSymbols", () => {
         const stash = {
@@ -11,55 +59,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
                         switch (key) {
                             case "indexes":
                                 return {
-                                    "/test": {
-                                        symbolIndex: {
-                                            empty: [],
-                                            fizz: [{
-                                                symbol: "fizz",
-                                                file: "fizz-file",
-                                                line: "fizz-line",
-                                                kind: "function",
-                                                container: "fizz-container"
-                                            }],
-                                            multi: [
-                                                {
-                                                    symbol: "multi",
-                                                    file: "multi-file-1",
-                                                    line: "multi-line-1",
-                                                    kind: "function",
-                                                    container: "multi-container-1"
-                                                },
-                                                {
-                                                    symbol: "multi",
-                                                    file: "multi-file-2",
-                                                    line: "multi-line-2",
-                                                    kind: "function",
-                                                    container: "multi-container-2"
-                                                }
-                                            ],
-                                            KONSTANT: [{
-                                                symbol: "KONSTANT",
-                                                file: "KONSTANT-file",
-                                                line: "KONSTANT-line",
-                                                kind: "function",
-                                                container: "KONSTANT-container"
-                                            }],
-                                            Klass: [{
-                                                symbol: "Klass",
-                                                file: "Klass-file",
-                                                line: "Klass-line",
-                                                kind: "function",
-                                                container: "Klass-container"
-                                            }],
-                                            symbol_with_underscores: [{
-                                                symbol: "symbol_with_underscores",
-                                                file: "symbol_with_underscores-file",
-                                                line: "symbol_with_underscores-line",
-                                                kind: "function",
-                                                container: "symbol_with_underscores-container"
-                                            }],
-                                        }
-                                    },
+                                    "/test": { symbolIndex }
                                 };
                         }
                     }
