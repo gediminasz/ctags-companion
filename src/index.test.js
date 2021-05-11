@@ -128,6 +128,19 @@ describe("reindexScope", () => {
                 }
             ],
             [
+                'method	test_projects/python/source.py	/^    def method(self):$/;"	kind:member	line:9	class:Klass',
+                "method",
+                "test_projects/python/source.py",
+                {
+                    container: undefined,
+                    file: "/test/test_projects/python/source.py",
+                    kind: "member",
+                    line: 8,
+                    symbol: "method",
+                    container: "Klass"
+                }
+            ],
+            [
                 'ExternalLib	/usr/lib/pyhon/external_lib.py	/^class ExternalLib:$/;"	kind:class	line:22',
                 "ExternalLib",
                 "/usr/lib/pyhon/external_lib.py",
@@ -153,12 +166,68 @@ describe("reindexScope", () => {
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: {
-                            [expectedSymbol]: [expectedDefinition]
-                        },
-                        documentIndex: {
-                            [expectedPath]: [expectedDefinition]
-                        }
+                        symbolIndex: { [expectedSymbol]: [expectedDefinition] },
+                        documentIndex: { [expectedPath]: [expectedDefinition] }
+                    }
+                }
+            });
+        });
+
+        it("appends to already indexed symbols", () => {
+            const stash = {
+                context: { workspaceState: new MockMemento() },
+                statusBarItem: new MockStatusBarItem()
+            };
+            const reader = new MockReader();
+
+            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
+            reader.handlers.line('Klass	first.py	/^class Klass:$/;"	kind:class	line:1');
+            reader.handlers.line('Klass	second.py	/^class Klass:$/;"	kind:class	line:2');
+            reader.handlers.close();
+
+            const firstDefinition = {
+                container: undefined,
+                file: "/test/first.py",
+                kind: "class",
+                line: 0,
+                symbol: "Klass"
+            };
+            const secondDefinition = {
+                container: undefined,
+                file: "/test/second.py",
+                kind: "class",
+                line: 1,
+                symbol: "Klass"
+            };
+            expect(stash.context.workspaceState.state).toEqual({
+                indexes: {
+                    "/test": {
+                        symbolIndex: { Klass: [firstDefinition, secondDefinition] },
+                        documentIndex: { "first.py": [firstDefinition], "second.py": [secondDefinition] }
+                    }
+                }
+            });
+        });
+
+        it("appends to already indexed documents", () => {
+            const stash = {
+                context: { workspaceState: new MockMemento() },
+                statusBarItem: new MockStatusBarItem()
+            };
+            const reader = new MockReader();
+
+            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
+            reader.handlers.line('Foo	src.py	/^class Foo:$/;"	kind:class	line:1');
+            reader.handlers.line('Bar	src.py	/^class Bar:$/;"	kind:class	line:2');
+            reader.handlers.close();
+
+            const fooDefinition = { container: undefined, file: "/test/src.py", kind: "class", line: 0, symbol: "Foo" };
+            const barDefinition = { container: undefined, file: "/test/src.py", kind: "class", line: 1, symbol: "Bar" };
+            expect(stash.context.workspaceState.state).toEqual({
+                indexes: {
+                    "/test": {
+                        symbolIndex: { Foo: [fooDefinition], Bar: [barDefinition] },
+                        documentIndex: { "src.py": [fooDefinition, barDefinition] }
                     }
                 }
             });
