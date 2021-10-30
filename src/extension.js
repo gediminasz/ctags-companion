@@ -4,9 +4,8 @@ const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provid
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
 const { EXTENSION_ID, EXTENSION_NAME, TASK_NAME } = require("./constants");
-const { getConfiguration, commandGuard} = require("./helpers");
+const { getConfiguration, commandGuard } = require("./helpers");
 const { reindexAll, reindexScope } = require("./index");
-const { runTests } = require("./tests");
 
 class Stash {
     constructor(context) {
@@ -17,8 +16,6 @@ class Stash {
 
 function activate(context) {
     const stash = new Stash(context);
-
-    if (process.env.CTAGS_COMPANION_TEST) runTests(stash);
 
     const documentSelector = getConfiguration().get("documentSelector");
 
