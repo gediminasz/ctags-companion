@@ -4,7 +4,7 @@ const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provid
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
 const { EXTENSION_ID, EXTENSION_NAME, TASK_NAME } = require("./constants");
-const { getConfiguration, commandGuard } = require("./helpers");
+const { determineScope, getConfiguration, commandGuard } = require("./helpers");
 const { reindexAll, reindexScope } = require("./index");
 
 class Extension {
@@ -58,19 +58,46 @@ function activate(context) {
                             TASK_NAME,
                             EXTENSION_NAME,
                             new vscode.ShellExecution(command),
-                            []
+                            [],  // do not prompt the user about problem matchers
                         );
                         task.presentationOptions.reveal = false;
                         return [task];
                     },
-                    resolveTask: (task) => task
+                    // A valid default implementation for the resolveTask method is to return undefined.
+                    resolveTask: () => undefined
                 })
             ));
     }
 
+    if (getConfiguration().get("reindexOnSaveEnabled")) {
+        vscode.workspace.onDidSaveTextDocument(document => {
+            const scope = determineScope(document);
+            const scopeConfiguration = getConfiguration(scope);
+            const documentSelector = scopeConfiguration.get("documentSelector");
+
+            if (vscode.languages.match(documentSelector, document) == 0) return;
+
+            const command = scopeConfiguration.get("command");
+            const tagsPath = scopeConfiguration.get("path");
+            const task = new vscode.Task(
+                { type: "shell" },
+                scope,
+                "append ctags",
+                EXTENSION_NAME,
+                new vscode.ShellExecution(
+                    // remove existing rows mentioning current file and then run ctags in append mode
+                    `grep -v ${document.fileName} ${tagsPath} > ${tagsPath} ; ${command} --append \${file}`
+                ),
+                [],
+            );
+            task.presentationOptions.reveal = false;
+            vscode.tasks.executeTask(task);
+        });
+    }
+
     vscode.tasks.onDidEndTask(event => {
         const { source, name, scope } = event.execution.task;
-        if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(extension, scope);
+        if (source == EXTENSION_NAME) reindexScope(extension, scope);
     });
 }
 

@@ -46,6 +46,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Should fuzzy matching be used in workspace symbols provider"
+                },
+                "ctags-companion.reindexOnSaveEnabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "(EXPERIMENTAL) Should files be automatically reindexed on save"
                 }
             }
         },
