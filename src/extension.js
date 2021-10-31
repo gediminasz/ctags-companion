@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const vscode = require('vscode');
 
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
@@ -69,31 +71,37 @@ function activate(context) {
             ));
     }
 
-    if (getConfiguration().get("reindexOnSaveEnabled")) {
-        vscode.workspace.onDidSaveTextDocument(document => {
+    vscode.workspace.onDidSaveTextDocument(document => {
+        if (getConfiguration().get("reindexOnSaveEnabled")) {
             const scope = determineScope(document);
             const scopeConfiguration = getConfiguration(scope);
             const documentSelector = scopeConfiguration.get("documentSelector");
 
             if (vscode.languages.match(documentSelector, document) == 0) return;
 
+            // remove existing tags mentioning current file:
+            const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
+            const documentRelativePath = vscode.workspace.asRelativePath(document.uri, false);
+            if (fs.existsSync(tagsPath)) {
+                const lines = fs.readFileSync(tagsPath, { encoding: "utf-8" }).split("\n");
+                const linesToKeep = lines.filter(line => !line.includes(documentRelativePath));
+                fs.writeFileSync(tagsPath, linesToKeep.join("\n"));
+            }
+
+            // execute ctags in append mode:
             const command = scopeConfiguration.get("command");
-            const tagsPath = scopeConfiguration.get("path");
             const task = new vscode.Task(
                 { type: "shell" },
                 scope,
                 "append ctags",
                 EXTENSION_NAME,
-                new vscode.ShellExecution(
-                    // remove existing rows mentioning current file and then run ctags in append mode
-                    `grep -v ${document.fileName} ${tagsPath} > ${tagsPath} ; ${command} --append \${file}`
-                ),
+                new vscode.ShellExecution(`${command} --append \${file}`),
                 [],
             );
             task.presentationOptions.reveal = false;
             vscode.tasks.executeTask(task);
-        });
-    }
+        }
+    });
 
     vscode.tasks.onDidEndTask(event => {
         const { source, name, scope } = event.execution.task;
