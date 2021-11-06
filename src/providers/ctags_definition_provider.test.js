@@ -29,13 +29,7 @@ describe(CtagsDefinitionProvider, () => {
                                     "/test": {
                                         symbolIndex: {
                                             emptyListSymbol: [],
-                                            foo: [{
-                                                symbol: "foo",
-                                                file: "foo-file",
-                                                line: "foo-line",
-                                                kind: "function",
-                                                container: "foo-container"
-                                            }]
+                                            foo: ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']
                                         }
                                     }
                                 };
@@ -71,11 +65,8 @@ describe(CtagsDefinitionProvider, () => {
 
             expect(definitions).toEqual([
                 {
-                    uri: "foo-file",
-                    rangeOrPosition: {
-                        line: "foo-line",
-                        character: 0
-                    }
+                    uri: "src.py",
+                    rangeOrPosition: { line: 31, character: 0 }
                 }
             ]);
         });
