@@ -18,6 +18,7 @@ async function reindexAll(stash) {
 }
 
 function reindexScope(stash, scope, { fs = fs_, readline = readline_ } = {}) {
+    console.time('reindexScope');
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
@@ -38,9 +39,11 @@ function reindexScope(stash, scope, { fs = fs_, readline = readline_ } = {}) {
 
         const symbolIndex = {};
         const documentIndex = {};
+        let count = 0;
 
         reader.on("line", (line) => {
             if (line.startsWith("!")) return;
+            count++;
 
             const [symbol, path, ...rest] = line.split("\t");
             const file = path.startsWith('/') ? vscode.Uri.parse(path) : vscode.Uri.joinPath(scope.uri, path);
@@ -64,7 +67,8 @@ function reindexScope(stash, scope, { fs = fs_, readline = readline_ } = {}) {
             const indexes = stash.context.workspaceState.get("indexes") || {};
             indexes[scope.uri.fsPath] = { symbolIndex, documentIndex };
             stash.context.workspaceState.update("indexes", indexes);
-
+            console.log({ count });
+            console.timeEnd('reindexScope');
             stash.statusBarItem.hide();
             resolve();
         });
