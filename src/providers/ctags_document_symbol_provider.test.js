@@ -58,7 +58,7 @@ describe(CtagsDocumentSymbolProvider, () => {
                     kind: vscode.SymbolKind.Property,
                     containerName: "Goo",
                     location: {
-                        uri: "src.py",
+                        uri: "/test/src.py",
                         rangeOrPosition: { line: 31, character: 0 }
                     }
                 }

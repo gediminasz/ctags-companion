@@ -70,7 +70,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
                     kind: vscode.SymbolKind.Variable,
                     containerName: undefined,
                     location: {
-                        uri: "fizz.py",
+                        uri: "/test/fizz.py",
                         rangeOrPosition: {
                             line: 99,
                             character: 0
@@ -90,13 +90,13 @@ describe(CtagsWorkspaceSymbolProvider, () => {
                     name: "multi",
                     kind: vscode.SymbolKind.Variable,
                     containerName: undefined,
-                    location: { uri: "multi1.py", rangeOrPosition: { line: 199, character: 0 } }
+                    location: { uri: "/test/multi1.py", rangeOrPosition: { line: 199, character: 0 } }
                 },
                 {
                     name: "multi",
                     kind: vscode.SymbolKind.Variable,
                     containerName: undefined,
-                    location: { uri: "multi2.py", rangeOrPosition: { line: 299, character: 0 } }
+                    location: { uri: "/test/multi2.py", rangeOrPosition: { line: 299, character: 0 } }
                 },
             ]);
         });
@@ -111,13 +111,13 @@ describe(CtagsWorkspaceSymbolProvider, () => {
                     name: "KONSTANT",
                     kind: vscode.SymbolKind.Variable,
                     containerName: undefined,
-                    location: { uri: "konstant.py", rangeOrPosition: { line: 99, character: 0 } }
+                    location: { uri: "/test/konstant.py", rangeOrPosition: { line: 99, character: 0 } }
                 },
                 {
                     name: "Klass",
                     kind: vscode.SymbolKind.Class,
                     containerName: undefined,
-                    location: { uri: "klass.py", rangeOrPosition: { line: 199, character: 0 } }
+                    location: { uri: "/test/klass.py", rangeOrPosition: { line: 199, character: 0 } }
                 },
             ]);
         });
@@ -135,7 +135,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
                     kind: vscode.SymbolKind.Variable,
                     containerName: undefined,
                     location: {
-                        uri: "underscores.py",
+                        uri: "/test/underscores.py",
                         rangeOrPosition: { line: 99, character: 0 }
                     }
                 },

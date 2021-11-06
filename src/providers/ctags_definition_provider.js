@@ -13,7 +13,9 @@ class CtagsDefinitionProvider {
 
         const definitions = symbolIndex[symbol];
         if (definitions) {
-            return definitions.map(definitionToSymbolInformation).map(({ location }) => location);
+            return definitions
+                .map(definition => definitionToSymbolInformation(definition, scope))
+                .map(({ location }) => location);
         }
     }
 }

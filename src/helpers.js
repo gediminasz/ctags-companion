@@ -76,8 +76,11 @@ const SYMBOL_KINDS = {
     variable: vscode.SymbolKind.Variable,
 };
 
-function definitionToSymbolInformation(definition) {
+function definitionToSymbolInformation(definition, scope) {
     const [symbol, path, ...rest] = definition.split("\t");
+
+    const file = path.startsWith('/') ? vscode.Uri.parse(path) : vscode.Uri.joinPath(scope.uri, path);
+
     const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
     const line = parseInt(lineNumberStr, 10) - 1;
 
@@ -90,12 +93,8 @@ function definitionToSymbolInformation(definition) {
         symbol,
         SYMBOL_KINDS[kind],
         container,
-        new vscode.Location(path, new vscode.Position(line, 0))
+        new vscode.Location(file, new vscode.Position(line, 0))
     );
 }
 
 module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation };
-
-
-// TODO
-// const file = path.startsWith('/') ? vscode.Uri.parse(path) : vscode.Uri.joinPath(scope.uri, path);

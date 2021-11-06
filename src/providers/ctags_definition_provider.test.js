@@ -65,7 +65,7 @@ describe(CtagsDefinitionProvider, () => {
 
             expect(definitions).toEqual([
                 {
-                    uri: "src.py",
+                    uri: "/test/src.py",
                     rangeOrPosition: { line: 31, character: 0 }
                 }
             ]);

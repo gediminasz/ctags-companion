@@ -19,11 +19,11 @@ class CtagsWorkspaceSymbolProvider {
 
         const matcher = this.getMatcher(query);
 
-        return indexes.flatMap(([_scope, { symbolIndex }]) => {
+        return indexes.flatMap(([scope, { symbolIndex }]) => {
             return Object.entries(symbolIndex)
                 .filter(([symbol]) => matcher(symbol.toLowerCase()))
                 .flatMap(([_, definitions]) => definitions)
-                .map(definitionToSymbolInformation);
+                .map(definition => definitionToSymbolInformation(definition, scope));
         });
     }
 
