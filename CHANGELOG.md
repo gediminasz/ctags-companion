@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Improved performance of tags file parsing.
+
 ## 2021.1.0
 
 - Added a warning message when `ctags-companion.command` setting is blank. Thanks, @crawler!
