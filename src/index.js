@@ -13,10 +13,12 @@ async function getIndexForScope(stash, scope) {
 }
 
 async function reindexAll(stash) {
-    await Promise.all(vscode.workspace.workspaceFolders.map(scope => reindexScope(stash, scope)));
+    vscode.workspace.workspaceFolders.map(scope => reindexScope(stash, scope));
 }
 
 function reindexScope(stash, scope, { fs = fs_ } = {}) {
+    console.time("[Ctags Companion] reindex");
+
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
@@ -28,22 +30,18 @@ function reindexScope(stash, scope, { fs = fs_ } = {}) {
         return;
     }
 
-    return new Promise(resolve => {
-        console.time("[Ctags Companion] reindex");
-        stash.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
-        stash.statusBarItem.show();
+    stash.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
+    stash.statusBarItem.show();
 
-        const lines = fs.readFileSync(tagsPath, { encoding: "utf-8" }).trim().split("\n");
+    const lines = fs.readFileSync(tagsPath, { encoding: "utf-8" }).trim().split("\n");
 
-        const indexes = stash.context.workspaceState.get("indexes") || {};  // TODO use Map here as well
-        indexes[scope.uri.fsPath] = createIndex(lines);
-        stash.context.workspaceState.update("indexes", indexes);
+    const indexes = stash.context.workspaceState.get("indexes") || {};  // TODO use Map here as well
+    indexes[scope.uri.fsPath] = createIndex(lines);
+    stash.context.workspaceState.update("indexes", indexes);
 
-        stash.statusBarItem.hide();
-        console.timeEnd("[Ctags Companion] reindex");
+    stash.statusBarItem.hide();
 
-        resolve();
-    });
+    console.timeEnd("[Ctags Companion] reindex");
 }
 
 function createIndex(lines) {
