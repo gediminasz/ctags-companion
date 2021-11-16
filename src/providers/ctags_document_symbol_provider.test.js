@@ -9,24 +9,16 @@ function makeDocumentWithPath(fsPath) {
 describe(CtagsDocumentSymbolProvider, () => {
     describe("provideDocumentSymbols", () => {
         const stash = {
-            context: {
-                workspaceState: {
-                    get: (key) => {
-                        switch (key) {
-                            case "indexes":
-                                return {
-                                    "/test": {
-                                        documentIndex: [
-                                            ["empty", []],
-                                            ["foo", ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']],
-                                        ]
-                                    }
-                                };
-                        }
-                    }
-                }
-            }
+            context: { workspaceState: new vscode.Memento() }
         };
+        stash.context.workspaceState.update("indexes", {
+            "/test": {
+                documentIndex: [
+                    ["empty", []],
+                    ["foo", ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']],
+                ]
+            }
+        });
 
         it("returns nothing when no definitions are found", async () => {
             const document = makeDocumentWithPath("/test/unknown");

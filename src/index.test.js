@@ -1,16 +1,7 @@
+const vscode = require("vscode");
+
 const { reindexScope } = require("./index");
 
-class MockMemento {
-    constructor() {
-        this.state = {};
-    }
-    get(key) {
-        return this.state[key];
-    }
-    update(key, value) {
-        this.state[key] = value;
-    }
-}
 
 class MockStatusBarItem {
     constructor() {
@@ -32,7 +23,7 @@ describe("reindexScope", () => {
 
     it("shows a warning when file does not exist", () => {
         const stash = {
-            context: { workspaceState: new MockMemento() },
+            context: { workspaceState: new vscode.Memento() },
             statusBarItem: new MockStatusBarItem()
         };
         const fs = {
@@ -59,7 +50,7 @@ describe("reindexScope", () => {
 
         it("indicates activity in status bar", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
 
@@ -72,7 +63,7 @@ describe("reindexScope", () => {
 
         it("skips meta lines", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
 
@@ -107,7 +98,7 @@ describe("reindexScope", () => {
             ],
         ])("indexes tags", (line, expectedSymbol, expectedPath) => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
 
@@ -125,7 +116,7 @@ describe("reindexScope", () => {
 
         it("appends to already indexed symbols", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
 
@@ -152,7 +143,7 @@ describe("reindexScope", () => {
 
         it("appends to already indexed documents", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
 
@@ -179,7 +170,7 @@ describe("reindexScope", () => {
 
         it("does not clash with built-in properties", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
 
