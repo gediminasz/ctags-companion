@@ -16,10 +16,10 @@ describe(CtagsDocumentSymbolProvider, () => {
                             case "indexes":
                                 return {
                                     "/test": {
-                                        documentIndex: {
-                                            empty: [],
-                                            foo: ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']
-                                        }
+                                        documentIndex: [
+                                            ["empty", []],
+                                            ["foo", ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']],
+                                        ]
                                     }
                                 };
                         }
