@@ -36,24 +36,24 @@ function reindexScope(stash, scope, { fs = fs_, readline = readline_ } = {}) {
         const input = fs.createReadStream(tagsPath);
         const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity });
 
-        const symbolIndex = {};
-        const documentIndex = {};
+        const symbolIndex = new Map();
+        const documentIndex = new Map();
 
         reader.on("line", (line) => {
             if (line.startsWith("!")) return;
 
             const [symbol, path, ...rest] = line.split("\t");
 
-            if (!symbolIndex.hasOwnProperty(symbol)) symbolIndex[symbol] = [];
-            symbolIndex[symbol].push(line);
+            if (!symbolIndex.has(symbol)) symbolIndex.set(symbol, []);
+            symbolIndex.get(symbol).push(line);
 
-            if (!documentIndex.hasOwnProperty(path)) documentIndex[path] = [];
-            documentIndex[path].push(line);
+            if (!documentIndex.has(path)) documentIndex.set(path, []);
+            documentIndex.get(path).push(line);
         });
 
         reader.on("close", () => {
-            const indexes = stash.context.workspaceState.get("indexes") || {};
-            indexes[scope.uri.fsPath] = { symbolIndex, documentIndex };
+            const indexes = stash.context.workspaceState.get("indexes") || {};  // TODO use Map here as well
+            indexes[scope.uri.fsPath] = { symbolIndex: [...symbolIndex], documentIndex: [...documentIndex] };
             stash.context.workspaceState.update("indexes", indexes);
 
             stash.statusBarItem.hide();

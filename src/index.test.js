@@ -107,8 +107,8 @@ describe("reindexScope", () => {
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: {},
-                        documentIndex: {}
+                        symbolIndex: [],
+                        documentIndex: []
                     }
                 }
             });
@@ -129,7 +129,7 @@ describe("reindexScope", () => {
                 'ExternalLib	/usr/lib/pyhon/external_lib.py	/^class ExternalLib:$/;"	kind:class	line:22',
                 "ExternalLib",
                 "/usr/lib/pyhon/external_lib.py",
-            ]
+            ],
         ])("indexes tags", (line, expectedSymbol, expectedPath) => {
             const stash = {
                 context: { workspaceState: new MockMemento() },
@@ -144,8 +144,8 @@ describe("reindexScope", () => {
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: { [expectedSymbol]: [line] },
-                        documentIndex: { [expectedPath]: [line] }
+                        symbolIndex: [[expectedSymbol, [line]]],
+                        documentIndex: [[expectedPath, [line]]],
                     }
                 }
             });
@@ -168,8 +168,13 @@ describe("reindexScope", () => {
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: { Klass: [firstDefinition, secondDefinition] },
-                        documentIndex: { "first.py": [firstDefinition], "second.py": [secondDefinition] }
+                        symbolIndex: [
+                            ["Klass", [firstDefinition, secondDefinition]]
+                        ],
+                        documentIndex: [
+                            ["first.py", [firstDefinition]],
+                            ["second.py", [secondDefinition]],
+                        ],
                     }
                 }
             });
@@ -192,8 +197,42 @@ describe("reindexScope", () => {
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: { Foo: [fooDefinition], Bar: [barDefinition] },
-                        documentIndex: { "src.py": [fooDefinition, barDefinition] }
+                        symbolIndex: [
+                            ["Foo", [fooDefinition]],
+                            ["Bar", [barDefinition]],
+                        ],
+                        documentIndex: [
+                            ["src.py", [fooDefinition, barDefinition]],
+                        ]
+                    }
+                }
+            });
+        });
+
+        it("does not clash with built-in properties", () => {
+            const stash = {
+                context: { workspaceState: new MockMemento() },
+                statusBarItem: new MockStatusBarItem()
+            };
+            const reader = new MockReader();
+            const clashingDefinition = 'hasOwnProperty	src.py	/^def hasOwnProperty():$/;"	kind:function line:1';
+            const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:10';
+
+            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
+            reader.handlers.line(clashingDefinition);
+            reader.handlers.line(fooDefinition);
+            reader.handlers.close();
+
+            expect(stash.context.workspaceState.state).toEqual({
+                indexes: {
+                    "/test": {
+                        symbolIndex: [
+                            ["hasOwnProperty", [clashingDefinition]],
+                            ["Foo", [fooDefinition]],
+                        ],
+                        documentIndex: [
+                            ["src.py", [clashingDefinition, fooDefinition]]
+                        ]
                     }
                 }
             });
