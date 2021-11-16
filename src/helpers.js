@@ -11,14 +11,14 @@ function getConfiguration(scope = null) {
 }
 
 function commandGuard(command) {
-    if ( typeof command !== 'string' || command.trim() === '')  {
+    if (typeof command !== 'string' || command.trim() === '') {
         vscode.window.showErrorMessage(
             `${EXTENSION_NAME}: The "Command" preference is not set. Please check your configuration.`
-        )
-        return true
+        );
+        return true;
     }
 
-    return false
+    return false;
 }
 
 const SYMBOL_KINDS = {
@@ -76,7 +76,19 @@ const SYMBOL_KINDS = {
     variable: vscode.SymbolKind.Variable,
 };
 
-function definitionToSymbolInformation({ symbol, file, line, kind, container }) {
+function definitionToSymbolInformation(definition, scope) {
+    const [symbol, path, ...rest] = definition.split("\t");
+
+    const file = path.startsWith('/') ? vscode.Uri.parse(path) : vscode.Uri.joinPath(scope.uri, path);
+
+    const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
+    const line = parseInt(lineNumberStr, 10) - 1;
+
+    const kind = rest.find(value => value.startsWith("kind:")).substring(5);
+
+    const containerTag = rest.find(value => value.startsWith("class:"));
+    const container = containerTag && containerTag.substring(6);
+
     return new vscode.SymbolInformation(
         symbol,
         SYMBOL_KINDS[kind],

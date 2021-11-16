@@ -3,6 +3,40 @@ const vscode = require("vscode");
 const { definitionToSymbolInformation, commandGuard } = require("./helpers");
 
 describe("definitionToSymbolInformation", () => {
+    const scope = { uri: { fsPath: "/path/to/scope" } };
+
+    it("parses symbol information from ctags string", () => {
+        const definition = 'fizz	relative/path/to/definition.py	/^    fizz = "fizz"$/;"	kind:variable	line:64	class:Buzz';
+
+        const symbolInformation = definitionToSymbolInformation(definition, scope);
+
+        expect(symbolInformation).toEqual({
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: "/path/to/scope/relative/path/to/definition.py",
+                rangeOrPosition: { line: 63, character: 0 }
+            }
+        });
+    });
+
+    it("parses symbol information from ctags string given absolute path", () => {
+        const definition = 'fizz	/absolute/path/to/definition.py	/^    fizz = "fizz"$/;"	kind:variable	line:64	class:Buzz';
+
+        const symbolInformation = definitionToSymbolInformation(definition, scope);
+
+        expect(symbolInformation).toEqual({
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: "/absolute/path/to/definition.py",
+                rangeOrPosition: { line: 63, character: 0 }
+            }
+        });
+    });
+
     it.each([
         ["class", vscode.SymbolKind.Class],
         ["func", vscode.SymbolKind.Function],
@@ -11,15 +45,9 @@ describe("definitionToSymbolInformation", () => {
         ["GlobalVar", undefined],
         ["unknown", undefined],
     ])("maps ctags symbol kind to vscode symbol kind", (ctagsKind, vscodeKind) => {
-        const definition = {
-            symbol: "whatever",
-            file: "whatever",
-            line: 0,
-            kind: ctagsKind,
-            container: "whatever"
-        };
+        const definition = `fizz	fizz.py	/^fizz = "fizz"$/;"	kind:${ctagsKind}	line:100`;
 
-        const symbolInformation = definitionToSymbolInformation(definition);
+        const symbolInformation = definitionToSymbolInformation(definition, scope);
 
         expect(symbolInformation.kind).toEqual(vscodeKind);
     });
@@ -29,12 +57,12 @@ describe('commandGuard', () => {
     it('silent when command is present', () => {
         expect(commandGuard("/bin/ctags")).toEqual(false);
         expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
-    })
+    });
 
     it.each([undefined, '', '  '])("params that cause error message", param => {
         expect(commandGuard(param)).toEqual(true);
         expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
             'Ctags Companion: The "Command" preference is not set. Please check your configuration.'
         );
-    })
-})
+    });
+});

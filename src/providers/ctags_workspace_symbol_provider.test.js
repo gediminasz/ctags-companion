@@ -4,50 +4,16 @@ const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provi
 
 const symbolIndex = {
     empty: [],
-    fizz: [{
-        symbol: "fizz",
-        file: "fizz-file",
-        line: "fizz-line",
-        kind: "function",
-        container: "fizz-container"
-    }],
+    fizz: ['fizz	fizz.py	/^fizz = "fizz"$/;"	kind:variable	line:100'],
     multi: [
-        {
-            symbol: "multi",
-            file: "multi-file-1",
-            line: "multi-line-1",
-            kind: "function",
-            container: "multi-container-1"
-        },
-        {
-            symbol: "multi",
-            file: "multi-file-2",
-            line: "multi-line-2",
-            kind: "function",
-            container: "multi-container-2"
-        }
+        'multi	multi1.py	/^multi = "multi"$/;"	kind:variable	line:200',
+        'multi	multi2.py	/^multi = "multi"$/;"	kind:variable	line:300',
     ],
-    KONSTANT: [{
-        symbol: "KONSTANT",
-        file: "KONSTANT-file",
-        line: "KONSTANT-line",
-        kind: "function",
-        container: "KONSTANT-container"
-    }],
-    Klass: [{
-        symbol: "Klass",
-        file: "Klass-file",
-        line: "Klass-line",
-        kind: "function",
-        container: "Klass-container"
-    }],
-    symbol_with_underscores: [{
-        symbol: "symbol_with_underscores",
-        file: "symbol_with_underscores-file",
-        line: "symbol_with_underscores-line",
-        kind: "function",
-        container: "symbol_with_underscores-container"
-    }],
+    KONSTANT: ['KONSTANT	konstant.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:100'],
+    Klass: ['Klass	klass.py	/^class Klass:$/;"	kind:class	line:200'],
+    symbol_with_underscores: [
+        'symbol_with_underscores	underscores.py	/^symbol_with_underscores = "?"$/;"	kind:variable	line:100'
+    ],
 };
 
 describe(CtagsWorkspaceSymbolProvider, () => {
@@ -101,12 +67,12 @@ describe(CtagsWorkspaceSymbolProvider, () => {
             expect(definitions).toEqual([
                 {
                     name: "fizz",
-                    kind: vscode.SymbolKind.Function,
-                    containerName: "fizz-container",
+                    kind: vscode.SymbolKind.Variable,
+                    containerName: undefined,
                     location: {
-                        uri: "fizz-file",
+                        uri: "/test/fizz.py",
                         rangeOrPosition: {
-                            line: "fizz-line",
+                            line: 99,
                             character: 0
                         }
                     }
@@ -122,15 +88,15 @@ describe(CtagsWorkspaceSymbolProvider, () => {
             expect(definitions).toEqual([
                 {
                     name: "multi",
-                    kind: vscode.SymbolKind.Function,
-                    containerName: "multi-container-1",
-                    location: { uri: "multi-file-1", rangeOrPosition: { line: "multi-line-1", character: 0 } }
+                    kind: vscode.SymbolKind.Variable,
+                    containerName: undefined,
+                    location: { uri: "/test/multi1.py", rangeOrPosition: { line: 199, character: 0 } }
                 },
                 {
                     name: "multi",
-                    kind: vscode.SymbolKind.Function,
-                    containerName: "multi-container-2",
-                    location: { uri: "multi-file-2", rangeOrPosition: { line: "multi-line-2", character: 0 } }
+                    kind: vscode.SymbolKind.Variable,
+                    containerName: undefined,
+                    location: { uri: "/test/multi2.py", rangeOrPosition: { line: 299, character: 0 } }
                 },
             ]);
         });
@@ -143,15 +109,15 @@ describe(CtagsWorkspaceSymbolProvider, () => {
             expect(definitions).toEqual([
                 {
                     name: "KONSTANT",
-                    kind: vscode.SymbolKind.Function,
-                    containerName: "KONSTANT-container",
-                    location: { uri: "KONSTANT-file", rangeOrPosition: { line: "KONSTANT-line", character: 0 } }
+                    kind: vscode.SymbolKind.Variable,
+                    containerName: undefined,
+                    location: { uri: "/test/konstant.py", rangeOrPosition: { line: 99, character: 0 } }
                 },
                 {
                     name: "Klass",
-                    kind: vscode.SymbolKind.Function,
-                    containerName: "Klass-container",
-                    location: { uri: "Klass-file", rangeOrPosition: { line: "Klass-line", character: 0 } }
+                    kind: vscode.SymbolKind.Class,
+                    containerName: undefined,
+                    location: { uri: "/test/klass.py", rangeOrPosition: { line: 199, character: 0 } }
                 },
             ]);
         });
@@ -166,11 +132,11 @@ describe(CtagsWorkspaceSymbolProvider, () => {
             expect(definitions).toEqual([
                 {
                     name: "symbol_with_underscores",
-                    kind: vscode.SymbolKind.Function,
-                    containerName: "symbol_with_underscores-container",
+                    kind: vscode.SymbolKind.Variable,
+                    containerName: undefined,
                     location: {
-                        uri: "symbol_with_underscores-file",
-                        rangeOrPosition: { line: "symbol_with_underscores-line", character: 0 }
+                        uri: "/test/underscores.py",
+                        rangeOrPosition: { line: 99, character: 0 }
                     }
                 },
             ]);

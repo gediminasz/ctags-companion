@@ -15,7 +15,7 @@ class CtagsDocumentSymbolProvider {
 
         const definitions = documentIndex[relativePath];
         if (definitions) {
-            return definitions.map(definitionToSymbolInformation);
+            return definitions.map(definition => definitionToSymbolInformation(definition, scope));
         }
     }
 }

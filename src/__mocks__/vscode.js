@@ -2,8 +2,9 @@ const path = require('path');
 
 const SymbolKind = {
     Class: 4,
+    Property: 6,
     Function: 11,
-    Variable: 12
+    Variable: 12,
 };
 
 const _scope = { uri: { fsPath: "/test" } };

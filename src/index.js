@@ -43,21 +43,12 @@ function reindexScope(stash, scope, { fs = fs_, readline = readline_ } = {}) {
             if (line.startsWith("!")) return;
 
             const [symbol, path, ...rest] = line.split("\t");
-            const file = path.startsWith('/') ? vscode.Uri.parse(path) : vscode.Uri.joinPath(scope.uri, path);
-            const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
-            const lineNumber = parseInt(lineNumberStr, 10) - 1;
-            const kind = rest.find(value => value.startsWith("kind:")).substring(5);
-
-            const containerTag = rest.find(value => value.startsWith("class:"));
-            const container = containerTag && containerTag.substring(6);
-
-            const definition = { symbol, file, line: lineNumber, kind, container };
 
             if (!symbolIndex.hasOwnProperty(symbol)) symbolIndex[symbol] = [];
-            symbolIndex[symbol].push(definition);
+            symbolIndex[symbol].push(line);
 
             if (!documentIndex.hasOwnProperty(path)) documentIndex[path] = [];
-            documentIndex[path].push(definition);
+            documentIndex[path].push(line);
         });
 
         reader.on("close", () => {
