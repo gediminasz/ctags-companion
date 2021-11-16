@@ -16,21 +16,14 @@ class MockStatusBarItem {
     constructor() {
         this.text = null;
         this.visible = false;
+        this._wasShown = false;
     }
     show() {
         this.visible = true;
+        this._wasShown = true;
     }
     hide() {
         this.visible = false;
-    }
-}
-
-class MockReader {
-    constructor() {
-        this.handlers = {};
-    }
-    on(event, handler) {
-        this.handlers[event] = handler;
     }
 }
 
@@ -57,40 +50,24 @@ describe("reindexScope", () => {
     });
 
     describe("when file exists", () => {
-        const inputReadStream = Symbol("inputReadStream");
         const fs = {
             existsSync: (path) => {
                 expect(path).toEqual("/test/path/to/ctags");
                 return true;
-            },
-            createReadStream: (path) => {
-                expect(path).toEqual("/test/path/to/ctags");
-                return inputReadStream;
             }
         };
-        const makeReadline = (reader) => ({
-            createInterface: ({ input }) => {
-                expect(input).toBe(inputReadStream);
-                return reader;
-            }
-        });
 
         it("indicates activity in status bar", () => {
             const stash = {
                 context: { workspaceState: new MockMemento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => "" } });
 
             expect(stash.statusBarItem.text).toMatch(/reindexing/);
-            expect(stash.statusBarItem.visible).toBeTruthy();
-
-            reader.handlers.close();
-
             expect(stash.statusBarItem.visible).toBeFalsy();
-
+            expect(stash.statusBarItem._wasShown).toBeTruthy();
         });
 
         it("skips meta lines", () => {
@@ -98,11 +75,9 @@ describe("reindexScope", () => {
                 context: { workspaceState: new MockMemento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line("!_THIS_LINE_SHOULD_BE_IGNORED");
-            reader.handlers.close();
+            line = "!_THIS_LINE_SHOULD_BE_IGNORED";
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => line } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
@@ -135,11 +110,8 @@ describe("reindexScope", () => {
                 context: { workspaceState: new MockMemento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line(line);
-            reader.handlers.close();
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => line } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
@@ -156,14 +128,12 @@ describe("reindexScope", () => {
                 context: { workspaceState: new MockMemento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
+
             const firstDefinition = 'Klass	first.py	/^class Klass:$/;"	kind:class	line:1';
             const secondDefinition = 'Klass	second.py	/^class Klass:$/;"	kind:class	line:2';
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line(firstDefinition);
-            reader.handlers.line(secondDefinition);
-            reader.handlers.close();
+            lines = firstDefinition + "\n" + secondDefinition;
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
@@ -185,14 +155,12 @@ describe("reindexScope", () => {
                 context: { workspaceState: new MockMemento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
+
             const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:1';
             const barDefinition = 'Bar	src.py	/^class Bar:$/;"	kind:class	line:2';
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line(fooDefinition);
-            reader.handlers.line(barDefinition);
-            reader.handlers.close();
+            lines = fooDefinition + "\n" + barDefinition;
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
@@ -214,14 +182,12 @@ describe("reindexScope", () => {
                 context: { workspaceState: new MockMemento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
+
             const clashingDefinition = 'hasOwnProperty	src.py	/^def hasOwnProperty():$/;"	kind:function line:1';
             const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:10';
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line(clashingDefinition);
-            reader.handlers.line(fooDefinition);
-            reader.handlers.close();
+            lines = clashingDefinition + "\n" + fooDefinition;
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
