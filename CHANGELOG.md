@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Improved performance of tags file parsing.
+- Fixed a bug when symbols matching certain JS methods (e.g. `hasOwnProperty`) would break the extension. Thanks to @ocoka for reporting!
 
 ## 2021.1.0
 
