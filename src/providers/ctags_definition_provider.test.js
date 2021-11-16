@@ -27,10 +27,10 @@ describe(CtagsDefinitionProvider, () => {
                             case "indexes":
                                 return {
                                     "/test": {
-                                        symbolIndex: {
-                                            emptyListSymbol: [],
-                                            foo: ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']
-                                        }
+                                        symbolIndex: [
+                                            ["emptyListSymbol", []],
+                                            ["foo", ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']]
+                                        ]
                                     }
                                 };
                         }
