@@ -6,4 +6,5 @@
 .vscode
 **/*.test.js
 coverage
+Makefile
 test_projects
