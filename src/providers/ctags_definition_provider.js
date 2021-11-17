@@ -11,7 +11,7 @@ class CtagsDefinitionProvider {
         const scope = determineScope(document);
         const { symbolIndex } = await getIndexForScope(this.stash, scope);
 
-        const definitions = symbolIndex[symbol];
+        const definitions = new Map(symbolIndex).get(symbol);
         if (definitions) {
             return definitions
                 .map(definition => definitionToSymbolInformation(definition, scope))

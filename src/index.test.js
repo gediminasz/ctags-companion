@@ -1,36 +1,20 @@
+const vscode = require("vscode");
+
 const { reindexScope } = require("./index");
 
-class MockMemento {
-    constructor() {
-        this.state = {};
-    }
-    get(key) {
-        return this.state[key];
-    }
-    update(key, value) {
-        this.state[key] = value;
-    }
-}
 
 class MockStatusBarItem {
     constructor() {
         this.text = null;
         this.visible = false;
+        this._wasShown = false;
     }
     show() {
         this.visible = true;
+        this._wasShown = true;
     }
     hide() {
         this.visible = false;
-    }
-}
-
-class MockReader {
-    constructor() {
-        this.handlers = {};
-    }
-    on(event, handler) {
-        this.handlers[event] = handler;
     }
 }
 
@@ -39,7 +23,7 @@ describe("reindexScope", () => {
 
     it("shows a warning when file does not exist", () => {
         const stash = {
-            context: { workspaceState: new MockMemento() },
+            context: { workspaceState: new vscode.Memento() },
             statusBarItem: new MockStatusBarItem()
         };
         const fs = {
@@ -57,58 +41,40 @@ describe("reindexScope", () => {
     });
 
     describe("when file exists", () => {
-        const inputReadStream = Symbol("inputReadStream");
         const fs = {
             existsSync: (path) => {
                 expect(path).toEqual("/test/path/to/ctags");
                 return true;
-            },
-            createReadStream: (path) => {
-                expect(path).toEqual("/test/path/to/ctags");
-                return inputReadStream;
             }
         };
-        const makeReadline = (reader) => ({
-            createInterface: ({ input }) => {
-                expect(input).toBe(inputReadStream);
-                return reader;
-            }
-        });
 
         it("indicates activity in status bar", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => "" } });
 
             expect(stash.statusBarItem.text).toMatch(/reindexing/);
-            expect(stash.statusBarItem.visible).toBeTruthy();
-
-            reader.handlers.close();
-
             expect(stash.statusBarItem.visible).toBeFalsy();
-
+            expect(stash.statusBarItem._wasShown).toBeTruthy();
         });
 
         it("skips meta lines", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line("!_THIS_LINE_SHOULD_BE_IGNORED");
-            reader.handlers.close();
+            line = "!_THIS_LINE_SHOULD_BE_IGNORED";
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => line } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: {},
-                        documentIndex: {}
+                        symbolIndex: [],
+                        documentIndex: []
                     }
                 }
             });
@@ -129,23 +95,20 @@ describe("reindexScope", () => {
                 'ExternalLib	/usr/lib/pyhon/external_lib.py	/^class ExternalLib:$/;"	kind:class	line:22',
                 "ExternalLib",
                 "/usr/lib/pyhon/external_lib.py",
-            ]
+            ],
         ])("indexes tags", (line, expectedSymbol, expectedPath) => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line(line);
-            reader.handlers.close();
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => line } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: { [expectedSymbol]: [line] },
-                        documentIndex: { [expectedPath]: [line] }
+                        symbolIndex: [[expectedSymbol, [line]]],
+                        documentIndex: [[expectedPath, [line]]],
                     }
                 }
             });
@@ -153,23 +116,26 @@ describe("reindexScope", () => {
 
         it("appends to already indexed symbols", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
+
             const firstDefinition = 'Klass	first.py	/^class Klass:$/;"	kind:class	line:1';
             const secondDefinition = 'Klass	second.py	/^class Klass:$/;"	kind:class	line:2';
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line(firstDefinition);
-            reader.handlers.line(secondDefinition);
-            reader.handlers.close();
+            lines = firstDefinition + "\n" + secondDefinition;
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: { Klass: [firstDefinition, secondDefinition] },
-                        documentIndex: { "first.py": [firstDefinition], "second.py": [secondDefinition] }
+                        symbolIndex: [
+                            ["Klass", [firstDefinition, secondDefinition]]
+                        ],
+                        documentIndex: [
+                            ["first.py", [firstDefinition]],
+                            ["second.py", [secondDefinition]],
+                        ],
                     }
                 }
             });
@@ -177,23 +143,53 @@ describe("reindexScope", () => {
 
         it("appends to already indexed documents", () => {
             const stash = {
-                context: { workspaceState: new MockMemento() },
+                context: { workspaceState: new vscode.Memento() },
                 statusBarItem: new MockStatusBarItem()
             };
-            const reader = new MockReader();
+
             const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:1';
             const barDefinition = 'Bar	src.py	/^class Bar:$/;"	kind:class	line:2';
 
-            reindexScope(stash, scope, { fs, readline: makeReadline(reader) });
-            reader.handlers.line(fooDefinition);
-            reader.handlers.line(barDefinition);
-            reader.handlers.close();
+            lines = fooDefinition + "\n" + barDefinition;
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
 
             expect(stash.context.workspaceState.state).toEqual({
                 indexes: {
                     "/test": {
-                        symbolIndex: { Foo: [fooDefinition], Bar: [barDefinition] },
-                        documentIndex: { "src.py": [fooDefinition, barDefinition] }
+                        symbolIndex: [
+                            ["Foo", [fooDefinition]],
+                            ["Bar", [barDefinition]],
+                        ],
+                        documentIndex: [
+                            ["src.py", [fooDefinition, barDefinition]],
+                        ]
+                    }
+                }
+            });
+        });
+
+        it("does not clash with built-in properties", () => {
+            const stash = {
+                context: { workspaceState: new vscode.Memento() },
+                statusBarItem: new MockStatusBarItem()
+            };
+
+            const clashingDefinition = 'hasOwnProperty	src.py	/^def hasOwnProperty():$/;"	kind:function line:1';
+            const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:10';
+
+            lines = clashingDefinition + "\n" + fooDefinition;
+            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
+
+            expect(stash.context.workspaceState.state).toEqual({
+                indexes: {
+                    "/test": {
+                        symbolIndex: [
+                            ["hasOwnProperty", [clashingDefinition]],
+                            ["Foo", [fooDefinition]],
+                        ],
+                        documentIndex: [
+                            ["src.py", [clashingDefinition, fooDefinition]]
+                        ]
                     }
                 }
             });

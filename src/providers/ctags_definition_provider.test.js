@@ -1,4 +1,7 @@
+const vscode = require("vscode");
+
 const { CtagsDefinitionProvider } = require("./ctags_definition_provider");
+const { reindexScope } = require("../index");
 
 const position = Symbol("position");
 const wordRange = Symbol("wordRange");
@@ -20,24 +23,16 @@ function makeDocumentWithSymbol(detectedSymbol) {
 describe(CtagsDefinitionProvider, () => {
     describe("provideDefinition", () => {
         const stash = {
-            context: {
-                workspaceState: {
-                    get: (key) => {
-                        switch (key) {
-                            case "indexes":
-                                return {
-                                    "/test": {
-                                        symbolIndex: {
-                                            emptyListSymbol: [],
-                                            foo: ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']
-                                        }
-                                    }
-                                };
-                        }
-                    }
-                }
-            }
+            context: { workspaceState: new vscode.Memento() }
         };
+        stash.context.workspaceState.update("indexes", {
+            "/test": {
+                symbolIndex: [
+                    ["emptyListSymbol", []],
+                    ["foo", ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']]
+                ]
+            }
+        });
 
         it("returns nothing when no definitions are found", async () => {
             const document = makeDocumentWithSymbol("unknownSymbol");

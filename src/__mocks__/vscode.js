@@ -52,4 +52,16 @@ const Uri = {
     joinPath: (left, right) => path.join(left.fsPath, right)
 };
 
-module.exports = { SymbolKind, workspace, window, Position, Location, SymbolInformation, Uri };
+class Memento {
+    constructor() {
+        this.state = {};
+    }
+    get(key) {
+        return this.state[key];
+    }
+    update(key, value) {
+        this.state[key] = value;
+    }
+}
+
+module.exports = { SymbolKind, workspace, window, Position, Location, SymbolInformation, Uri, Memento };

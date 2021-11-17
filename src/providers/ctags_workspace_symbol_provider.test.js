@@ -2,36 +2,29 @@ const vscode = require("vscode");
 
 const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provider");
 
-const symbolIndex = {
-    empty: [],
-    fizz: ['fizz	fizz.py	/^fizz = "fizz"$/;"	kind:variable	line:100'],
-    multi: [
-        'multi	multi1.py	/^multi = "multi"$/;"	kind:variable	line:200',
-        'multi	multi2.py	/^multi = "multi"$/;"	kind:variable	line:300',
-    ],
-    KONSTANT: ['KONSTANT	konstant.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:100'],
-    Klass: ['Klass	klass.py	/^class Klass:$/;"	kind:class	line:200'],
-    symbol_with_underscores: [
-        'symbol_with_underscores	underscores.py	/^symbol_with_underscores = "?"$/;"	kind:variable	line:100'
-    ],
-};
 
 describe(CtagsWorkspaceSymbolProvider, () => {
     describe("provideWorkspaceSymbols", () => {
         const stash = {
-            context: {
-                workspaceState: {
-                    get: (key) => {
-                        switch (key) {
-                            case "indexes":
-                                return {
-                                    "/test": { symbolIndex }
-                                };
-                        }
-                    }
-                }
-            }
+            context: { workspaceState: new vscode.Memento() }
         };
+        stash.context.workspaceState.update("indexes", {
+            "/test": {
+                symbolIndex: [
+                    ["empty", []],
+                    ["fizz", ['fizz	fizz.py	/^fizz = "fizz"$/;"	kind:variable	line:100']],
+                    ["multi", [
+                        'multi	multi1.py	/^multi = "multi"$/;"	kind:variable	line:200',
+                        'multi	multi2.py	/^multi = "multi"$/;"	kind:variable	line:300',
+                    ]],
+                    ["KONSTANT", ['KONSTANT	konstant.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:100']],
+                    ["Klass", ['Klass	klass.py	/^class Klass:$/;"	kind:class	line:200']],
+                    ["symbol_with_underscores", [
+                        'symbol_with_underscores	underscores.py	/^symbol_with_underscores = "?"$/;"	kind:variable	line:100'
+                    ]],
+                ]
+            }
+        });
 
         it.each([undefined, null, ""])("returns nothing when query is falsy", async (query) => {
             const provider = new CtagsWorkspaceSymbolProvider(stash);

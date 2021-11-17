@@ -1,6 +1,5 @@
 const fs_ = require('fs');
 const path = require('path');
-const readline_ = require('readline');
 const vscode = require('vscode');
 
 const { getConfiguration } = require("./helpers");
@@ -14,10 +13,12 @@ async function getIndexForScope(stash, scope) {
 }
 
 async function reindexAll(stash) {
-    await Promise.all(vscode.workspace.workspaceFolders.map(scope => reindexScope(stash, scope)));
+    vscode.workspace.workspaceFolders.map(scope => reindexScope(stash, scope));
 }
 
-function reindexScope(stash, scope, { fs = fs_, readline = readline_ } = {}) {
+function reindexScope(stash, scope, { fs = fs_ } = {}) {
+    console.time("[Ctags Companion] reindex");
+
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
@@ -29,37 +30,37 @@ function reindexScope(stash, scope, { fs = fs_, readline = readline_ } = {}) {
         return;
     }
 
-    return new Promise(resolve => {
-        stash.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
-        stash.statusBarItem.show();
+    stash.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
+    stash.statusBarItem.show();
 
-        const input = fs.createReadStream(tagsPath);
-        const reader = readline.createInterface({ input, terminal: false, crlfDelay: Infinity });
+    const lines = fs.readFileSync(tagsPath, { encoding: "utf-8" }).trim().split("\n");
 
-        const symbolIndex = {};
-        const documentIndex = {};
+    const indexes = stash.context.workspaceState.get("indexes") || {};  // TODO use Map here as well
+    indexes[scope.uri.fsPath] = createIndex(lines);
+    stash.context.workspaceState.update("indexes", indexes);
 
-        reader.on("line", (line) => {
-            if (line.startsWith("!")) return;
+    stash.statusBarItem.hide();
 
-            const [symbol, path, ...rest] = line.split("\t");
+    console.timeEnd("[Ctags Companion] reindex");
+}
 
-            if (!symbolIndex.hasOwnProperty(symbol)) symbolIndex[symbol] = [];
-            symbolIndex[symbol].push(line);
+function createIndex(lines) {
+    const symbolIndex = new Map();
+    const documentIndex = new Map();
 
-            if (!documentIndex.hasOwnProperty(path)) documentIndex[path] = [];
-            documentIndex[path].push(line);
-        });
+    lines.forEach(line => {
+        if (line.startsWith("!")) return;
 
-        reader.on("close", () => {
-            const indexes = stash.context.workspaceState.get("indexes") || {};
-            indexes[scope.uri.fsPath] = { symbolIndex, documentIndex };
-            stash.context.workspaceState.update("indexes", indexes);
+        const [symbol, path] = line.split("\t", 2);
 
-            stash.statusBarItem.hide();
-            resolve();
-        });
+        if (!symbolIndex.has(symbol)) symbolIndex.set(symbol, []);
+        symbolIndex.get(symbol).push(line);
+
+        if (!documentIndex.has(path)) documentIndex.set(path, []);
+        documentIndex.get(path).push(line);
     });
+
+    return { symbolIndex: [...symbolIndex], documentIndex: [...documentIndex] };
 }
 
 module.exports = { getIndexForScope, reindexAll, reindexScope };

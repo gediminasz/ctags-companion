@@ -13,7 +13,7 @@ class CtagsDocumentSymbolProvider {
         const scope = determineScope(document);
         const { documentIndex } = await getIndexForScope(this.stash, scope);
 
-        const definitions = documentIndex[relativePath];
+        const definitions = new Map(documentIndex).get(relativePath);
         if (definitions) {
             return definitions.map(definition => definitionToSymbolInformation(definition, scope));
         }
