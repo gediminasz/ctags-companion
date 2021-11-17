@@ -4,5 +4,5 @@ update:
 package:
 	vsce package
 
-publish:
+publish: package
 	vsce publish
