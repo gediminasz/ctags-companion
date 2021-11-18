@@ -5,6 +5,7 @@
 .ignored
 .vscode
 **/*.test.js
+assets
 coverage
 Makefile
 test_projects

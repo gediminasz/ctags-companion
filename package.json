@@ -3,11 +3,12 @@
     "displayName": "Ctags Companion",
     "description": "A Visual Studio Code symbols provider based on Ctags",
     "publisher": "gediminaszlatkus",
+    "icon": "logo.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/gediminasz/ctags-companion"
     },
-    "version": "2021.11.0",
+    "version": "2021.11.1",
     "engines": {
         "vscode": "^1.42.0"
     },

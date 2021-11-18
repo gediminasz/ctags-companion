@@ -1,5 +1,9 @@
 # Change Log
 
+## 2021.11.1
+
+- Added icon.
+
 ## 2021.11.0
 
 - Improved performance of tags file parsing.
