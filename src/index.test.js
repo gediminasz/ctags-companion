@@ -1,15 +1,13 @@
 const vscode = require("vscode");
 
 const { reindexScope } = require("./index");
+const { Extension } = require("./extension");
 
 describe("reindexScope", () => {
     const scope = { uri: { fsPath: "/test" } };
 
     it("shows a warning when file does not exist", () => {
-        const stash = {
-            context: { workspaceState: new vscode.Memento() },
-            statusBarItem: new vscode.StatusBarItem(),
-        };
+        const extension = new Extension();
         const fs = {
             existsSync: (path) => {
                 expect(path).toEqual("/test/path/to/ctags");
@@ -17,11 +15,11 @@ describe("reindexScope", () => {
             }
         };
 
-        reindexScope(stash, scope, { fs });
+        reindexScope(extension, scope, { fs });
 
-        expect(stash.context.workspaceState.state).toEqual({});
-        expect(stash.statusBarItem.text).toMatch(/not found/);
-        expect(stash.statusBarItem.visible).toBeTruthy();
+        expect(extension.indexes).toEqual(new Map());
+        expect(extension.statusBarItem.text).toMatch(/not found/);
+        expect(extension.statusBarItem.visible).toBeTruthy();
     });
 
     describe("when file exists", () => {
@@ -33,35 +31,22 @@ describe("reindexScope", () => {
         };
 
         it("indicates activity in status bar", () => {
-            const stash = {
-                context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new vscode.StatusBarItem(),
-            };
+            const extension = new Extension();
 
-            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => "" } });
+            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => "" } });
 
-            expect(stash.statusBarItem.text).toMatch(/reindexing/);
-            expect(stash.statusBarItem.visible).toBeFalsy();
-            expect(stash.statusBarItem._wasShown).toBeTruthy();
+            expect(extension.statusBarItem.text).toMatch(/reindexing/);
+            expect(extension.statusBarItem.visible).toBeFalsy();
+            expect(extension.statusBarItem._wasShown).toBeTruthy();
         });
 
         it("skips meta lines", () => {
-            const stash = {
-                context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new vscode.StatusBarItem(),
-            };
+            const extension = new Extension();
 
             line = "!_THIS_LINE_SHOULD_BE_IGNORED";
-            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => line } });
+            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => line } });
 
-            expect(stash.context.workspaceState.state).toEqual({
-                indexes: {
-                    "/test": {
-                        symbolIndex: [],
-                        documentIndex: []
-                    }
-                }
-            });
+            expect(extension.indexes).toEqual(new Map([["/test", { symbolIndex: [], documentIndex: [] }]]));
         });
 
         it.each([
@@ -81,38 +66,34 @@ describe("reindexScope", () => {
                 "/usr/lib/pyhon/external_lib.py",
             ],
         ])("indexes tags", (line, expectedSymbol, expectedPath) => {
-            const stash = {
-                context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new vscode.StatusBarItem(),
-            };
+            const extension = new Extension();
 
-            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => line } });
+            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => line } });
 
-            expect(stash.context.workspaceState.state).toEqual({
-                indexes: {
-                    "/test": {
+            expect(extension.indexes).toEqual(new Map([
+                [
+                    "/test",
+                    {
                         symbolIndex: [[expectedSymbol, [line]]],
                         documentIndex: [[expectedPath, [line]]],
                     }
-                }
-            });
+                ]
+            ]));
         });
 
         it("appends to already indexed symbols", () => {
-            const stash = {
-                context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new vscode.StatusBarItem(),
-            };
+            const extension = new Extension();
 
             const firstDefinition = 'Klass	first.py	/^class Klass:$/;"	kind:class	line:1';
             const secondDefinition = 'Klass	second.py	/^class Klass:$/;"	kind:class	line:2';
 
             lines = firstDefinition + "\n" + secondDefinition;
-            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
+            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => lines } });
 
-            expect(stash.context.workspaceState.state).toEqual({
-                indexes: {
-                    "/test": {
+            expect(extension.indexes).toEqual(new Map([
+                [
+                    "/test",
+                    {
                         symbolIndex: [
                             ["Klass", [firstDefinition, secondDefinition]]
                         ],
@@ -121,25 +102,23 @@ describe("reindexScope", () => {
                             ["second.py", [secondDefinition]],
                         ],
                     }
-                }
-            });
+                ]
+            ]));
         });
 
         it("appends to already indexed documents", () => {
-            const stash = {
-                context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new vscode.StatusBarItem(),
-            };
+            const extension = new Extension();
 
             const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:1';
             const barDefinition = 'Bar	src.py	/^class Bar:$/;"	kind:class	line:2';
 
             lines = fooDefinition + "\n" + barDefinition;
-            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
+            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => lines } });
 
-            expect(stash.context.workspaceState.state).toEqual({
-                indexes: {
-                    "/test": {
+            expect(extension.indexes).toEqual(new Map([
+                [
+                    "/test",
+                    {
                         symbolIndex: [
                             ["Foo", [fooDefinition]],
                             ["Bar", [barDefinition]],
@@ -148,25 +127,23 @@ describe("reindexScope", () => {
                             ["src.py", [fooDefinition, barDefinition]],
                         ]
                     }
-                }
-            });
+                ]
+            ]));
         });
 
         it("does not clash with built-in properties", () => {
-            const stash = {
-                context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new vscode.StatusBarItem(),
-            };
+            const extension = new Extension();
 
             const clashingDefinition = 'hasOwnProperty	src.py	/^def hasOwnProperty():$/;"	kind:function line:1';
             const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:10';
 
             lines = clashingDefinition + "\n" + fooDefinition;
-            reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => lines } });
+            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => lines } });
 
-            expect(stash.context.workspaceState.state).toEqual({
-                indexes: {
-                    "/test": {
+            expect(extension.indexes).toEqual(new Map([
+                [
+                    "/test",
+                    {
                         symbolIndex: [
                             ["hasOwnProperty", [clashingDefinition]],
                             ["Foo", [fooDefinition]],
@@ -175,8 +152,8 @@ describe("reindexScope", () => {
                             ["src.py", [clashingDefinition, fooDefinition]]
                         ]
                     }
-                }
-            });
+                ]
+            ]));
         });
     });
 });
