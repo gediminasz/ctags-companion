@@ -4,38 +4,38 @@ const vscode = require('vscode');
 
 const { getConfiguration } = require("./helpers");
 
-async function getIndexForScope(stash, scope) {
+async function getIndexForScope(extension, scope) {
     const path = scope.uri.fsPath;
-    return stash.indexes.get(path) || await reindexScope(stash, scope);
+    return extension.indexes.get(path) || await reindexScope(extension, scope);
 }
 
 
-async function reindexAll(stash) {
-    vscode.workspace.workspaceFolders.map(scope => reindexScope(stash, scope));
+async function reindexAll(extension) {
+    vscode.workspace.workspaceFolders.map(scope => reindexScope(extension, scope));
 }
 
-function reindexScope(stash, scope, { fs = fs_ } = {}) {
+function reindexScope(extension, scope, { fs = fs_ } = {}) {
     console.time("[Ctags Companion] reindex");
 
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 
     if (!fs.existsSync(tagsPath)) {
-        stash.statusBarItem.text = (
+        extension.statusBarItem.text = (
             `$(warning) Ctags Companion: file ${getConfiguration(scope).get("path")} not found, ` +
             'you may need rerun "rebuild ctags" task'
         );
-        stash.statusBarItem.show();
+        extension.statusBarItem.show();
         return;
     }
 
-    stash.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
-    stash.statusBarItem.show();
+    extension.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
+    extension.statusBarItem.show();
 
     const lines = fs.readFileSync(tagsPath, { encoding: "utf-8" }).trim().split("\n");
     const index = createIndex(lines);
-    stash.indexes.set(scope.uri.fsPath, index);
+    extension.indexes.set(scope.uri.fsPath, index);
 
-    stash.statusBarItem.hide();
+    extension.statusBarItem.hide();
     console.timeEnd("[Ctags Companion] reindex");
     return index;
 }

@@ -4,8 +4,8 @@ const { definitionToSymbolInformation, getConfiguration } = require("../helpers"
 const { getIndexForScope } = require("../index");
 
 class CtagsWorkspaceSymbolProvider {
-    constructor(stash) {
-        this.stash = stash;
+    constructor(extension) {
+        this.extension = extension;
     }
 
     async provideWorkspaceSymbols(query) {
@@ -13,7 +13,7 @@ class CtagsWorkspaceSymbolProvider {
 
         const indexes = await Promise.all(
             vscode.workspace.workspaceFolders.map(
-                async scope => [scope, await getIndexForScope(this.stash, scope)]
+                async scope => [scope, await getIndexForScope(this.extension, scope)]
             )
         );
 

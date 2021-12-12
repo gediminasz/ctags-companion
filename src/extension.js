@@ -7,7 +7,7 @@ const { EXTENSION_ID, EXTENSION_NAME, TASK_NAME } = require("./constants");
 const { getConfiguration, commandGuard } = require("./helpers");
 const { reindexAll, reindexScope } = require("./index");
 
-class Stash {
+class Extension {
     constructor(context) {
         this.context = context;
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
@@ -16,32 +16,32 @@ class Stash {
 }
 
 function activate(context) {
-    const stash = new Stash(context);
+    const extension = new Extension(context);
 
     const documentSelector = getConfiguration().get("documentSelector");
 
-    context.subscriptions.push(stash.statusBarItem);
+    context.subscriptions.push(extension.statusBarItem);
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(stash)));
+    context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(extension)));
 
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
             documentSelector,
-            new CtagsDefinitionProvider(stash)
+            new CtagsDefinitionProvider(extension)
         )
     );
 
     context.subscriptions.push(
         vscode.languages.registerDocumentSymbolProvider(
             documentSelector,
-            new CtagsDocumentSymbolProvider(stash),
+            new CtagsDocumentSymbolProvider(extension),
             { label: EXTENSION_NAME }
         )
     );
 
     context.subscriptions.push(
         vscode.languages.registerWorkspaceSymbolProvider(
-            new CtagsWorkspaceSymbolProvider(stash)
+            new CtagsWorkspaceSymbolProvider(extension)
         )
     );
 
@@ -70,9 +70,9 @@ function activate(context) {
 
     vscode.tasks.onDidEndTask(event => {
         const { source, name, scope } = event.execution.task;
-        if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(stash, scope);
+        if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(extension, scope);
     });
 }
 
 exports.activate = activate;
-module.exports = { activate, Stash };
+module.exports = { activate, Extension };

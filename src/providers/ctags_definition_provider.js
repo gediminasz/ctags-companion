@@ -2,14 +2,14 @@ const { determineScope, definitionToSymbolInformation } = require("../helpers");
 const { getIndexForScope } = require("../index");
 
 class CtagsDefinitionProvider {
-    constructor(stash) {
-        this.stash = stash;
+    constructor(extension) {
+        this.extension = extension;
     }
 
     async provideDefinition(document, position) {
         const symbol = document.getText(document.getWordRangeAtPosition(position));
         const scope = determineScope(document);
-        const { symbolIndex } = await getIndexForScope(this.stash, scope);
+        const { symbolIndex } = await getIndexForScope(this.extension, scope);
 
         const definitions = new Map(symbolIndex).get(symbol);
         if (definitions) {

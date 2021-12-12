@@ -4,14 +4,14 @@ const { determineScope, definitionToSymbolInformation } = require("../helpers");
 const { getIndexForScope } = require("../index");
 
 class CtagsDocumentSymbolProvider {
-    constructor(stash) {
-        this.stash = stash;
+    constructor(extension) {
+        this.extension = extension;
     }
 
     async provideDocumentSymbols(document) {
         const relativePath = vscode.workspace.asRelativePath(document.uri, false);
         const scope = determineScope(document);
-        const { documentIndex } = await getIndexForScope(this.stash, scope);
+        const { documentIndex } = await getIndexForScope(this.extension, scope);
 
         const definitions = new Map(documentIndex).get(relativePath);
         if (definitions) {

@@ -2,11 +2,11 @@ const vscode = require("vscode");
 
 const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provider");
 const { reindexScope } = require("../index");
-const { Stash } = require("../extension");
+const { Extension } = require("../extension");
 
 describe(CtagsWorkspaceSymbolProvider, () => {
     describe("provideWorkspaceSymbols", () => {
-        const stash = new Stash();
+        const extension = new Extension();
         const scope = { uri: { fsPath: "/test" } };
         const fs = {
             existsSync: () => true,
@@ -19,10 +19,10 @@ describe(CtagsWorkspaceSymbolProvider, () => {
                 'symbol_with_underscores	underscores.py	/^symbol_with_underscores = "?"$/;"	kind:variable	line:100',
             ].join("\n")
         };
-        reindexScope(stash, scope, { fs });
+        reindexScope(extension, scope, { fs });
 
         it.each([undefined, null, ""])("returns nothing when query is falsy", async (query) => {
-            const provider = new CtagsWorkspaceSymbolProvider(stash);
+            const provider = new CtagsWorkspaceSymbolProvider(extension);
 
             const definitions = await provider.provideWorkspaceSymbols(query);
 
@@ -30,7 +30,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
         });
 
         it("returns nothing when no definitions are found", async () => {
-            const provider = new CtagsWorkspaceSymbolProvider(stash);
+            const provider = new CtagsWorkspaceSymbolProvider(extension);
 
             const definitions = await provider.provideWorkspaceSymbols("unknownSymbol");
 
@@ -40,7 +40,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
         it.each(
             ["fizz", "Fizz", "FIZZ", "f", "fi", "fiz", "zz"]
         )("returns symbol informations given a matching query", async (query) => {
-            const provider = new CtagsWorkspaceSymbolProvider(stash);
+            const provider = new CtagsWorkspaceSymbolProvider(extension);
 
             const definitions = await provider.provideWorkspaceSymbols(query);
 
@@ -61,7 +61,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
         });
 
         it("returns symbol informations given multiple definitions", async () => {
-            const provider = new CtagsWorkspaceSymbolProvider(stash);
+            const provider = new CtagsWorkspaceSymbolProvider(extension);
 
             const definitions = await provider.provideWorkspaceSymbols("multi");
 
@@ -82,7 +82,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
         });
 
         it.each(["K", "k"])("returns symbol informations given multiple matches", async () => {
-            const provider = new CtagsWorkspaceSymbolProvider(stash);
+            const provider = new CtagsWorkspaceSymbolProvider(extension);
 
             const definitions = await provider.provideWorkspaceSymbols("K");
 
@@ -105,7 +105,7 @@ describe(CtagsWorkspaceSymbolProvider, () => {
         it.each(
             ["symbol_with_underscores", "symbolwithunderscores", "swu", "symwithund", "sym_w_us"]
         )("returns symbol informations given symbol with underscores", async (query) => {
-            const provider = new CtagsWorkspaceSymbolProvider(stash);
+            const provider = new CtagsWorkspaceSymbolProvider(extension);
 
             const definitions = await provider.provideWorkspaceSymbols(query);
 
