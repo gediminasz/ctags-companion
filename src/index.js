@@ -5,12 +5,10 @@ const vscode = require('vscode');
 const { getConfiguration } = require("./helpers");
 
 async function getIndexForScope(stash, scope) {
-    const indexes = stash.context.workspaceState.get("indexes");
     const path = scope.uri.fsPath;
-    const isScopeIndexed = indexes && indexes.hasOwnProperty(path);
-    if (!isScopeIndexed) await reindexScope(stash, scope);
-    return stash.context.workspaceState.get("indexes")[path];
+    return stash.indexes.get(path) || await reindexScope(stash, scope);
 }
+
 
 async function reindexAll(stash) {
     vscode.workspace.workspaceFolders.map(scope => reindexScope(stash, scope));
@@ -34,14 +32,12 @@ function reindexScope(stash, scope, { fs = fs_ } = {}) {
     stash.statusBarItem.show();
 
     const lines = fs.readFileSync(tagsPath, { encoding: "utf-8" }).trim().split("\n");
-
-    const indexes = stash.context.workspaceState.get("indexes") || {};  // TODO use Map here as well
-    indexes[scope.uri.fsPath] = createIndex(lines);
-    stash.context.workspaceState.update("indexes", indexes);
+    const index = createIndex(lines);
+    stash.indexes.set(scope.uri.fsPath, index);
 
     stash.statusBarItem.hide();
-
     console.timeEnd("[Ctags Companion] reindex");
+    return index;
 }
 
 function createIndex(lines) {

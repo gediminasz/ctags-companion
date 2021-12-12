@@ -2,6 +2,8 @@ const vscode = require("vscode");
 
 const { CtagsDefinitionProvider } = require("./ctags_definition_provider");
 const { reindexScope } = require("../index");
+const { Stash } = require("../extension");
+
 
 const position = Symbol("position");
 const wordRange = Symbol("wordRange");
@@ -22,10 +24,7 @@ function makeDocumentWithSymbol(detectedSymbol) {
 
 describe(CtagsDefinitionProvider, () => {
     describe("provideDefinition", () => {
-        const stash = {
-            context: { workspaceState: new vscode.Memento() },
-            statusBarItem: new vscode.StatusBarItem(),
-        };
+        const stash = new Stash();
         const scope = { uri: { fsPath: "/test" } };
         const fs = {
             existsSync: () => true,

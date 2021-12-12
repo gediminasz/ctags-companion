@@ -2,6 +2,7 @@ const vscode = require("vscode");
 
 const { CtagsDocumentSymbolProvider } = require("./ctags_document_symbol_provider");
 const { reindexScope } = require("../index");
+const { Stash } = require("../extension");
 
 function makeDocumentWithPath(fsPath) {
     return { uri: { fsPath }, };
@@ -9,10 +10,7 @@ function makeDocumentWithPath(fsPath) {
 
 describe(CtagsDocumentSymbolProvider, () => {
     describe("provideDocumentSymbols", () => {
-        const stash = {
-            context: { workspaceState: new vscode.Memento() },
-            statusBarItem: new vscode.StatusBarItem(),
-        };
+        const stash = new Stash();
         const scope = { uri: { fsPath: "/test" } };
         const fs = {
             existsSync: () => true,

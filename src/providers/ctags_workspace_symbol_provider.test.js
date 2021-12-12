@@ -2,13 +2,11 @@ const vscode = require("vscode");
 
 const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provider");
 const { reindexScope } = require("../index");
+const { Stash } = require("../extension");
 
 describe(CtagsWorkspaceSymbolProvider, () => {
     describe("provideWorkspaceSymbols", () => {
-        const stash = {
-            context: { workspaceState: new vscode.Memento() },
-            statusBarItem: new vscode.StatusBarItem(),
-        };
+        const stash = new Stash();
         const scope = { uri: { fsPath: "/test" } };
         const fs = {
             existsSync: () => true,

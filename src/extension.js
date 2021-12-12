@@ -11,6 +11,7 @@ class Stash {
     constructor(context) {
         this.context = context;
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this.indexes = new Map();
     }
 }
 
@@ -74,4 +75,4 @@ function activate(context) {
 }
 
 exports.activate = activate;
-module.exports = { activate };
+module.exports = { activate, Stash };

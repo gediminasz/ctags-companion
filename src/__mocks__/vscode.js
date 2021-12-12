@@ -7,6 +7,11 @@ const SymbolKind = {
     Variable: 12,
 };
 
+const StatusBarAlignment = {
+    Left: 1,
+    Right: 2
+};
+
 const _scope = { uri: { fsPath: "/test" } };
 
 const workspace = {
@@ -33,6 +38,7 @@ console.assert(workspace.asRelativePath({ fsPath: "/elsewhere/bar" }) == "/elsew
 
 const window = {
     showErrorMessage: jest.fn(),
+    createStatusBarItem: () => new StatusBarItem()
 };
 
 function Position(line, character) {
@@ -52,18 +58,6 @@ const Uri = {
     joinPath: (left, right) => path.join(left.fsPath, right)
 };
 
-class Memento {
-    constructor() {
-        this.state = {};
-    }
-    get(key) {
-        return this.state[key];
-    }
-    update(key, value) {
-        this.state[key] = value;
-    }
-}
-
 class StatusBarItem {
     constructor() {
         this.text = null;
@@ -79,4 +73,13 @@ class StatusBarItem {
     }
 }
 
-module.exports = { SymbolKind, workspace, window, Position, Location, SymbolInformation, Uri, Memento, StatusBarItem };
+module.exports = {
+    Location,
+    Position,
+    StatusBarAlignment,
+    SymbolInformation,
+    SymbolKind,
+    Uri,
+    window,
+    workspace,
+};
