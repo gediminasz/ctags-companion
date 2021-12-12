@@ -64,4 +64,19 @@ class Memento {
     }
 }
 
-module.exports = { SymbolKind, workspace, window, Position, Location, SymbolInformation, Uri, Memento };
+class StatusBarItem {
+    constructor() {
+        this.text = null;
+        this.visible = false;
+        this._wasShown = false;
+    }
+    show() {
+        this.visible = true;
+        this._wasShown = true;
+    }
+    hide() {
+        this.visible = false;
+    }
+}
+
+module.exports = { SymbolKind, workspace, window, Position, Location, SymbolInformation, Uri, Memento, StatusBarItem };

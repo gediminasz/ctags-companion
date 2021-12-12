@@ -1,30 +1,27 @@
 const vscode = require("vscode");
 
 const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provider");
-
+const { reindexScope } = require("../index");
 
 describe(CtagsWorkspaceSymbolProvider, () => {
     describe("provideWorkspaceSymbols", () => {
         const stash = {
-            context: { workspaceState: new vscode.Memento() }
+            context: { workspaceState: new vscode.Memento() },
+            statusBarItem: new vscode.StatusBarItem(),
         };
-        stash.context.workspaceState.update("indexes", {
-            "/test": {
-                symbolIndex: [
-                    ["empty", []],
-                    ["fizz", ['fizz	fizz.py	/^fizz = "fizz"$/;"	kind:variable	line:100']],
-                    ["multi", [
-                        'multi	multi1.py	/^multi = "multi"$/;"	kind:variable	line:200',
-                        'multi	multi2.py	/^multi = "multi"$/;"	kind:variable	line:300',
-                    ]],
-                    ["KONSTANT", ['KONSTANT	konstant.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:100']],
-                    ["Klass", ['Klass	klass.py	/^class Klass:$/;"	kind:class	line:200']],
-                    ["symbol_with_underscores", [
-                        'symbol_with_underscores	underscores.py	/^symbol_with_underscores = "?"$/;"	kind:variable	line:100'
-                    ]],
-                ]
-            }
-        });
+        const scope = { uri: { fsPath: "/test" } };
+        const fs = {
+            existsSync: () => true,
+            readFileSync: () => [
+                'fizz	fizz.py	/^fizz = "fizz"$/;"	kind:variable	line:100',
+                'multi	multi1.py	/^multi = "multi"$/;"	kind:variable	line:200',
+                'multi	multi2.py	/^multi = "multi"$/;"	kind:variable	line:300',
+                'KONSTANT	konstant.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:100',
+                'Klass	klass.py	/^class Klass:$/;"	kind:class	line:200',
+                'symbol_with_underscores	underscores.py	/^symbol_with_underscores = "?"$/;"	kind:variable	line:100',
+            ].join("\n")
+        };
+        reindexScope(stash, scope, { fs });
 
         it.each([undefined, null, ""])("returns nothing when query is falsy", async (query) => {
             const provider = new CtagsWorkspaceSymbolProvider(stash);
@@ -38,14 +35,6 @@ describe(CtagsWorkspaceSymbolProvider, () => {
             const provider = new CtagsWorkspaceSymbolProvider(stash);
 
             const definitions = await provider.provideWorkspaceSymbols("unknownSymbol");
-
-            expect(definitions).toEqual([]);
-        });
-
-        it("handles empty list", async () => {
-            const provider = new CtagsWorkspaceSymbolProvider(stash);
-
-            const definitions = await provider.provideWorkspaceSymbols("empty");
 
             expect(definitions).toEqual([]);
         });

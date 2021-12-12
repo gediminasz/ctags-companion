@@ -23,16 +23,15 @@ function makeDocumentWithSymbol(detectedSymbol) {
 describe(CtagsDefinitionProvider, () => {
     describe("provideDefinition", () => {
         const stash = {
-            context: { workspaceState: new vscode.Memento() }
+            context: { workspaceState: new vscode.Memento() },
+            statusBarItem: new vscode.StatusBarItem(),
         };
-        stash.context.workspaceState.update("indexes", {
-            "/test": {
-                symbolIndex: [
-                    ["emptyListSymbol", []],
-                    ["foo", ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']]
-                ]
-            }
-        });
+        const scope = { uri: { fsPath: "/test" } };
+        const fs = {
+            existsSync: () => true,
+            readFileSync: () => 'foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo',
+        };
+        reindexScope(stash, scope, { fs });
 
         it("returns nothing when no definitions are found", async () => {
             const document = makeDocumentWithSymbol("unknownSymbol");
@@ -41,15 +40,6 @@ describe(CtagsDefinitionProvider, () => {
             const definitions = await provider.provideDefinition(document, position);
 
             expect(definitions).toBe(undefined);
-        });
-
-        it("handles empty list", async () => {
-            const document = makeDocumentWithSymbol("emptyListSymbol");
-            const provider = new CtagsDefinitionProvider(stash);
-
-            const definitions = await provider.provideDefinition(document, position);
-
-            expect(definitions).toEqual([]);
         });
 
         it("returns locations given indexed symbol", async () => {

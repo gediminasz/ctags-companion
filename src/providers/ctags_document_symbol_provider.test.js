@@ -1,6 +1,7 @@
 const vscode = require("vscode");
 
 const { CtagsDocumentSymbolProvider } = require("./ctags_document_symbol_provider");
+const { reindexScope } = require("../index");
 
 function makeDocumentWithPath(fsPath) {
     return { uri: { fsPath }, };
@@ -9,16 +10,15 @@ function makeDocumentWithPath(fsPath) {
 describe(CtagsDocumentSymbolProvider, () => {
     describe("provideDocumentSymbols", () => {
         const stash = {
-            context: { workspaceState: new vscode.Memento() }
+            context: { workspaceState: new vscode.Memento() },
+            statusBarItem: new vscode.StatusBarItem(),
         };
-        stash.context.workspaceState.update("indexes", {
-            "/test": {
-                documentIndex: [
-                    ["empty", []],
-                    ["foo", ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo']],
-                ]
-            }
-        });
+        const scope = { uri: { fsPath: "/test" } };
+        const fs = {
+            existsSync: () => true,
+            readFileSync: () => 'foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo',
+        };
+        reindexScope(stash, scope, { fs });
 
         it("returns nothing when no definitions are found", async () => {
             const document = makeDocumentWithPath("/test/unknown");
@@ -29,17 +29,8 @@ describe(CtagsDocumentSymbolProvider, () => {
             expect(definitions).toBe(undefined);
         });
 
-        it("handles empty list", async () => {
-            const document = makeDocumentWithPath("/test/empty");
-            const provider = new CtagsDocumentSymbolProvider(stash);
-
-            const definitions = await provider.provideDocumentSymbols(document);
-
-            expect(definitions).toEqual([]);
-        });
-
         it("returns symbol informations given indexed document", async () => {
-            const document = makeDocumentWithPath("/test/foo");
+            const document = makeDocumentWithPath("/test/src.py");
             const provider = new CtagsDocumentSymbolProvider(stash);
 
             const definitions = await provider.provideDocumentSymbols(document);

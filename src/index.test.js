@@ -2,29 +2,13 @@ const vscode = require("vscode");
 
 const { reindexScope } = require("./index");
 
-
-class MockStatusBarItem {
-    constructor() {
-        this.text = null;
-        this.visible = false;
-        this._wasShown = false;
-    }
-    show() {
-        this.visible = true;
-        this._wasShown = true;
-    }
-    hide() {
-        this.visible = false;
-    }
-}
-
 describe("reindexScope", () => {
     const scope = { uri: { fsPath: "/test" } };
 
     it("shows a warning when file does not exist", () => {
         const stash = {
             context: { workspaceState: new vscode.Memento() },
-            statusBarItem: new MockStatusBarItem()
+            statusBarItem: new vscode.StatusBarItem(),
         };
         const fs = {
             existsSync: (path) => {
@@ -51,7 +35,7 @@ describe("reindexScope", () => {
         it("indicates activity in status bar", () => {
             const stash = {
                 context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new MockStatusBarItem()
+                statusBarItem: new vscode.StatusBarItem(),
             };
 
             reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => "" } });
@@ -64,7 +48,7 @@ describe("reindexScope", () => {
         it("skips meta lines", () => {
             const stash = {
                 context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new MockStatusBarItem()
+                statusBarItem: new vscode.StatusBarItem(),
             };
 
             line = "!_THIS_LINE_SHOULD_BE_IGNORED";
@@ -99,7 +83,7 @@ describe("reindexScope", () => {
         ])("indexes tags", (line, expectedSymbol, expectedPath) => {
             const stash = {
                 context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new MockStatusBarItem()
+                statusBarItem: new vscode.StatusBarItem(),
             };
 
             reindexScope(stash, scope, { fs: { ...fs, readFileSync: () => line } });
@@ -117,7 +101,7 @@ describe("reindexScope", () => {
         it("appends to already indexed symbols", () => {
             const stash = {
                 context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new MockStatusBarItem()
+                statusBarItem: new vscode.StatusBarItem(),
             };
 
             const firstDefinition = 'Klass	first.py	/^class Klass:$/;"	kind:class	line:1';
@@ -144,7 +128,7 @@ describe("reindexScope", () => {
         it("appends to already indexed documents", () => {
             const stash = {
                 context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new MockStatusBarItem()
+                statusBarItem: new vscode.StatusBarItem(),
             };
 
             const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:1';
@@ -171,7 +155,7 @@ describe("reindexScope", () => {
         it("does not clash with built-in properties", () => {
             const stash = {
                 context: { workspaceState: new vscode.Memento() },
-                statusBarItem: new MockStatusBarItem()
+                statusBarItem: new vscode.StatusBarItem(),
             };
 
             const clashingDefinition = 'hasOwnProperty	src.py	/^def hasOwnProperty():$/;"	kind:function line:1';
