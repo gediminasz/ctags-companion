@@ -20,7 +20,7 @@ class CtagsWorkspaceSymbolProvider {
         const matcher = this.getMatcher(query);
 
         return indexes.flatMap(([scope, { symbolIndex }]) => {
-            return symbolIndex
+            return [...symbolIndex]
                 .filter(([symbol]) => matcher(symbol.toLowerCase()))
                 .flatMap(([_, definitions]) => definitions)
                 .map(definition => definitionToSymbolInformation(definition, scope));

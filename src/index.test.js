@@ -46,7 +46,7 @@ describe("reindexScope", () => {
             line = "!_THIS_LINE_SHOULD_BE_IGNORED";
             reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => line } });
 
-            expect(extension.indexes).toEqual(new Map([["/test", { symbolIndex: [], documentIndex: [] }]]));
+            expect(extension.indexes).toEqual(new Map([["/test", { symbolIndex: new Map(), documentIndex: new Map() }]]));
         });
 
         it.each([
@@ -74,8 +74,8 @@ describe("reindexScope", () => {
                 [
                     "/test",
                     {
-                        symbolIndex: [[expectedSymbol, [line]]],
-                        documentIndex: [[expectedPath, [line]]],
+                        symbolIndex: new Map([[expectedSymbol, [line]]]),
+                        documentIndex: new Map([[expectedPath, [line]]]),
                     }
                 ]
             ]));
@@ -94,13 +94,8 @@ describe("reindexScope", () => {
                 [
                     "/test",
                     {
-                        symbolIndex: [
-                            ["Klass", [firstDefinition, secondDefinition]]
-                        ],
-                        documentIndex: [
-                            ["first.py", [firstDefinition]],
-                            ["second.py", [secondDefinition]],
-                        ],
+                        symbolIndex: new Map([["Klass", [firstDefinition, secondDefinition]]]),
+                        documentIndex: new Map([["first.py", [firstDefinition]], ["second.py", [secondDefinition]]]),
                     }
                 ]
             ]));
@@ -119,13 +114,8 @@ describe("reindexScope", () => {
                 [
                     "/test",
                     {
-                        symbolIndex: [
-                            ["Foo", [fooDefinition]],
-                            ["Bar", [barDefinition]],
-                        ],
-                        documentIndex: [
-                            ["src.py", [fooDefinition, barDefinition]],
-                        ]
+                        symbolIndex: new Map([["Foo", [fooDefinition]], ["Bar", [barDefinition]]]),
+                        documentIndex: new Map([["src.py", [fooDefinition, barDefinition]]])
                     }
                 ]
             ]));
@@ -144,13 +134,8 @@ describe("reindexScope", () => {
                 [
                     "/test",
                     {
-                        symbolIndex: [
-                            ["hasOwnProperty", [clashingDefinition]],
-                            ["Foo", [fooDefinition]],
-                        ],
-                        documentIndex: [
-                            ["src.py", [clashingDefinition, fooDefinition]]
-                        ]
+                        symbolIndex: new Map([["hasOwnProperty", [clashingDefinition]], ["Foo", [fooDefinition]]]),
+                        documentIndex: new Map([["src.py", [clashingDefinition, fooDefinition]]])
                     }
                 ]
             ]));

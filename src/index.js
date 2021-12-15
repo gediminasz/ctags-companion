@@ -56,7 +56,7 @@ function createIndex(lines) {
         documentIndex.get(path).push(line);
     });
 
-    return { symbolIndex: [...symbolIndex], documentIndex: [...documentIndex] };
+    return { symbolIndex, documentIndex };
 }
 
 module.exports = { getIndexForScope, reindexAll, reindexScope };
