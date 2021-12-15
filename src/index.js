@@ -4,9 +4,9 @@ const vscode = require('vscode');
 
 const { getConfiguration } = require("./helpers");
 
-async function getIndexForScope(extension, scope) {
+function getIndexForScope(extension, scope) {
     const path = scope.uri.fsPath;
-    return extension.indexes.get(path) || await reindexScope(extension, scope);
+    return extension.indexes.get(path) || reindexScope(extension, scope);
 }
 
 

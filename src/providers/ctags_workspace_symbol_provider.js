@@ -8,13 +8,11 @@ class CtagsWorkspaceSymbolProvider {
         this.extension = extension;
     }
 
-    async provideWorkspaceSymbols(query) {
+    provideWorkspaceSymbols(query) {
         if (!query) return;
 
-        const indexes = await Promise.all(
-            vscode.workspace.workspaceFolders.map(
-                async scope => [scope, await getIndexForScope(this.extension, scope)]
-            )
+        const indexes = vscode.workspace.workspaceFolders.map(
+            scope => [scope, getIndexForScope(this.extension, scope)]
         );
 
         const matcher = this.getMatcher(query);
