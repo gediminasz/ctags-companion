@@ -2,7 +2,7 @@ const fs_ = require('fs');
 const path = require('path');
 const vscode = require('vscode');
 
-const { getConfiguration } = require("./helpers");
+const { getConfiguration, getTagsPath } = require("./helpers");
 
 function getIndexForScope(extension, scope) {
     const path = scope.uri.fsPath;
@@ -17,8 +17,7 @@ async function reindexAll(extension) {
 function reindexScope(extension, scope, { fs = fs_ } = {}) {
     console.time("[Ctags Companion] reindex");
 
-    const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
-
+    const tagsPath = getTagsPath(scope);
     if (!fs.existsSync(tagsPath)) {
         extension.statusBarItem.text = (
             `$(warning) Ctags Companion: file ${getConfiguration(scope).get("path")} not found, ` +

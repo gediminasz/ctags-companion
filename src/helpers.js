@@ -1,3 +1,4 @@
+const path = require('path');
 const vscode = require("vscode");
 
 const { EXTENSION_ID, EXTENSION_NAME } = require("./constants");
@@ -8,6 +9,10 @@ function determineScope(document) {
 
 function getConfiguration(scope = null) {
     return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
+}
+
+function getTagsPath(scope) {
+    return path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
 }
 
 function commandGuard(command) {
@@ -97,4 +102,4 @@ function definitionToSymbolInformation(definition, scope) {
     );
 }
 
-module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation };
+module.exports = { determineScope, getConfiguration, getTagsPath, commandGuard, definitionToSymbolInformation };
