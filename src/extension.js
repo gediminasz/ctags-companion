@@ -3,8 +3,8 @@ const vscode = require('vscode');
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
-const { EXTENSION_ID, EXTENSION_NAME, TASK_NAME } = require("./constants");
-const { getConfiguration, commandGuard } = require("./helpers");
+const { EXTENSION_ID, EXTENSION_NAME } = require("./constants");
+const { getConfiguration, commandGuard, makeTask } = require("./helpers");
 const { reindexAll, reindexScope } = require("./index");
 const { parseDocument } = require("./ctags");
 
@@ -53,15 +53,7 @@ function activate(context) {
                     provideTasks: () => {
                         const command = getConfiguration(scope).get("command");
                         if (commandGuard(command)) return [];
-                        const task = new vscode.Task(
-                            { type: "shell" },
-                            scope,
-                            TASK_NAME,
-                            EXTENSION_NAME,
-                            new vscode.ShellExecution(command),
-                            [],  // do not prompt the user about problem matchers
-                        );
-                        task.presentationOptions.reveal = false;
+                        const task = makeTask(scope, "rebuild ctags", command);
                         return [task];
                     },
                     // A valid default implementation for the resolveTask method is to return undefined.

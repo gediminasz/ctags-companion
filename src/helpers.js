@@ -102,4 +102,24 @@ function definitionToSymbolInformation(definition, scope) {
     );
 }
 
-module.exports = { determineScope, getConfiguration, getTagsPath, commandGuard, definitionToSymbolInformation };
+function makeTask(scope, name, command) {
+    const task = new vscode.Task(
+        { type: "shell" },
+        scope,
+        name,
+        EXTENSION_NAME,
+        new vscode.ShellExecution(command),
+        [],  // do not prompt the user about problem matchers
+    );
+    task.presentationOptions.reveal = false;
+    return task;
+}
+
+module.exports = {
+    commandGuard,
+    definitionToSymbolInformation,
+    determineScope,
+    getConfiguration,
+    getTagsPath,
+    makeTask,
+};

@@ -2,7 +2,7 @@ const fs = require('fs');
 const vscode = require('vscode');
 
 const { EXTENSION_NAME } = require("./constants");
-const { determineScope, getConfiguration, commandGuard, getTagsPath } = require("./helpers");
+const { determineScope, getConfiguration, commandGuard, getTagsPath, makeTask } = require("./helpers");
 
 function parseDocument(document) {
     const scope = determineScope(document);
@@ -29,15 +29,7 @@ function removeExistingTags(scope, documentRelativePath) {
 function appendTags(scope, documentRelativePath) {
     const command = getConfiguration(scope).get("command");
     if (commandGuard(command)) return;
-    const task = new vscode.Task(
-        { type: "shell" },
-        scope,
-        "append ctags",
-        EXTENSION_NAME,
-        new vscode.ShellExecution(`${command} --append ${documentRelativePath}`),
-        [],
-    );
-    task.presentationOptions.reveal = false;
+    const task = makeTask(scope, "append ctags", `${command} --append ${documentRelativePath}`);
     vscode.tasks.executeTask(task);
 }
 
