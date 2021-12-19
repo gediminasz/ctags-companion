@@ -5,8 +5,6 @@ const { EXTENSION_NAME } = require("./constants");
 const { determineScope, getConfiguration, commandGuard, getTagsPath } = require("./helpers");
 
 function parseDocument(document) {
-    if (!getConfiguration().get("reindexOnSaveEnabled")) return;
-
     const scope = determineScope(document);
 
     const documentSelector = getConfiguration(scope).get("documentSelector");
@@ -24,6 +22,7 @@ function removeExistingTags(scope, documentRelativePath) {
     const lines = fs.readFileSync(tagsPath, { encoding: "utf-8" })
         .split("\n")
         .filter(line => !line.includes(documentRelativePath));
+
     fs.writeFileSync(tagsPath, lines.join("\n"));
 }
 

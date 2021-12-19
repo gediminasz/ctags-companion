@@ -70,7 +70,9 @@ function activate(context) {
             ));
     }
 
-    vscode.workspace.onDidSaveTextDocument(parseDocument);
+    if (getConfiguration().get("reindexOnSaveEnabled")) {
+        vscode.workspace.onDidSaveTextDocument(parseDocument);
+    }
 
     vscode.tasks.onDidEndTask(event => {
         const { source, _, scope } = event.execution.task;
