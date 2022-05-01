@@ -61,6 +61,6 @@
         "ci:test": "jest --ci --coverage --verbose"
     },
     "devDependencies": {
-        "jest": "^27.3.1"
+        "jest": "^28.0.3"
     }
 }
