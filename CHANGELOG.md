@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2022.11.0
 
 - Running ctags with `--fields=+nKz` is no longer required.
 

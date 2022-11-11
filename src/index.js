@@ -9,7 +9,6 @@ function getIndexForScope(extension, scope) {
     return extension.indexes.get(path) || reindexScope(extension, scope);
 }
 
-
 async function reindexAll(extension) {
     vscode.workspace.workspaceFolders.map(scope => reindexScope(extension, scope));
 }
