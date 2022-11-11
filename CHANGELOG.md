@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Running ctags with `--fields=+nKz` is no longer required.
+
 ## 2021.11.1
 
 - Added icon.

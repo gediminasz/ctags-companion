@@ -77,24 +77,26 @@ const SYMBOL_KINDS = {
 };
 
 function definitionToSymbolInformation(definition, scope) {
-    const [symbol, path, ...rest] = definition.split("\t");
+    const [symbol, path, ...fields] = definition.split("\t");
 
     const file = path.startsWith('/') ? vscode.Uri.parse(path) : vscode.Uri.joinPath(scope.uri, path);
 
-    const lineNumberStr = rest.find(value => value.startsWith("line:")).substring(5);
-    const line = parseInt(lineNumberStr, 10) - 1;
-
-    const kind = rest.find(value => value.startsWith("kind:")).substring(5);
-
-    const containerTag = rest.find(value => value.startsWith("class:"));
-    const container = containerTag && containerTag.substring(6);
+    const lineStr = findField(fields, "line:");
+    const line = lineStr ? parseInt(lineStr, 10) - 1 : 0;
+    const kind = findField(fields, "kind:");
+    const container = findField(fields, "class:");
 
     return new vscode.SymbolInformation(
         symbol,
-        SYMBOL_KINDS[kind],
+        kind && SYMBOL_KINDS[kind],
         container,
         new vscode.Location(file, new vscode.Position(line, 0))
     );
+}
+
+function findField(tags, prefix) {
+    const tag = tags.find(value => value.startsWith(prefix));
+    return tag && tag.substring(prefix.length);
 }
 
 module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation };

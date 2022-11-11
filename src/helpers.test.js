@@ -51,6 +51,22 @@ describe("definitionToSymbolInformation", () => {
 
         expect(symbolInformation.kind).toEqual(vscodeKind);
     });
+
+    it("handles missing fields", () => {
+        const definition = 'fizz	relative/path/to/definition.py	/^    fizz = "fizz"$/;"';
+
+        const symbolInformation = definitionToSymbolInformation(definition, scope);
+
+        expect(symbolInformation).toEqual({
+            name: "fizz",
+            kind: undefined,
+            containerName: undefined,
+            location: {
+                uri: "/path/to/scope/relative/path/to/definition.py",
+                rangeOrPosition: { line: 0, character: 0 }
+            }
+        });
+    });
 });
 
 describe('commandGuard', () => {

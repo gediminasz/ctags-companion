@@ -16,7 +16,7 @@ To create a ctags file and index it invoke the "rebuild ctags" task (Terminal > 
 
 | Name                                   | Default                                     | Description                                                                                                                                  |
 |----------------------------------------|---------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| `ctags-companion.command`              | `"ctags -R --fields=+nKz -f .vscode/.tags"` | Command invoked in the "rebuild ctags" task. `nKz` fields are required.                                                                      |
+| `ctags-companion.command`              | `"ctags -R --fields=+nKz -f .vscode/.tags"` | Command invoked in the "rebuild ctags" task. `nKz` fields are recommended.                                                                   |
 | `ctags-companion.path`                 | `".vscode/.tags"`                           | Location of the ctags file used when reindexing ctags.                                                                                       |
 | `ctags-companion.documentSelector`     | `{"scheme": "file"}`                        | [Document selector](https://code.visualstudio.com/api/references/vscode-api#DocumentSelector) object used when registering symbol providers. |
 | `ctags-companion.fuzzyMatchingEnabled` | `true`                                      | Should fuzzy matching be used in workspace symbols provider                                                                                  |
