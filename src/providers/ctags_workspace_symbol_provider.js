@@ -8,16 +8,17 @@ class CtagsWorkspaceSymbolProvider {
         this.extension = extension;
     }
 
-    provideWorkspaceSymbols(query) {
+    async provideWorkspaceSymbols(query) {
         if (!query) return;
 
         const matcher = this.getMatcher(query);
 
-        return vscode.workspace.workspaceFolders.flatMap(scope => {
-            const { symbolIndex } = getIndexForScope(this.extension, scope);
-            const definitions = this.findDefinitions(symbolIndex, matcher);
-            return Array.from(definitions).map(d => definitionToSymbolInformation(d, scope));
-        });
+        const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
+            const { symbolIndex } = await getIndexForScope(this.extension, scope);
+            const definitions = Array.from(this.findDefinitions(symbolIndex, matcher));
+            return definitions.map(d => definitionToSymbolInformation(d, scope));
+        }));
+        return results.flat();
     }
 
     *findDefinitions(symbolIndex, matcher) {

@@ -1,25 +1,33 @@
 const vscode = require("vscode");
 
 const { CtagsWorkspaceSymbolProvider } = require("./ctags_workspace_symbol_provider");
-const { reindexScope } = require("../index");
 const { Extension } = require("../extension");
+const { reindexScope } = require("../index");
 
 describe(CtagsWorkspaceSymbolProvider, () => {
     describe("provideWorkspaceSymbols", () => {
         const extension = new Extension();
         const scope = { uri: { fsPath: "/test" } };
+        const readStream = Symbol("readStream");
         const fs = {
             existsSync: () => true,
-            readFileSync: () => [
-                'fizz	fizz.py	/^fizz = "fizz"$/;"	kind:variable	line:100',
-                'multi	multi1.py	/^multi = "multi"$/;"	kind:variable	line:200',
-                'multi	multi2.py	/^multi = "multi"$/;"	kind:variable	line:300',
-                'KONSTANT	konstant.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:100',
-                'Klass	klass.py	/^class Klass:$/;"	kind:class	line:200',
-                'symbol_with_underscores	underscores.py	/^symbol_with_underscores = "?"$/;"	kind:variable	line:100',
-            ].join("\n")
+            createReadStream: () => readStream,
         };
-        reindexScope(extension, scope, { fs });
+        const readline = {
+            createInterface: ({ input }) => {
+                expect(input).toBe(readStream);
+                return [
+                    'fizz	fizz.py	/^fizz = "fizz"$/;"	kind:variable	line:100',
+                    'multi	multi1.py	/^multi = "multi"$/;"	kind:variable	line:200',
+                    'multi	multi2.py	/^multi = "multi"$/;"	kind:variable	line:300',
+                    'KONSTANT	konstant.py	/^KONSTANT = "KONSTANT"$/;"	kind:variable	line:100',
+                    'Klass	klass.py	/^class Klass:$/;"	kind:class	line:200',
+                    'symbol_with_underscores	underscores.py	/^symbol_with_underscores = "?"$/;"	kind:variable	line:100',
+                ];
+            },
+        };
+
+        reindexScope(extension, scope, { fs, readline });
 
         it.each([undefined, null, ""])("returns nothing when query is falsy", async (query) => {
             const provider = new CtagsWorkspaceSymbolProvider(extension);

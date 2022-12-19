@@ -1,8 +1,6 @@
-const vscode = require("vscode");
-
 const { CtagsDefinitionProvider } = require("./ctags_definition_provider");
-const { reindexScope } = require("../index");
 const { Extension } = require("../extension");
+const { reindexScope } = require("../index");
 
 
 const position = Symbol("position");
@@ -26,11 +24,19 @@ describe(CtagsDefinitionProvider, () => {
     describe("provideDefinition", () => {
         const extension = new Extension();
         const scope = { uri: { fsPath: "/test" } };
+        const readStream = Symbol("readStream");
         const fs = {
             existsSync: () => true,
-            readFileSync: () => 'foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo',
+            createReadStream: () => readStream,
         };
-        reindexScope(extension, scope, { fs });
+        const readline = {
+            createInterface: ({ input }) => {
+                expect(input).toBe(readStream);
+                return ['foo	src.py	/^    def foo(self):$/;"	kind:member	line:32	class:Goo'];
+            },
+        };
+
+        reindexScope(extension, scope, { fs, readline });
 
         it("returns nothing when no definitions are found", async () => {
             const document = makeDocumentWithSymbol("unknownSymbol");

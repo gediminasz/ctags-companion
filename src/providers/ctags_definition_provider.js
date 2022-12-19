@@ -6,10 +6,10 @@ class CtagsDefinitionProvider {
         this.extension = extension;
     }
 
-    provideDefinition(document, position) {
+    async provideDefinition(document, position) {
         const symbol = document.getText(document.getWordRangeAtPosition(position));
         const scope = determineScope(document);
-        const { symbolIndex } = getIndexForScope(this.extension, scope);
+        const { symbolIndex } = await getIndexForScope(this.extension, scope);
 
         const definitions = symbolIndex.get(symbol);
         if (definitions) {

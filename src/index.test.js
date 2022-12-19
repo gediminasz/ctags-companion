@@ -1,10 +1,9 @@
-const vscode = require("vscode");
-
-const { reindexScope } = require("./index");
 const { Extension } = require("./extension");
+const { reindexScope } = require("./index");
 
 describe("reindexScope", () => {
     const scope = { uri: { fsPath: "/test" } };
+    const readStream = Symbol("readStream");
 
     it("shows a warning when file does not exist", () => {
         const extension = new Extension();
@@ -12,10 +11,16 @@ describe("reindexScope", () => {
             existsSync: (path) => {
                 expect(path).toEqual("/test/path/to/ctags");
                 return false;
-            }
+            },
+            createReadStream: () => readStream,
+        };
+        const readline = {
+            createInterface: () => {
+                fail('should not be called');
+            },
         };
 
-        reindexScope(extension, scope, { fs });
+        reindexScope(extension, scope, { fs, readline });
 
         expect(extension.indexes).toEqual(new Map());
         expect(extension.statusBarItem.text).toMatch(/not found/);
@@ -27,24 +32,28 @@ describe("reindexScope", () => {
             existsSync: (path) => {
                 expect(path).toEqual("/test/path/to/ctags");
                 return true;
-            }
+            },
+            createReadStream: () => readStream,
+        };
+        const readline = {
+            createInterface: () => [],
         };
 
-        it("indicates activity in status bar", () => {
+        it("indicates activity in status bar", async () => {
             const extension = new Extension();
 
-            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => "" } });
+            await reindexScope(extension, scope, { fs, readline });
 
             expect(extension.statusBarItem.text).toMatch(/reindexing/);
             expect(extension.statusBarItem.visible).toBeFalsy();
             expect(extension.statusBarItem._wasShown).toBeTruthy();
         });
 
-        it("skips meta lines", () => {
+        it("skips meta lines", async () => {
             const extension = new Extension();
 
             line = "!_THIS_LINE_SHOULD_BE_IGNORED";
-            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => line } });
+            await reindexScope(extension, scope, { fs, readline: { createInterface: () => [line] } });
 
             expect(extension.indexes).toEqual(new Map([["/test", { symbolIndex: new Map(), documentIndex: new Map() }]]));
         });
@@ -65,10 +74,10 @@ describe("reindexScope", () => {
                 "ExternalLib",
                 "/usr/lib/pyhon/external_lib.py",
             ],
-        ])("indexes tags", (line, expectedSymbol, expectedPath) => {
+        ])("indexes tags", async (line, expectedSymbol, expectedPath) => {
             const extension = new Extension();
 
-            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => line } });
+            await reindexScope(extension, scope, { fs, readline: { createInterface: () => [line] } });
 
             expect(extension.indexes).toEqual(new Map([
                 [
@@ -81,14 +90,13 @@ describe("reindexScope", () => {
             ]));
         });
 
-        it("appends to already indexed symbols", () => {
+        it("appends to already indexed symbols", async () => {
             const extension = new Extension();
 
             const firstDefinition = 'Klass	first.py	/^class Klass:$/;"	kind:class	line:1';
             const secondDefinition = 'Klass	second.py	/^class Klass:$/;"	kind:class	line:2';
 
-            lines = firstDefinition + "\n" + secondDefinition;
-            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => lines } });
+            await reindexScope(extension, scope, { fs, readline: { createInterface: () => [firstDefinition, secondDefinition] } });
 
             expect(extension.indexes).toEqual(new Map([
                 [
@@ -101,14 +109,13 @@ describe("reindexScope", () => {
             ]));
         });
 
-        it("appends to already indexed documents", () => {
+        it("appends to already indexed documents", async () => {
             const extension = new Extension();
 
             const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:1';
             const barDefinition = 'Bar	src.py	/^class Bar:$/;"	kind:class	line:2';
 
-            lines = fooDefinition + "\n" + barDefinition;
-            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => lines } });
+            await reindexScope(extension, scope, { fs, readline: { createInterface: () => [fooDefinition, barDefinition] } });
 
             expect(extension.indexes).toEqual(new Map([
                 [
@@ -121,14 +128,13 @@ describe("reindexScope", () => {
             ]));
         });
 
-        it("does not clash with built-in properties", () => {
+        it("does not clash with built-in properties", async () => {
             const extension = new Extension();
 
             const clashingDefinition = 'hasOwnProperty	src.py	/^def hasOwnProperty():$/;"	kind:function line:1';
             const fooDefinition = 'Foo	src.py	/^class Foo:$/;"	kind:class	line:10';
 
-            lines = clashingDefinition + "\n" + fooDefinition;
-            reindexScope(extension, scope, { fs: { ...fs, readFileSync: () => lines } });
+            await reindexScope(extension, scope, { fs, readline: { createInterface: () => [clashingDefinition, fooDefinition] } });
 
             expect(extension.indexes).toEqual(new Map([
                 [
