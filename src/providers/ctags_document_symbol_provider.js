@@ -8,10 +8,10 @@ class CtagsDocumentSymbolProvider {
         this.extension = extension;
     }
 
-    provideDocumentSymbols(document) {
+    async provideDocumentSymbols(document) {
         const relativePath = vscode.workspace.asRelativePath(document.uri, false);
         const scope = determineScope(document);
-        const { documentIndex } = getIndexForScope(this.extension, scope);
+        const { documentIndex } = await getIndexForScope(this.extension, scope);
 
         const definitions = documentIndex.get(relativePath);
         if (definitions) {

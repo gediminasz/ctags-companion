@@ -1,19 +1,20 @@
 const fs_ = require('fs');
 const path = require('path');
+const readline_ = require('readline');
 const vscode = require('vscode');
 
 const { getConfiguration } = require("./helpers");
 
-function getIndexForScope(extension, scope) {
+async function getIndexForScope(extension, scope) {
     const path = scope.uri.fsPath;
-    return extension.indexes.get(path) || reindexScope(extension, scope);
+    return extension.indexes.get(path) || await reindexScope(extension, scope);
 }
 
 async function reindexAll(extension) {
     vscode.workspace.workspaceFolders.map(scope => reindexScope(extension, scope));
 }
 
-function reindexScope(extension, scope, { fs = fs_ } = {}) {
+async function reindexScope(extension, scope, { fs = fs_, readline = readline_ } = {}) {
     console.time("[Ctags Companion] reindex");
 
     const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
@@ -30,8 +31,8 @@ function reindexScope(extension, scope, { fs = fs_ } = {}) {
     extension.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
     extension.statusBarItem.show();
 
-    const lines = fs.readFileSync(tagsPath, { encoding: "utf-8" }).trim().split("\n");
-    const index = createIndex(lines);
+    const index = await createIndex(tagsPath, { fs, readline });
+
     extension.indexes.set(scope.uri.fsPath, index);
 
     extension.statusBarItem.hide();
@@ -39,12 +40,14 @@ function reindexScope(extension, scope, { fs = fs_ } = {}) {
     return index;
 }
 
-function createIndex(lines) {
+async function createIndex(tagsPath, { fs = fs_, readline = readline_ } = {}) {
     const symbolIndex = new Map();
     const documentIndex = new Map();
 
-    lines.forEach(line => {
-        if (line.startsWith("!")) return;
+    const reader = readline.createInterface({ input: fs.createReadStream(tagsPath) });
+
+    for await (const line of reader) {
+        if (line.startsWith("!")) continue;
 
         const [symbol, path] = line.split("\t", 2);
 
@@ -53,7 +56,7 @@ function createIndex(lines) {
 
         if (!documentIndex.has(path)) documentIndex.set(path, []);
         documentIndex.get(path).push(line);
-    });
+    }
 
     return { symbolIndex, documentIndex };
 }

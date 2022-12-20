@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Improved stability when indexing large ctags files.
+
 ## 2022.12.0
 
 - Running ctags with `--fields=+nKz` is no longer required.
