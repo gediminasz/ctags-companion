@@ -1,3 +1,6 @@
+test:
+	npm test
+
 update:
 	npm add --include=dev jest@latest
 
