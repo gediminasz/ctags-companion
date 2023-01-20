@@ -31,7 +31,8 @@ async function reindexScope(extension, scope, { fs = fs_, readline = readline_ }
     extension.statusBarItem.text = `$(refresh) Ctags Companion: reindexing ${scope.name}...`;
     extension.statusBarItem.show();
 
-    const index = await createIndex(tagsPath, { fs, readline });
+    const reader = readline.createInterface({ input: fs.createReadStream(tagsPath) });
+    const index = await createIndex(reader);
 
     extension.indexes.set(scope.uri.fsPath, index);
 
@@ -40,11 +41,9 @@ async function reindexScope(extension, scope, { fs = fs_, readline = readline_ }
     return index;
 }
 
-async function createIndex(tagsPath, { fs = fs_, readline = readline_ } = {}) {
+async function createIndex(reader) {
     const symbolIndex = new Map();
     const documentIndex = new Map();
-
-    const reader = readline.createInterface({ input: fs.createReadStream(tagsPath) });
 
     for await (const line of reader) {
         if (line.startsWith("!")) continue;
