@@ -30,6 +30,12 @@
                     "description": "Command to generate the tags file",
                     "scope": "resource"
                 },
+                "ctags-companion.readtagsCommand": {
+                    "type": "string",
+                    "default": "readtags -t .vscode/.tags",
+                    "description": "TODO description",
+                    "scope": "resource"
+                },
                 "ctags-companion.path": {
                     "type": "string",
                     "default": ".vscode/.tags",

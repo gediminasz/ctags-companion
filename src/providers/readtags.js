@@ -15,9 +15,10 @@ class ReadtagsProvider {
         const symbol = document.getText(document.getWordRangeAtPosition(position));
         const scope = determineScope(document);
 
-        // TODO GZL readtagsCommand setting and cwd to scope root
-        const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
-        const { stdout } = await promisify(exec)(`readtags -t ${tagsPath} ${symbol}`);
+        const command = getConfiguration(scope).get("readtagsCommand");
+        const cwd = scope.uri.fsPath;
+        const { stdout } = await promisify(exec)(`${command} ${symbol}`, { cwd });
+
         console.log(stdout);
     }
 }
