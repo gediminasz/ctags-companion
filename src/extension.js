@@ -34,17 +34,17 @@ function activate(context) {
         )
     );
 
-    context.subscriptions.push(
-        vscode.languages.registerDocumentSymbolProvider(
-            documentSelector,
-            new CtagsDocumentSymbolProvider(extension),
-            { label: EXTENSION_NAME }
-        )
-    );
+    // context.subscriptions.push(
+    //     vscode.languages.registerDocumentSymbolProvider(
+    //         documentSelector,
+    //         new CtagsDocumentSymbolProvider(extension),
+    //         { label: EXTENSION_NAME }
+    //     )
+    // );
 
     context.subscriptions.push(
         vscode.languages.registerWorkspaceSymbolProvider(
-            new CtagsWorkspaceSymbolProvider(extension)
+            new ReadtagsProvider(extension)
         )
     );
 

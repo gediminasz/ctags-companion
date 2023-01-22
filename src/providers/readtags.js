@@ -1,6 +1,8 @@
 const { exec } = require('child_process');
 const { promisify } = require('util');
 
+const vscode = require("vscode");
+
 const { determineScope, getConfiguration, definitionToSymbolInformation } = require("../helpers");
 
 // Definitions provider based on readtags command line utility
@@ -24,6 +26,19 @@ class ReadtagsProvider {
                 .map(definition => definitionToSymbolInformation(definition, scope))
                 .map(({ location }) => location);
         }
+    }
+
+    async provideWorkspaceSymbols(query) {
+        if (!query) return;
+
+        const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
+            const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
+            const cwd = scope.uri.fsPath;
+            const { stdout } = await promisify(exec)(`${command} ${query}`, { cwd });
+            const definitions = stdout.trim().split('\n');
+            return definitions.map(d => definitionToSymbolInformation(d, scope));
+        }));
+        return results.flat();
     }
 }
 
