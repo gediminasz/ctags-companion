@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 
+const { ReadtagsProvider } = require("./providers/readtags");
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
@@ -16,6 +17,8 @@ class Extension {
 }
 
 function activate(context) {
+    console.time("[Ctags Companion] activate");
+
     const extension = new Extension(context);
 
     const documentSelector = getConfiguration().get("documentSelector");
@@ -27,7 +30,7 @@ function activate(context) {
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
             documentSelector,
-            new CtagsDefinitionProvider(extension)
+            new ReadtagsProvider(extension)
         )
     );
 
@@ -72,6 +75,8 @@ function activate(context) {
         const { source, name, scope } = event.execution.task;
         if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(extension, scope);
     });
+
+    console.timeEnd("[Ctags Companion] activate");
 }
 
 exports.activate = activate;
