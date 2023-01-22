@@ -1,8 +1,7 @@
 const { exec } = require('child_process');
 const { promisify } = require('util');
-const path = require('path');
 
-const { determineScope, getConfiguration } = require("../helpers");
+const { determineScope, getConfiguration, definitionToSymbolInformation } = require("../helpers");
 
 // Definitions provider based on readtags command line utility
 // https://docs.ctags.io/en/latest/man/readtags.1.html
@@ -15,11 +14,16 @@ class ReadtagsProvider {
         const symbol = document.getText(document.getWordRangeAtPosition(position));
         const scope = determineScope(document);
 
-        const command = getConfiguration(scope).get("readtagsCommand");
+        const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
         const cwd = scope.uri.fsPath;
         const { stdout } = await promisify(exec)(`${command} ${symbol}`, { cwd });
 
-        console.log(stdout);
+        const definitions = stdout.trim().split('\n');  // TODO handle stdout == ''
+        if (definitions) {
+            return definitions
+                .map(definition => definitionToSymbolInformation(definition, scope))
+                .map(({ location }) => location);
+        }
     }
 }
 
