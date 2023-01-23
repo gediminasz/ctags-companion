@@ -7,5 +7,6 @@
 **/*.test.js
 assets
 coverage
+format_settings.py
 Makefile
 test_projects
