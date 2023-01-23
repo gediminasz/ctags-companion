@@ -30,18 +30,6 @@
                     "description": "Command to generate the tags file",
                     "scope": "resource"
                 },
-                "ctags-companion.readtagsGoToDefinitionCommand": {
-                    "type": "string",
-                    "default": "readtags -en -t .vscode/.tags",
-                    "description": "When using readtags provider, this command is used for \"go to definition\" (i.e. F12 or Ctrl+click)",
-                    "scope": "resource"
-                },
-                "ctags-companion.readtagsGoToSymbolInWorkspaceCommand": {
-                    "type": "string",
-                    "default": "readtags -einp -t .vscode/.tags",
-                    "description": "When using readtags provider, this command is used for \"go to symbol in workspace\" (i.e. Ctrl+T)",
-                    "scope": "resource"
-                },
                 "ctags-companion.path": {
                     "type": "string",
                     "default": ".vscode/.tags",
@@ -58,6 +46,23 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Should fuzzy matching be used in workspace symbols provider"
+                },
+                "ctags-companion.readtagsEnabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Should readtags command be used for looking up symbol definitions"
+                },
+                "ctags-companion.readtagsGoToDefinitionCommand": {
+                    "type": "string",
+                    "default": "readtags -en -t .vscode/.tags",
+                    "description": "When readtags is enabled, this command is used for \"go to definition\" (i.e. F12 or Ctrl+click)",
+                    "scope": "resource"
+                },
+                "ctags-companion.readtagsGoToSymbolInWorkspaceCommand": {
+                    "type": "string",
+                    "default": "readtags -einp -t .vscode/.tags",
+                    "description": "When readtags is enabled, this command is used for \"go to symbol in workspace\" (i.e. Ctrl+T)",
+                    "scope": "resource"
                 }
             }
         },
