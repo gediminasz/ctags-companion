@@ -35,7 +35,7 @@ class ReadtagsProvider {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;
             const { stdout } = await promisify(exec)(`${command} ${query}`, { cwd });
-            const definitions = stdout.trim().split('\n');
+            const definitions = stdout.trim().split('\n');  // TODO handle stdout == ''
             return definitions.map(d => definitionToSymbolInformation(d, scope));
         }));
         return results.flat();
