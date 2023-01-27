@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2023.1.0
 
 - Improved stability when indexing large ctags files.
 - Added experimental definitions provider based on `readtags`. Compared to an in-memory index it is faster and more memory efficient. This provider can enabled by setting `ctags-companion.readtagsEnabled` to `true`.
