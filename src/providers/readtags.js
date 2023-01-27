@@ -18,17 +18,10 @@ class ReadtagsProvider {
         const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
         const cwd = scope.uri.fsPath;
 
-        try {
-            const { stdout } = await promisify(exec)(`${command} ${symbol}`, { cwd });
-            const definitions = stdout.trim().split('\n');  // TODO handle stdout == ''
-            if (definitions) {
-                return definitions
-                    .map(definition => definitionToSymbolInformation(definition, scope))
-                    .map(({ location }) => location);
-            }
-        } catch ({ stderr }) {
-            this.extension.showErrorMessage(stderr);
-        }
+        const definitions = await this.readTags(command, symbol, cwd);
+        return definitions
+            .map(d => definitionToSymbolInformation(d, scope))
+            .map(({ location }) => location);
     }
 
     async provideWorkspaceSymbols(query) {
@@ -37,15 +30,24 @@ class ReadtagsProvider {
         const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;
-            try {
-                const { stdout } = await promisify(exec)(`${command} ${query}`, { cwd });
-                const definitions = stdout.trim().split('\n');  // TODO handle stdout == ''
-                return definitions.map(d => definitionToSymbolInformation(d, scope));
-            } catch ({ stderr }) {
-                this.extension.showErrorMessage(stderr);
-            }
+            const definitions = await this.readTags(command, query, cwd);
+            return definitions.map(d => definitionToSymbolInformation(d, scope));
         }));
         return results.flat();
+    }
+
+    async readTags(command, query, cwd) {
+        try {
+            const { stdout } = await promisify(exec)(`${command} ${query}`, { cwd });
+            const output = stdout.trim();
+            if (output) {
+                return output.split('\n');
+            }
+            return [];
+        } catch ({ stderr }) {
+            this.extension.showErrorMessage(stderr);
+            return [];
+        }
     }
 }
 
