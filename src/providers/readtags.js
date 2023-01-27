@@ -8,8 +8,9 @@ const { determineScope, getConfiguration, definitionToSymbolInformation } = requ
 // Definitions provider based on readtags command line utility
 // https://docs.ctags.io/en/latest/man/readtags.1.html
 class ReadtagsProvider {
-    constructor(extension) {
+    constructor(extension, { execute = promisify(exec) } = {}) {
         this.extension = extension;
+        this.execute = execute;
     }
 
     async provideDefinition(document, position) {
@@ -38,7 +39,7 @@ class ReadtagsProvider {
 
     async readTags(command, query, cwd) {
         try {
-            const { stdout } = await promisify(exec)(`${command} ${query}`, { cwd });
+            const { stdout } = await this.execute(`${command} ${query}`, { cwd });
             const output = stdout.trim();
             if (output) {
                 return output.split('\n');
