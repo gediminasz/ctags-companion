@@ -15,16 +15,19 @@ class ReadtagsProvider {
     async provideDefinition(document, position) {
         const symbol = document.getText(document.getWordRangeAtPosition(position));
         const scope = determineScope(document);
-
         const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
         const cwd = scope.uri.fsPath;
-        const { stdout } = await promisify(exec)(`${command} ${symbol}`, { cwd });
 
-        const definitions = stdout.trim().split('\n');  // TODO handle stdout == ''
-        if (definitions) {
-            return definitions
-                .map(definition => definitionToSymbolInformation(definition, scope))
-                .map(({ location }) => location);
+        try {
+            const { stdout } = await promisify(exec)(`${command} ${symbol}`, { cwd });
+            const definitions = stdout.trim().split('\n');  // TODO handle stdout == ''
+            if (definitions) {
+                return definitions
+                    .map(definition => definitionToSymbolInformation(definition, scope))
+                    .map(({ location }) => location);
+            }
+        } catch ({ stderr }) {
+            this.extension.showErrorMessage(stderr);
         }
     }
 
@@ -34,9 +37,13 @@ class ReadtagsProvider {
         const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;
-            const { stdout } = await promisify(exec)(`${command} ${query}`, { cwd });
-            const definitions = stdout.trim().split('\n');  // TODO handle stdout == ''
-            return definitions.map(d => definitionToSymbolInformation(d, scope));
+            try {
+                const { stdout } = await promisify(exec)(`${command} ${query}`, { cwd });
+                const definitions = stdout.trim().split('\n');  // TODO handle stdout == ''
+                return definitions.map(d => definitionToSymbolInformation(d, scope));
+            } catch ({ stderr }) {
+                this.extension.showErrorMessage(stderr);
+            }
         }));
         return results.flat();
     }

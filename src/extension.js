@@ -14,6 +14,10 @@ class Extension {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         this.indexes = new Map();
     }
+
+    showErrorMessage(message) {
+        vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${message}`);
+    }
 }
 
 function activate(context) {
