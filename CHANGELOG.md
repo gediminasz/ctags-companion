@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Improved stability when indexing large ctags files.
+- Added experimental definitions provider based on `readtags`. Compared to an in-memory index it is faster and more memory efficient. This provider can enabled by setting `ctags-companion.readtagsEnabled` to `true`.
+- Added settings `ctags-companion.readtagsGoToDefinitionCommand` and `ctags-companion.readtagsGoToSymbolInWorkspaceCommand`.
 
 ## 2022.12.0
 

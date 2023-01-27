@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 
+const { ReadtagsProvider } = require("./providers/readtags");
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
@@ -13,37 +14,20 @@ class Extension {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         this.indexes = new Map();
     }
+
+    showErrorMessage(message) {
+        vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${message}`);
+    }
 }
 
 function activate(context) {
+    console.time("[Ctags Companion] activate");
+
     const extension = new Extension(context);
 
     const documentSelector = getConfiguration().get("documentSelector");
 
     context.subscriptions.push(extension.statusBarItem);
-
-    context.subscriptions.push(vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(extension)));
-
-    context.subscriptions.push(
-        vscode.languages.registerDefinitionProvider(
-            documentSelector,
-            new CtagsDefinitionProvider(extension)
-        )
-    );
-
-    context.subscriptions.push(
-        vscode.languages.registerDocumentSymbolProvider(
-            documentSelector,
-            new CtagsDocumentSymbolProvider(extension),
-            { label: EXTENSION_NAME }
-        )
-    );
-
-    context.subscriptions.push(
-        vscode.languages.registerWorkspaceSymbolProvider(
-            new CtagsWorkspaceSymbolProvider(extension)
-        )
-    );
 
     if (vscode.workspace.workspaceFolders) {
         vscode.workspace.workspaceFolders.forEach(scope =>
@@ -68,10 +52,43 @@ function activate(context) {
             ));
     }
 
-    vscode.tasks.onDidEndTask(event => {
-        const { source, name, scope } = event.execution.task;
-        if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(extension, scope);
-    });
+    if (getConfiguration().get("readtagsEnabled")) {
+        provider = new ReadtagsProvider(extension);
+        context.subscriptions.push(vscode.languages.registerDefinitionProvider(documentSelector, provider));
+        context.subscriptions.push(vscode.languages.registerWorkspaceSymbolProvider(provider));
+    } else {
+        context.subscriptions.push(
+            vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(extension))
+        );
+
+        context.subscriptions.push(
+            vscode.languages.registerDefinitionProvider(
+                documentSelector,
+                new CtagsDefinitionProvider(extension)
+            )
+        );
+
+        context.subscriptions.push(
+            vscode.languages.registerDocumentSymbolProvider(
+                documentSelector,
+                new CtagsDocumentSymbolProvider(extension),
+                { label: EXTENSION_NAME }
+            )
+        );
+
+        context.subscriptions.push(
+            vscode.languages.registerWorkspaceSymbolProvider(
+                new CtagsWorkspaceSymbolProvider(extension)
+            )
+        );
+
+        vscode.tasks.onDidEndTask(event => {
+            const { source, name, scope } = event.execution.task;
+            if (source == EXTENSION_NAME && name == TASK_NAME) reindexScope(extension, scope);
+        });
+    }
+
+    console.timeEnd("[Ctags Companion] activate");
 }
 
 exports.activate = activate;

@@ -27,25 +27,42 @@
                 "ctags-companion.command": {
                     "type": "string",
                     "default": "ctags -R --fields=+nKz -f .vscode/.tags",
-                    "description": "Command to generate the tags file",
+                    "description": "Command to generate the tags file. This command is used by the `Terminal > Run Task... > Ctags Companion: rebuild tags` task.",
                     "scope": "resource"
                 },
                 "ctags-companion.path": {
                     "type": "string",
                     "default": ".vscode/.tags",
-                    "description": "Location of the ctags file",
+                    "description": "Location of the ctags file.",
                     "scope": "resource"
                 },
                 "ctags-companion.documentSelector": {
                     "default": {
                         "scheme": "file"
                     },
-                    "description": "Document selector object used when registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector"
+                    "description": "Document selector object used when registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector."
                 },
                 "ctags-companion.fuzzyMatchingEnabled": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Should fuzzy matching be used in workspace symbols provider"
+                    "description": "Should fuzzy matching be used in workspace symbols provider."
+                },
+                "ctags-companion.readtagsEnabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Should `readtags` command be used for looking up symbol definitions. This option is fast and memory efficient, however it is experimental and does not provide document symbols (e.g. the outline)."
+                },
+                "ctags-companion.readtagsGoToDefinitionCommand": {
+                    "type": "string",
+                    "default": "readtags -en -t .vscode/.tags",
+                    "description": "When `readtags` is enabled, this command is used for \"go to definition\" feature (i.e. F12 or Ctrl+click).",
+                    "scope": "resource"
+                },
+                "ctags-companion.readtagsGoToSymbolInWorkspaceCommand": {
+                    "type": "string",
+                    "default": "readtags -einp -t .vscode/.tags",
+                    "description": "When `readtags` is enabled, this command is used for \"go to symbol in workspace\" feature (i.e. Ctrl+T).",
+                    "scope": "resource"
                 }
             }
         },
