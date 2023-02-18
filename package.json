@@ -82,7 +82,7 @@
     "jest": {
         "coverageThreshold": {
             "global": {
-                "branches": 63
+                "branches": 67
             }
         }
     }

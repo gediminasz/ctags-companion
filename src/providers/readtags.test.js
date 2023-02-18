@@ -62,6 +62,12 @@ describe(ReadtagsProvider, () => {
                 }
             ]);
         });
+
+        it.each([undefined, null, ""])("returns nothing when query is falsy", async (query) => {
+            const provider = new ReadtagsProvider(extension, { execute: undefined });
+            const definitions = await provider.provideWorkspaceSymbols(query);
+            expect(definitions).toBe(undefined);
+        });
     });
 });
 
