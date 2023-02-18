@@ -19,7 +19,7 @@ class ReadtagsProvider {
         const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
         const cwd = scope.uri.fsPath;
 
-        const definitions = await this.readTags(command, symbol, cwd);
+        const definitions = await this._readTags(command, symbol, cwd);
         return definitions
             .map(d => definitionToSymbolInformation(d, scope))
             .map(({ location }) => location);
@@ -31,13 +31,13 @@ class ReadtagsProvider {
         const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;
-            const definitions = await this.readTags(command, query, cwd);
+            const definitions = await this._readTags(command, query, cwd);
             return definitions.map(d => definitionToSymbolInformation(d, scope));
         }));
         return results.flat();
     }
 
-    async readTags(command, query, cwd) {
+    async _readTags(command, query, cwd) {
         try {
             const { stdout } = await this.execute(`${command} ${query}`, { cwd });
             const output = stdout.trim();
