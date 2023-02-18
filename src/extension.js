@@ -56,6 +56,7 @@ function activate(context) {
         provider = new ReadtagsProvider(extension);
         context.subscriptions.push(vscode.languages.registerDefinitionProvider(documentSelector, provider));
         context.subscriptions.push(vscode.languages.registerWorkspaceSymbolProvider(provider));
+        context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(documentSelector, provider, { label: EXTENSION_NAME }));
     } else {
         context.subscriptions.push(
             vscode.commands.registerCommand(`${EXTENSION_ID}.reindex`, () => reindexAll(extension))

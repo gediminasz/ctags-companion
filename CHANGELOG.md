@@ -1,5 +1,10 @@
 # Change Log
 
+## Unreleased
+
+- Added outline and "go to symbol in editor" capability to `readtags` provider.
+- Added setting `companion.ctagsGoToSymbolInEditorCommand`.
+
 ## 2023.1.0
 
 - Improved stability when indexing large ctags files.
