@@ -50,18 +50,24 @@
                 "ctags-companion.readtagsEnabled": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Should `readtags` command be used for looking up symbol definitions. This option is fast and memory efficient, however it is experimental and does not provide document symbols (e.g. the outline)."
+                    "description": "Should `readtags` command be used for looking up symbol definitions. This option is fast and memory efficient, however it is still experimental."
                 },
                 "ctags-companion.readtagsGoToDefinitionCommand": {
                     "type": "string",
                     "default": "readtags -en -t .vscode/.tags",
-                    "description": "When `readtags` is enabled, this command is used for \"go to definition\" feature (i.e. F12 or Ctrl+click).",
+                    "description": "When `readtags` is enabled, this command is used for the \"go to definition\" feature (i.e. F12 or Ctrl+click).",
                     "scope": "resource"
                 },
                 "ctags-companion.readtagsGoToSymbolInWorkspaceCommand": {
                     "type": "string",
                     "default": "readtags -einp -t .vscode/.tags",
-                    "description": "When `readtags` is enabled, this command is used for \"go to symbol in workspace\" feature (i.e. Ctrl+T).",
+                    "description": "When `readtags` is enabled, this command is used for the \"go to symbol in workspace\" feature (i.e. Ctrl+T).",
+                    "scope": "resource"
+                },
+                "ctags-companion.ctagsGoToSymbolInEditorCommand": {
+                    "type": "string",
+                    "default": "ctags --fields=+nKz -f -",
+                    "description": "When `readtags` is enabled, this command is used for the outline and the \"go to symbol in editor\" feature (i.e. Ctrl+Shift+O).",
                     "scope": "resource"
                 }
             }

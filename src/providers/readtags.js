@@ -19,7 +19,7 @@ class ReadtagsProvider {
         const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
         const cwd = scope.uri.fsPath;
 
-        const definitions = await this._readTags(command, symbol, cwd);
+        const definitions = await this._executeCommand(`${command} ${symbol}`, cwd);
         return definitions
             .map(d => definitionToSymbolInformation(d, scope))
             .map(({ location }) => location);
@@ -31,15 +31,25 @@ class ReadtagsProvider {
         const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;
-            const definitions = await this._readTags(command, query, cwd);
+            const definitions = await this._executeCommand(`${command} ${query}`, cwd);
             return definitions.map(d => definitionToSymbolInformation(d, scope));
         }));
         return results.flat();
     }
 
-    async _readTags(command, query, cwd) {
+    async provideDocumentSymbols(document) {
+        const scope = determineScope(document);
+        const command = getConfiguration(scope).get("ctagsGoToSymbolInEditorCommand");
+        const relativePath = vscode.workspace.asRelativePath(document.uri, false);
+        const cwd = scope.uri.fsPath;
+
+        const definitions = await this._executeCommand(`${command} ${relativePath}`, cwd);
+        return definitions.map(d => definitionToSymbolInformation(d, scope));
+    }
+
+    async _executeCommand(command, cwd) {
         try {
-            const { stdout } = await this.execute(`${command} ${query}`, { cwd });
+            const { stdout } = await this.execute(command, { cwd });
             const output = stdout.trim();
             if (output) {
                 return output.split('\n');
