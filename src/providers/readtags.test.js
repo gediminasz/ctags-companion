@@ -77,6 +77,20 @@ describe(ReadtagsProvider, () => {
 
             expect(definitions).toEqual([]);
         });
+
+        it("returns an empty list when readtags fail", async () => {
+            const execute = () => {
+                const e = new Error();
+                e.stderr = "epic fail";
+                throw e;
+            };
+
+            const provider = new ReadtagsProvider(extension, { execute });
+            const definitions = await provider.provideWorkspaceSymbols("foobar");
+
+            expect(definitions).toEqual([]);
+            expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Ctags Companion: epic fail");
+        });
     });
 });
 
