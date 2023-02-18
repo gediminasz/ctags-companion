@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { definitionToSymbolInformation, commandGuard } = require("./helpers");
+const { definitionToSymbolInformation, commandGuard, wrapExec } = require("./helpers");
 
 describe("definitionToSymbolInformation", () => {
     const scope = { uri: { fsPath: "/path/to/scope" } };
@@ -80,5 +80,32 @@ describe('commandGuard', () => {
         expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
             'Ctags Companion: The "Command" preference is not set. Please check your configuration.'
         );
+    });
+});
+
+describe('wrapExec', () => {
+    it('returns an array of stdout lines', async () => {
+        const exec = async () => ({ stdout: "\naaa\nbbb\nccc\n" });
+        const result = await wrapExec(exec)();
+        expect(result).toEqual(["aaa", "bbb", "ccc"]);
+    });
+
+    it.each(["", " ", "\n"])('returns an empty array when stdout is blank', async (stdout) => {
+        const exec = async () => ({ stdout });
+        const result = await wrapExec(exec)();
+        expect(result).toEqual([]);
+    });
+
+    it('returns an empty array when exec fails', async () => {
+        const exec = async () => {
+            const e = new Error();
+            e.stderr = "epic fail";
+            throw e;
+        };
+
+        const result = await wrapExec(exec)();
+
+        expect(result).toEqual([]);
+        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Ctags Companion: epic fail");
     });
 });

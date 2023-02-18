@@ -1,6 +1,3 @@
-const { exec } = require('child_process');
-const { promisify } = require('util');
-
 const vscode = require("vscode");
 
 const { determineScope, getConfiguration, definitionToSymbolInformation } = require("../helpers");
@@ -8,9 +5,8 @@ const { determineScope, getConfiguration, definitionToSymbolInformation } = requ
 // Definitions provider based on readtags command line utility
 // https://docs.ctags.io/en/latest/man/readtags.1.html
 class ReadtagsProvider {
-    constructor(extension, { execute = promisify(exec) } = {}) {
-        this.extension = extension;
-        this.execute = execute;
+    constructor(exec) {
+        this.exec = exec;
     }
 
     async provideDefinition(document, position) {
@@ -19,7 +15,7 @@ class ReadtagsProvider {
         const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
         const cwd = scope.uri.fsPath;
 
-        const definitions = await this._executeCommand(`${command} ${symbol}`, cwd);
+        const definitions = await this.exec(`${command} ${symbol}`, { cwd });
         return definitions
             .map(d => definitionToSymbolInformation(d, scope))
             .map(({ location }) => location);
@@ -31,7 +27,7 @@ class ReadtagsProvider {
         const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;
-            const definitions = await this._executeCommand(`${command} ${query}`, cwd);
+            const definitions = await this.exec(`${command} ${query}`, { cwd });
             return definitions.map(d => definitionToSymbolInformation(d, scope));
         }));
         return results.flat();
@@ -43,22 +39,8 @@ class ReadtagsProvider {
         const relativePath = vscode.workspace.asRelativePath(document.uri, false);
         const cwd = scope.uri.fsPath;
 
-        const definitions = await this._executeCommand(`${command} ${relativePath}`, cwd);
+        const definitions = await this.exec(`${command} ${relativePath}`, { cwd });
         return definitions.map(d => definitionToSymbolInformation(d, scope));
-    }
-
-    async _executeCommand(command, cwd) {
-        try {
-            const { stdout } = await this.execute(command, { cwd });
-            const output = stdout.trim();
-            if (output) {
-                return output.split('\n');
-            }
-            return [];
-        } catch ({ stderr }) {
-            this.extension.showErrorMessage(stderr);
-            return [];
-        }
     }
 }
 

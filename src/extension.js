@@ -1,11 +1,13 @@
 const vscode = require('vscode');
+const { exec } = require('child_process');
+const { promisify } = require('util');
 
 const { ReadtagsProvider } = require("./providers/readtags");
 const { CtagsDefinitionProvider } = require("./providers/ctags_definition_provider");
 const { CtagsDocumentSymbolProvider } = require("./providers/ctags_document_symbol_provider");
 const { CtagsWorkspaceSymbolProvider } = require("./providers/ctags_workspace_symbol_provider");
 const { EXTENSION_ID, EXTENSION_NAME, TASK_NAME } = require("./constants");
-const { getConfiguration, commandGuard } = require("./helpers");
+const { getConfiguration, commandGuard, wrapExec } = require("./helpers");
 const { reindexAll, reindexScope } = require("./index");
 
 class Extension {
@@ -13,10 +15,6 @@ class Extension {
         this.context = context;
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         this.indexes = new Map();
-    }
-
-    showErrorMessage(message) {
-        vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${message}`);
     }
 }
 
@@ -53,7 +51,7 @@ function activate(context) {
     }
 
     if (getConfiguration().get("readtagsEnabled")) {
-        provider = new ReadtagsProvider(extension);
+        const provider = new ReadtagsProvider(wrapExec(promisify(exec)));
         context.subscriptions.push(vscode.languages.registerDefinitionProvider(documentSelector, provider));
         context.subscriptions.push(vscode.languages.registerWorkspaceSymbolProvider(provider));
         context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(documentSelector, provider, { label: EXTENSION_NAME }));
