@@ -68,6 +68,15 @@ describe(ReadtagsProvider, () => {
             const definitions = await provider.provideWorkspaceSymbols(query);
             expect(definitions).toBe(undefined);
         });
+
+        it.each(["", "\n", " "])("returns an empty list when readtags output is blank", async (stdout) => {
+            const execute = () => ({ stdout });
+
+            const provider = new ReadtagsProvider(extension, { execute });
+            const definitions = await provider.provideWorkspaceSymbols("foobar");
+
+            expect(definitions).toEqual([]);
+        });
     });
 });
 
