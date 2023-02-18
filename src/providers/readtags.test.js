@@ -1,7 +1,6 @@
 const vscode = require("vscode");
 
 const { ReadtagsProvider } = require("./readtags");
-const { Extension } = require("../extension");
 
 const position = Symbol("position");
 const wordRange = Symbol("wordRange");
@@ -21,14 +20,14 @@ function makeDocumentWithSymbol(detectedSymbol) {
 }
 
 describe(ReadtagsProvider, () => {
-    const extension = new Extension();
     const document = makeDocumentWithSymbol("bitmap_complement");
+    const exec = () => [
+        'bitmap_complement	include/linux/bitmap.h	/^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$/;"	kind:function	line:354	typeref:typename:void'
+    ];
 
     describe("provideDefinition", () => {
         it("returns symbol location", async () => {
-            const execute = () => ({ stdout: 'bitmap_complement	include/linux/bitmap.h	/^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$/;"	kind:function	line:354	typeref:typename:void' });
-
-            const provider = new ReadtagsProvider(extension, { execute });
+            const provider = new ReadtagsProvider(exec);
             const definitions = await provider.provideDefinition(document, position);
 
             expect(definitions).toEqual([
@@ -38,13 +37,17 @@ describe(ReadtagsProvider, () => {
                 }
             ]);
         });
+
+        it("returns an empty list when readtags output is blank", async () => {
+            const provider = new ReadtagsProvider(() => []);
+            const definitions = await provider.provideWorkspaceSymbols("foobar");
+            expect(definitions).toEqual([]);
+        });
     });
 
     describe("provideWorkspaceSymbols", () => {
         it("returns symbol location", async () => {
-            const execute = () => ({ stdout: 'bitmap_complement	include/linux/bitmap.h	/^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$/;"	kind:function	line:354	typeref:typename:void' });
-
-            const provider = new ReadtagsProvider(extension, { execute });
+            const provider = new ReadtagsProvider(exec);
             const definitions = await provider.provideWorkspaceSymbols("bitmap_complement");
 
             expect(definitions).toEqual([
@@ -64,40 +67,21 @@ describe(ReadtagsProvider, () => {
         });
 
         it.each([undefined, null, ""])("returns nothing when query is falsy", async (query) => {
-            const provider = new ReadtagsProvider(extension, { execute: undefined });
+            const provider = new ReadtagsProvider(undefined);
             const definitions = await provider.provideWorkspaceSymbols(query);
             expect(definitions).toBe(undefined);
         });
 
-        it.each(["", "\n", " "])("returns an empty list when readtags output is blank", async (stdout) => {
-            const execute = () => ({ stdout });
-
-            const provider = new ReadtagsProvider(extension, { execute });
+        it("returns an empty list when readtags output is blank", async () => {
+            const provider = new ReadtagsProvider(() => []);
             const definitions = await provider.provideWorkspaceSymbols("foobar");
-
             expect(definitions).toEqual([]);
-        });
-
-        it("returns an empty list when readtags fail", async () => {
-            const execute = () => {
-                const e = new Error();
-                e.stderr = "epic fail";
-                throw e;
-            };
-
-            const provider = new ReadtagsProvider(extension, { execute });
-            const definitions = await provider.provideWorkspaceSymbols("foobar");
-
-            expect(definitions).toEqual([]);
-            expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Ctags Companion: epic fail");
         });
     });
 
     describe("provideDocumentSymbols", () => {
         it("returns symbol location", async () => {
-            const execute = () => ({ stdout: 'bitmap_complement	include/linux/bitmap.h	/^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$/;"	kind:function	line:354	typeref:typename:void' });
-
-            const provider = new ReadtagsProvider(extension, { execute });
+            const provider = new ReadtagsProvider(exec);
             const definitions = await provider.provideDocumentSymbols(document);
 
             expect(definitions).toEqual([
@@ -116,12 +100,9 @@ describe(ReadtagsProvider, () => {
             ]);
         });
 
-        it.each(["", "\n", " "])("returns an empty list when readtags output is blank", async (stdout) => {
-            const execute = () => ({ stdout });
-
-            const provider = new ReadtagsProvider(extension, { execute });
+        it("returns an empty list when readtags output is blank", async () => {
+            const provider = new ReadtagsProvider(() => []);
             const definitions = await provider.provideDocumentSymbols(document);
-
             expect(definitions).toEqual([]);
         });
     });

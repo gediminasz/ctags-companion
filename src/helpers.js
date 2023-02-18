@@ -99,4 +99,17 @@ function findField(tags, prefix) {
     return tag && tag.substring(prefix.length);
 }
 
-module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation };
+function wrapExec(exec) {
+    return async (...args) => {
+        try {
+            const { stdout } = await exec(...args);
+            const output = stdout.trim();
+            return output ? output.split('\n') : [];
+        } catch ({ stderr }) {
+            vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${stderr}`);
+            return [];
+        }
+    };
+}
+
+module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation, wrapExec };
