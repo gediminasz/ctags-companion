@@ -12,3 +12,8 @@ package:
 
 publish: package
 	vsce publish
+
+ci:
+	npm audit
+	npm install
+	npm run test -- --ci --coverage --verbose
