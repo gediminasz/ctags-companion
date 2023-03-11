@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2023.3.0
 
 - Added outline and "go to symbol in editor" capability to `readtags` provider.
 - Added setting `companion.ctagsGoToSymbolInEditorCommand`.
