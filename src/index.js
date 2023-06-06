@@ -16,13 +16,14 @@ async function reindexAll(extension) {
 
 async function reindexScope(extension, scope, { fs = fs_, readline = readline_ } = {}) {
     console.time("[Ctags Companion] reindex");
+    const configPath = getConfiguration(scope).get("path")
 
-    const tagsPath = path.join(scope.uri.fsPath, getConfiguration(scope).get("path"));
+    const tagsPath = configPath.startsWith('/') ? vscode.Uri.parse(configPath) : vscode.Uri.joinPath(scope.uri.fsPath, configPath);
 
     if (!fs.existsSync(tagsPath)) {
         extension.statusBarItem.text = (
-            `$(warning) Ctags Companion: file ${getConfiguration(scope).get("path")} not found, ` +
-            'you may need rerun "rebuild ctags" task'
+            `$(warning) Ctags Companion: file ${tagsPath)} not found, ` +
+            'you may need rerun "rebuild ctags" task or adjust the "ctags-companion.path" setting'
         );
         extension.statusBarItem.show();
         return;
