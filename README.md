@@ -1,12 +1,10 @@
 # Ctags Companion
 
-A Visual Studio Code symbols provider based on Ctags.
+A Visual Studio Code symbols provider based on Ctags. This extension provides the following capabilities:
 
-## Features
-
-- Definition provider, i.e. ["Go to Definition"](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition)
-- Document symbol provider, i.e. [outline](https://code.visualstudio.com/docs/getstarted/userinterface#_outline-view) and ["Go to Symbol in File"](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-symbol)
-- Workspace symbol provider, i.e. ["Go to Symbol in Workspace"](https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name)
+- [Go to Definition](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition) (F12)
+- [Go to Symbol in File](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-symbol) (⇧⌘O) as well as [the Outline](https://code.visualstudio.com/docs/getstarted/userinterface#_outline-view)
+- [Go to Symbol in Workspace](https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name) (⌘T)
 
 ## Usage
 
