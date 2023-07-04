@@ -4,9 +4,9 @@ A Visual Studio Code symbols provider based on Ctags.
 
 ## Features
 
-- Definition provider, i.e. "Go to Definition"
-- Document symbol provider, i.e. outline and "Go to Symbol in File"
-- Workspace symbol provider, i.e. "Go to Symbol in Workspace"
+- Definition provider, i.e. ["Go to Definition"](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition)
+- Document symbol provider, i.e. [outline](https://code.visualstudio.com/docs/getstarted/userinterface#_outline-view) and ["Go to Symbol in File"](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-symbol)
+- Workspace symbol provider, i.e. ["Go to Symbol in Workspace"](https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name)
 
 ## Usage
 
