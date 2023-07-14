@@ -7,11 +7,6 @@ const SymbolKind = {
     Variable: 12,
 };
 
-const StatusBarAlignment = {
-    Left: 1,
-    Right: 2
-};
-
 const _scope = { uri: { fsPath: "/test" } };
 
 const workspace = {
@@ -20,10 +15,8 @@ const workspace = {
     getConfiguration: () => ({
         get: (key) => {
             switch (key) {
-                case "path":
-                    return "path/to/ctags";
-                case "fuzzyMatchingEnabled":
-                    return true;
+                default:
+                    return "MOCK_SETTING_VALUE";
             }
         }
     }),
@@ -38,7 +31,6 @@ console.assert(workspace.asRelativePath({ fsPath: "/elsewhere/bar" }) == "/elsew
 
 const window = {
     showErrorMessage: jest.fn(),
-    createStatusBarItem: () => new StatusBarItem()
 };
 
 function Position(line, character) {
@@ -58,25 +50,9 @@ const Uri = {
     joinPath: (left, right) => path.join(left.fsPath, right)
 };
 
-class StatusBarItem {
-    constructor() {
-        this.text = null;
-        this.visible = false;
-        this._wasShown = false;
-    }
-    show() {
-        this.visible = true;
-        this._wasShown = true;
-    }
-    hide() {
-        this.visible = false;
-    }
-}
-
 module.exports = {
     Location,
     Position,
-    StatusBarAlignment,
     SymbolInformation,
     SymbolKind,
     Uri,

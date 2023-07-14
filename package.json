@@ -30,27 +30,11 @@
                     "description": "Command to generate the tags file. This command is used by the `Terminal > Run Task... > Ctags Companion: rebuild tags` task.",
                     "scope": "resource"
                 },
-                "ctags-companion.path": {
-                    "type": "string",
-                    "default": "tags",
-                    "description": "Location of the ctags file.",
-                    "scope": "resource"
-                },
                 "ctags-companion.documentSelector": {
                     "default": {
                         "scheme": "file"
                     },
                     "description": "Document selector object used when registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector."
-                },
-                "ctags-companion.fuzzyMatchingEnabled": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Should fuzzy matching be used in workspace symbols provider."
-                },
-                "ctags-companion.readtagsEnabled": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Should `readtags` command be used for looking up symbol definitions. This option is fast and memory efficient, however it is still experimental."
                 },
                 "ctags-companion.readtagsGoToDefinitionCommand": {
                     "type": "string",
@@ -88,7 +72,10 @@
     "jest": {
         "coverageThreshold": {
             "global": {
-                "branches": 70
+                "statements": 90,
+                "branches": 90,
+                "functions": 90,
+                "lines": 90
             }
         }
     }
