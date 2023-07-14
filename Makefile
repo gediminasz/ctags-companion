@@ -17,3 +17,6 @@ ci:
 	npm audit
 	npm install
 	npm run test -- --ci --coverage --verbose
+
+docs:
+	python format_settings.py

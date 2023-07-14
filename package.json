@@ -26,13 +26,13 @@
             "properties": {
                 "ctags-companion.command": {
                     "type": "string",
-                    "default": "ctags -R --fields=+nKz -f .vscode/.tags",
+                    "default": "ctags -R --fields=+nKz",
                     "description": "Command to generate the tags file. This command is used by the `Terminal > Run Task... > Ctags Companion: rebuild tags` task.",
                     "scope": "resource"
                 },
                 "ctags-companion.path": {
                     "type": "string",
-                    "default": ".vscode/.tags",
+                    "default": "tags",
                     "description": "Location of the ctags file.",
                     "scope": "resource"
                 },
@@ -54,13 +54,13 @@
                 },
                 "ctags-companion.readtagsGoToDefinitionCommand": {
                     "type": "string",
-                    "default": "readtags -en -t .vscode/.tags",
+                    "default": "readtags --extension-fields --line-number",
                     "description": "When `readtags` is enabled, this command is used for the \"go to definition\" feature (i.e. F12 or Ctrl+click).",
                     "scope": "resource"
                 },
                 "ctags-companion.readtagsGoToSymbolInWorkspaceCommand": {
                     "type": "string",
-                    "default": "readtags -einp -t .vscode/.tags",
+                    "default": "readtags --extension-fields --line-number --prefix-match --icase-match",
                     "description": "When `readtags` is enabled, this command is used for the \"go to symbol in workspace\" feature (i.e. Ctrl+T).",
                     "scope": "resource"
                 },
@@ -83,7 +83,7 @@
         "test": "jest"
     },
     "devDependencies": {
-        "jest": "^29.3.1"
+        "jest": "^29.6.1"
     },
     "jest": {
         "coverageThreshold": {

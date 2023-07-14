@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Switched to using the default `tags` file location rather than `.vscode/.tags`
+
 ## 2023.3.0
 
 - Added outline and "go to symbol in editor" capability to `readtags` provider.
