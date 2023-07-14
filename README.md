@@ -8,28 +8,28 @@ A Visual Studio Code symbols provider based on Ctags. This extension provides th
 
 ## Usage
 
-To create a ctags file and index it invoke the "rebuild ctags" task (Terminal > Run Task... and select "Ctags Companion: rebuild ctags"). You may need to ensure `.vscode` directory is present in your project. On completion the task will trigger a "reindex" command which will read the tags file and create a symbol index in memory. After that's done, symbol definitions should become available in the editor.
+To create a ctags file and index it invoke the "rebuild ctags" task (Terminal > Run Task... and select "Ctags Companion: rebuild ctags"). By default it will generate a `tags` file in your project root. On completion the task will trigger a "reindex" command which will read the tags file and create a symbol index in memory. After that's done, symbol definitions should become available in the editor.
 
 ## Settings
 
 ### `ctags-companion.command`
 
-Default: `"ctags -R --fields=+nKz -f .vscode/.tags"`
+Default: `"ctags -R --fields=+nKz"`
 
 Command to generate the tags file. This command is used by the `Terminal > Run Task... > Ctags Companion: rebuild tags` task.
 
 ```json
-"ctags-companion.command": "ctags -R --fields=+nKz -f .vscode/.tags"
+"ctags-companion.command": "ctags -R --fields=+nKz"
 ```
 
 ### `ctags-companion.path`
 
-Default: `".vscode/.tags"`
+Default: `"tags"`
 
 Location of the ctags file.
 
 ```json
-"ctags-companion.path": ".vscode/.tags"
+"ctags-companion.path": "tags"
 ```
 
 ### `ctags-companion.documentSelector`
@@ -64,22 +64,22 @@ Should `readtags` command be used for looking up symbol definitions. This option
 
 ### `ctags-companion.readtagsGoToDefinitionCommand`
 
-Default: `"readtags -en -t .vscode/.tags"`
+Default: `"readtags --extension-fields --line-number"`
 
 When `readtags` is enabled, this command is used for the "go to definition" feature (i.e. F12 or Ctrl+click).
 
 ```json
-"ctags-companion.readtagsGoToDefinitionCommand": "readtags -en -t .vscode/.tags"
+"ctags-companion.readtagsGoToDefinitionCommand": "readtags --extension-fields --line-number"
 ```
 
 ### `ctags-companion.readtagsGoToSymbolInWorkspaceCommand`
 
-Default: `"readtags -einp -t .vscode/.tags"`
+Default: `"readtags --extension-fields --line-number --prefix-match --icase-match"`
 
 When `readtags` is enabled, this command is used for the "go to symbol in workspace" feature (i.e. Ctrl+T).
 
 ```json
-"ctags-companion.readtagsGoToSymbolInWorkspaceCommand": "readtags -einp -t .vscode/.tags"
+"ctags-companion.readtagsGoToSymbolInWorkspaceCommand": "readtags --extension-fields --line-number --prefix-match --icase-match"
 ```
 
 ### `ctags-companion.ctagsGoToSymbolInEditorCommand`
