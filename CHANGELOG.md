@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Switched to using the default `tags` file location rather than `.vscode/.tags`
+- Replaced in-memory symbol index with more efficient `readtags`.
 
 ## 2023.3.0
 

@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { determineScope, getConfiguration, definitionToSymbolInformation } = require("../helpers");
+const { determineScope, getConfiguration, definitionToSymbolInformation } = require("./helpers");
 
 // Definitions provider based on readtags command line utility
 // https://docs.ctags.io/en/latest/man/readtags.1.html

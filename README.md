@@ -8,7 +8,7 @@ A Visual Studio Code symbols provider based on Ctags. This extension provides th
 
 ## Usage
 
-To create a ctags file and index it invoke the "rebuild ctags" task (Terminal > Run Task... and select "Ctags Companion: rebuild ctags"). By default it will generate a `tags` file in your project root. On completion the task will trigger a "reindex" command which will read the tags file and create a symbol index in memory. After that's done, symbol definitions should become available in the editor.
+In order to provide symbol definitions a `tags` file must be present. You can generate it using the "rebuild ctags" task (Terminal > Run Task... and select "Ctags Companion: rebuild ctags"). It will run [ctags](https://docs.ctags.io/en/latest/man/ctags.1.html) and generate a `tags` file inside your project directory. The extension will then use [readtags](https://docs.ctags.io/en/latest/man/readtags.1.html) to perform symbol definition lookup.
 
 ## Settings
 
@@ -22,16 +22,6 @@ Command to generate the tags file. This command is used by the `Terminal > Run T
 "ctags-companion.command": "ctags -R --fields=+nKz"
 ```
 
-### `ctags-companion.path`
-
-Default: `"tags"`
-
-Location of the ctags file.
-
-```json
-"ctags-companion.path": "tags"
-```
-
 ### `ctags-companion.documentSelector`
 
 Default: `{"scheme": "file"}`
@@ -40,26 +30,6 @@ Document selector object used when registering symbol providers, read more at ht
 
 ```json
 "ctags-companion.documentSelector": {"scheme": "file"}
-```
-
-### `ctags-companion.fuzzyMatchingEnabled`
-
-Default: `true`
-
-Should fuzzy matching be used in workspace symbols provider.
-
-```json
-"ctags-companion.fuzzyMatchingEnabled": true
-```
-
-### `ctags-companion.readtagsEnabled`
-
-Default: `false`
-
-Should `readtags` command be used for looking up symbol definitions. This option is fast and memory efficient, however it is still experimental.
-
-```json
-"ctags-companion.readtagsEnabled": false
 ```
 
 ### `ctags-companion.readtagsGoToDefinitionCommand`
