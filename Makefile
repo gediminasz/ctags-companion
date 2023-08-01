@@ -7,7 +7,7 @@ update:
 lock:
 	npm install --package-lock-only
 
-package:
+package: ci
 	vsce package
 
 publish: package
