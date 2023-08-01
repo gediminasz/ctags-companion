@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2023.8.0
 
 - Switched to using the default `tags` file location rather than `.vscode/.tags`
 - Replaced in-memory symbol index with more efficient `readtags`.
