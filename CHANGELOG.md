@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2023.8.1
 
 - Fixed workspace symbol lookup failing when `readtags` returns too many results.
 
