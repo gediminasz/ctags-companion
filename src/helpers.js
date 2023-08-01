@@ -105,8 +105,8 @@ function wrapExec(exec) {
             const { stdout } = await exec(...args);
             const output = stdout.trim();
             return output ? output.split('\n') : [];
-        } catch ({ stderr }) {
-            vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${stderr}`);
+        } catch ({ message }) {
+            vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${message}`);
             return [];
         }
     };

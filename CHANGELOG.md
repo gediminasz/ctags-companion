@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Fixed workspace symbol lookup failing when `readtags` returns too many results.
+
 ## 2023.8.0
 
 - Switched to using the default `tags` file location rather than `.vscode/.tags`
