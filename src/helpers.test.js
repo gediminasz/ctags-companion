@@ -99,7 +99,7 @@ describe('wrapExec', () => {
     it('returns an empty array when exec fails', async () => {
         const exec = async () => {
             const e = new Error();
-            e.stderr = "epic fail";
+            e.message = "epic fail";
             throw e;
         };
 

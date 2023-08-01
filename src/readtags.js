@@ -27,7 +27,7 @@ class ReadtagsProvider {
         const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;
-            const definitions = await this.exec(`${command} ${query}`, { cwd });
+            const definitions = await this.exec(`${command} ${query}`, { cwd, maxBuffer: Infinity });
             return definitions.map(d => definitionToSymbolInformation(d, scope));
         }));
         return results.flat();
