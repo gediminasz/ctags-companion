@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2023.8.2
 
 - Changed default setting values for better compatibility with different `readtags` implementations:
     - `readtagsGoToDefinitionCommand`: from `readtags --extension-fields --line-number` to `readtags -en`
