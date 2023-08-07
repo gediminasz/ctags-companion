@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+
+- Changed default setting values for better compatibility with different `readtags` implementations:
+    - `readtagsGoToDefinitionCommand`: from `readtags --extension-fields --line-number` to `readtags -en`
+    - `readtagsGoToSymbolInWorkspaceCommand`: from `readtags --extension-fields --line-number --prefix-match --icase-match` to `readtags -enpi`
+
 ## 2023.8.1
 
 - Fixed workspace symbol lookup failing when `readtags` returns too many results.
