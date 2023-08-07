@@ -38,13 +38,13 @@
                 },
                 "ctags-companion.readtagsGoToDefinitionCommand": {
                     "type": "string",
-                    "default": "readtags --extension-fields --line-number",
+                    "default": "readtags -en",
                     "description": "When `readtags` is enabled, this command is used for the \"go to definition\" feature (i.e. F12 or Ctrl+click).",
                     "scope": "resource"
                 },
                 "ctags-companion.readtagsGoToSymbolInWorkspaceCommand": {
                     "type": "string",
-                    "default": "readtags --extension-fields --line-number --prefix-match --icase-match",
+                    "default": "readtags -enpi",
                     "description": "When `readtags` is enabled, this command is used for the \"go to symbol in workspace\" feature (i.e. Ctrl+T).",
                     "scope": "resource"
                 },
