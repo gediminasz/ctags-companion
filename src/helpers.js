@@ -100,8 +100,10 @@ function findField(tags, prefix) {
 }
 
 function wrapExec(exec) {
+    const outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
     return async (...args) => {
         try {
+            outputChannel.appendLine(args[0]);
             const { stdout } = await exec(...args);
             const output = stdout.trim();
             return output ? output.split('\n') : [];

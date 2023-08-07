@@ -31,6 +31,9 @@ console.assert(workspace.asRelativePath({ fsPath: "/elsewhere/bar" }) == "/elsew
 
 const window = {
     showErrorMessage: jest.fn(),
+    createOutputChannel: () => ({
+        appendLine() { }
+    })
 };
 
 function Position(line, character) {
