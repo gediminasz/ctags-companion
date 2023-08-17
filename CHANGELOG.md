@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Fixed `readtags` command failing when a symbol query contains non-alphanumeric characters.
+
 ## 2023.8.2
 
 - Changed default setting values for better compatibility with different `readtags` implementations:
