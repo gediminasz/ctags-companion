@@ -63,3 +63,11 @@ When `readtags` is enabled, this command is used for the outline and the "go to 
 ```json
 "ctags-companion.ctagsGoToSymbolInEditorCommand": "ctags --fields=+nKz -f -"
 ```
+
+## FAQ
+
+### How to install Universal Ctags?
+
+* macOS: `brew install universal-ctags`
+* Ubuntu: `apt install universal-ctags` or `snap install universal-ctags`
+* Windows: `winget install 'Universal Ctags'`
