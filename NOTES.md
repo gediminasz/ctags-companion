@@ -15,5 +15,6 @@
     * A pre-release version may look something like this: `2023.9.0-beta`.
 1. Ensure `CHANGELOG.md` is up to date.
     * Change the "Unreleased" heading to the version you are about to release.
+1. Commit changes.
 1. `make publish`
 1. Create a release together with a new tag in GitHub.

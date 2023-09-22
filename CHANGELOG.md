@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2023.9.0
 
 - Fixed `readtags` command failing when a symbol query contains non-alphanumeric characters.
 
