@@ -108,4 +108,20 @@ describe('wrapExec', () => {
         expect(result).toEqual([]);
         expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Ctags Companion: epic fail");
     });
+
+    it.each([
+        ["win32", "powershell.exe"],
+        ["darwin", undefined],
+        ["linux", undefined]
+    ])('uses powershell in windows', async (platform, expectedShell) => {
+        let shellUsed = undefined;
+
+        const exec = async (_, { shell }) => {
+            shellUsed = shell;
+            return { stdout: "OK" };
+        };
+
+        await wrapExec(exec, platform)("fakecommand", {});
+        expect(shellUsed).toEqual(expectedShell);
+    });
 });

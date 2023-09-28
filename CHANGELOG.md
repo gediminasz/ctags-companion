@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Execute shell commands under `powershell.exe` on Windows. This addresses Command Prompt not supporting queries wrapped in single quotes.
+
 ## 2023.9.0
 
 - Fixed `readtags` command failing when a symbol query contains non-alphanumeric characters.
