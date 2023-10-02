@@ -7,6 +7,10 @@
 1. `make package`
 1. `code --install-extension ctags-companion-2023.9.0-beta.vsix`
 1. Manually test the extension on a few projects
+    1. Rebuild ctags task
+    1. Go to Symbol in Workspace
+    1. Go to Symbol in File
+    1. Go to Definition
 
 ## Release checklist
 
