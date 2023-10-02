@@ -99,12 +99,18 @@ function findField(tags, prefix) {
     return tag && tag.substring(prefix.length);
 }
 
-function wrapExec(exec) {
+function wrapExec(exec, platform = process.platform) {
     const outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
-    return async (...args) => {
+    return async (command, options) => {
         try {
-            outputChannel.appendLine(args[0]);
-            const { stdout } = await exec(...args);
+            if (platform === "win32") {
+                // Use PowerShell on Windows because Command Prompt does not support single quotes
+                options = {...options, shell: "powershell.exe"}
+            }
+
+            outputChannel.appendLine(`${command} ${JSON.stringify(options)}`);
+
+            const { stdout } = await exec(command, options);
             const output = stdout.trim();
             return output ? output.split('\n') : [];
         } catch ({ message }) {
