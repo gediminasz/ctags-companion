@@ -36,29 +36,29 @@ Document selector object used when registering symbol providers, read more at ht
 
 ### `ctags-companion.readtagsGoToDefinitionCommand`
 
-Default: `"readtags --extension-fields --line-number"`
+Default: `"readtags -en"`
 
-When `readtags` is enabled, this command is used for the "go to definition" feature (i.e. F12 or Ctrl+click).
+The command used for the "go to definition" feature (i.e. F12 or Ctrl+click).
 
 ```json
-"ctags-companion.readtagsGoToDefinitionCommand": "readtags --extension-fields --line-number"
+"ctags-companion.readtagsGoToDefinitionCommand": "readtags -en"
 ```
 
 ### `ctags-companion.readtagsGoToSymbolInWorkspaceCommand`
 
-Default: `"readtags --extension-fields --line-number --prefix-match --icase-match"`
+Default: `"readtags -enpi"`
 
-When `readtags` is enabled, this command is used for the "go to symbol in workspace" feature (i.e. Ctrl+T).
+The command used for the "go to symbol in workspace" feature (i.e. Ctrl+T).
 
 ```json
-"ctags-companion.readtagsGoToSymbolInWorkspaceCommand": "readtags --extension-fields --line-number --prefix-match --icase-match"
+"ctags-companion.readtagsGoToSymbolInWorkspaceCommand": "readtags -enpi"
 ```
 
 ### `ctags-companion.ctagsGoToSymbolInEditorCommand`
 
 Default: `"ctags --fields=+nKz -f -"`
 
-When `readtags` is enabled, this command is used for the outline and the "go to symbol in editor" feature (i.e. Ctrl+Shift+O).
+The command used for the outline and the "go to symbol in editor" feature (i.e. Ctrl+Shift+O).
 
 ```json
 "ctags-companion.ctagsGoToSymbolInEditorCommand": "ctags --fields=+nKz -f -"

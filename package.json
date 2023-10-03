@@ -39,19 +39,19 @@
                 "ctags-companion.readtagsGoToDefinitionCommand": {
                     "type": "string",
                     "default": "readtags -en",
-                    "description": "When `readtags` is enabled, this command is used for the \"go to definition\" feature (i.e. F12 or Ctrl+click).",
+                    "description": "The command used for the \"go to definition\" feature (i.e. F12 or Ctrl+click).",
                     "scope": "resource"
                 },
                 "ctags-companion.readtagsGoToSymbolInWorkspaceCommand": {
                     "type": "string",
                     "default": "readtags -enpi",
-                    "description": "When `readtags` is enabled, this command is used for the \"go to symbol in workspace\" feature (i.e. Ctrl+T).",
+                    "description": "The command used for the \"go to symbol in workspace\" feature (i.e. Ctrl+T).",
                     "scope": "resource"
                 },
                 "ctags-companion.ctagsGoToSymbolInEditorCommand": {
                     "type": "string",
                     "default": "ctags --fields=+nKz -f -",
-                    "description": "When `readtags` is enabled, this command is used for the outline and the \"go to symbol in editor\" feature (i.e. Ctrl+Shift+O).",
+                    "description": "The command used for the outline and the \"go to symbol in editor\" feature (i.e. Ctrl+Shift+O).",
                     "scope": "resource"
                 }
             }
