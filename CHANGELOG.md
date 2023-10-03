@@ -1,5 +1,9 @@
 # Change Log
 
+## 2023.10.1
+
+- Updated settings documentation.
+
 ## 2023.10.0
 
 - Execute shell commands under `powershell.exe` on Windows. This addresses Command Prompt not supporting queries wrapped in single quotes.
