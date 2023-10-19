@@ -55,13 +55,7 @@
                     "scope": "resource"
                 }
             }
-        },
-        "commands": [
-            {
-                "command": "ctags-companion.reindex",
-                "title": "Ctags Companion: reindex"
-            }
-        ]
+        }
     },
     "scripts": {
         "test": "jest"
