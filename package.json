@@ -61,7 +61,7 @@
         "test": "jest"
     },
     "devDependencies": {
-        "jest": "^29.6.1"
+        "jest": "^29.7.0"
     },
     "jest": {
         "coverageThreshold": {
