@@ -1,5 +1,9 @@
 # Change Log
 
+## 2023.10.2
+
+- Removed reference to no longer functional reindex command.
+
 ## 2023.10.1
 
 - Updated settings documentation.
