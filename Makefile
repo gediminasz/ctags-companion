@@ -2,7 +2,7 @@ test:
 	npm test
 
 update:
-	npm add --include=dev jest@latest
+	npm add --save-dev jest@latest @vscode/vsce@latest ovsx@latest
 
 lock:
 	npm install --package-lock-only
