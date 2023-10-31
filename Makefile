@@ -8,10 +8,11 @@ lock:
 	npm install --package-lock-only
 
 package: ci
-	vsce package
+	npx vsce package
 
 publish: package
-	vsce publish
+	npx vsce publish
+	npx ovsx publish
 
 ci:
 	npm audit
