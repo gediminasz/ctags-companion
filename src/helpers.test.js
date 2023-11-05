@@ -104,10 +104,10 @@ describe('wrapExec', () => {
         };
 
         const result = await wrapExec(exec)();
-
         expect(result).toEqual([]);
+
         const outputChannel = vscode.window.createOutputChannel();
-        expect(outputChannel.appendLine).toHaveBeenCalledWith("epic fail");
+        expect(outputChannel.appendLine).toHaveBeenLastCalledWith("epic fail");
     });
 
     it.each([
