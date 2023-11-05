@@ -29,11 +29,13 @@ const workspace = {
 console.assert(workspace.asRelativePath({ fsPath: "/test/foo" }) == "foo");
 console.assert(workspace.asRelativePath({ fsPath: "/elsewhere/bar" }) == "/elsewhere/bar");
 
+const mockOutputChannel = {
+    appendLine: jest.fn(),
+};
+
 const window = {
     showErrorMessage: jest.fn(),
-    createOutputChannel: () => ({
-        appendLine() { }
-    })
+    createOutputChannel: () => mockOutputChannel
 };
 
 function Position(line, character) {

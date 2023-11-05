@@ -104,9 +104,10 @@ describe('wrapExec', () => {
         };
 
         const result = await wrapExec(exec)();
-
         expect(result).toEqual([]);
-        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Ctags Companion: epic fail");
+
+        const outputChannel = vscode.window.createOutputChannel();
+        expect(outputChannel.appendLine).toHaveBeenLastCalledWith("epic fail");
     });
 
     it.each([

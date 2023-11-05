@@ -99,13 +99,14 @@ function findField(tags, prefix) {
     return tag && tag.substring(prefix.length);
 }
 
+const outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
+
 function wrapExec(exec, platform = process.platform) {
-    const outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
     return async (command, options) => {
         try {
             if (platform === "win32") {
                 // Use PowerShell on Windows because Command Prompt does not support single quotes
-                options = {...options, shell: "powershell.exe"}
+                options = { ...options, shell: "powershell.exe" };
             }
 
             outputChannel.appendLine(`${command} ${JSON.stringify(options)}`);
@@ -114,7 +115,7 @@ function wrapExec(exec, platform = process.platform) {
             const output = stdout.trim();
             return output ? output.split('\n') : [];
         } catch ({ message }) {
-            vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${message}`);
+            outputChannel.appendLine(message);
             return [];
         }
     };
