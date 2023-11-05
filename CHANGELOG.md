@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- `readtags` and `ctags` execution errors are now logged to "Ctags Companion" output channel instead of toast notifications.
+
 ## 2023.10.2
 
 - Removed reference to no longer functional reindex command.
