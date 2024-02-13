@@ -61,7 +61,7 @@
         "test": "jest"
     },
     "devDependencies": {
-        "@vscode/vsce": "^2.22.0",
+        "@vscode/vsce": "^2.23.0",
         "jest": "^29.7.0",
         "ovsx": "^0.8.3"
     },
