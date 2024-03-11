@@ -3,8 +3,7 @@
     "displayName": "Ctags Companion",
     "description": "A Visual Studio Code symbols provider based on Ctags",
     "author": {
-        "name": "Gediminas Zlatkus",
-        "email": "gediminas.zlatkus@gmail.com"
+        "name": "Gediminas Zlatkus"
     },
     "license": "MIT",
     "publisher": "gediminaszlatkus",
