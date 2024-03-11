@@ -2,12 +2,18 @@
     "name": "ctags-companion",
     "displayName": "Ctags Companion",
     "description": "A Visual Studio Code symbols provider based on Ctags",
+    "author": {
+        "name": "Gediminas Zlatkus",
+        "email": "gediminas.zlatkus@gmail.com"
+    },
+    "license": "MIT",
     "publisher": "gediminaszlatkus",
     "icon": "logo.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/gediminasz/ctags-companion"
     },
+    "homepage": "https://github.com/gediminasz/ctags-companion",
     "version": "2023.11.0",
     "engines": {
         "vscode": "^1.42.0"
