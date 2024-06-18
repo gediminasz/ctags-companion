@@ -2,6 +2,8 @@ test:
 	npm test
 
 update:
+	rm -rf node_modules
+	rm package-lock.json
 	npm add --save-dev jest@latest @vscode/vsce@latest ovsx@latest
 
 lock:
