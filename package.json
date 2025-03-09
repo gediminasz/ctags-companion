@@ -60,7 +60,20 @@
                     "scope": "resource"
                 }
             }
-        }
+        },
+        "taskDefinitions": [
+            {
+                "type": "ctags-companion",
+                "required": [
+                    "task"
+                ],
+                "properties": {
+                    "task": {
+                        "type": "string"
+                    }
+                }
+            }
+        ]
     },
     "scripts": {
         "test": "jest"

@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 
 const { ReadtagsProvider } = require("./readtags");
-const { EXTENSION_NAME, TASK_NAME } = require("./constants");
+const { EXTENSION_NAME } = require("./constants");
 const { getConfiguration, commandGuard, wrapExec } = require("./helpers");
 
 function activate(context) {
@@ -14,22 +14,21 @@ function activate(context) {
     if (vscode.workspace.workspaceFolders) {
         vscode.workspace.workspaceFolders.forEach(scope =>
             context.subscriptions.push(
-                vscode.tasks.registerTaskProvider("shell", {
+                vscode.tasks.registerTaskProvider("ctags-companion", {
                     provideTasks: () => {
                         const command = getConfiguration(scope).get("command");
                         if (commandGuard(command)) return [];
                         const task = new vscode.Task(
-                            { type: "shell" },
+                            { type: "ctags-companion", task: "rebuild" },
                             scope,
-                            TASK_NAME,
+                            "rebuild ctags",
                             EXTENSION_NAME,
                             new vscode.ShellExecution(command),
                             []
                         );
                         task.presentationOptions.reveal = false;
                         return [task];
-                    },
-                    resolveTask: (task) => task
+                    }
                 })
             ));
     }
