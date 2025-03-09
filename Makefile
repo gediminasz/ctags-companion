@@ -4,7 +4,7 @@ test:
 update:
 	rm -rf node_modules
 	rm package-lock.json
-	npm add --save-dev jest@latest @vscode/vsce@latest ovsx@latest
+	npm install
 
 lock:
 	npm install --package-lock-only
