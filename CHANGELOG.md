@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- **Breaking Change**: Converted "rebuild ctags" task into a VS Code command. The task (Terminal > Run Task... > Ctags Companion: rebuild ctags) has been replaced with a command (⇧⌘P > Ctags Companion: Rebuild Ctags).
+
 ## 2023.11.0
 
 - `readtags` and `ctags` execution errors are now logged to "Ctags Companion" output channel instead of toast notifications.
