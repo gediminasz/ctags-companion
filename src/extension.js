@@ -34,6 +34,10 @@ function activate(context) {
             ));
     }
 
+    context.subscriptions.push(vscode.commands.registerCommand("ctags-companion.rebuildCtags", () => {
+        console.log("TODO");
+    }));
+
     const provider = new ReadtagsProvider(wrapExec(promisify(exec)));
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(documentSelector, provider));
     context.subscriptions.push(vscode.languages.registerWorkspaceSymbolProvider(provider));
