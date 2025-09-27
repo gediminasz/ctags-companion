@@ -1,4 +1,6 @@
 const vscode = require("vscode");
+const { exec } = require('child_process');
+const { promisify } = require('util');
 
 const { EXTENSION_ID, EXTENSION_NAME } = require("./constants");
 
@@ -122,4 +124,6 @@ function wrapExec(exec, platform = process.platform) {
     };
 }
 
-module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation, wrapExec };
+const tryExec = wrapExec(promisify(exec));
+
+module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation, wrapExec, tryExec };
