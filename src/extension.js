@@ -4,7 +4,7 @@ const { promisify } = require('util');
 
 const { ReadtagsProvider } = require("./readtags");
 const { EXTENSION_NAME, TASK_NAME } = require("./constants");
-const { getConfiguration, commandGuard, wrapExec } = require("./helpers");
+const { getConfiguration, commandGuard, wrapExec, determineScope } = require("./helpers");
 
 function activate(context) {
     console.time("[Ctags Companion] activate");
@@ -35,7 +35,20 @@ function activate(context) {
     }
 
     context.subscriptions.push(vscode.commands.registerCommand("ctags-companion.rebuildCtags", () => {
-        console.log("TODO");
+        if (vscode.window.activeTextEditor === undefined) {
+            return;
+        }
+        const scope = determineScope(vscode.window.activeTextEditor.document);
+        const command = getConfiguration(scope).get("command");
+        const task = new vscode.Task(
+            { type: "shell" },
+            scope,
+            TASK_NAME,
+            EXTENSION_NAME,
+            new vscode.ShellExecution(command),
+            []
+        );
+        vscode.tasks.executeTask(task);
     }));
 
     const provider = new ReadtagsProvider(wrapExec(promisify(exec)));

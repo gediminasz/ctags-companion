@@ -3,6 +3,7 @@ const vscode = require("vscode");
 const { EXTENSION_ID, EXTENSION_NAME } = require("./constants");
 
 function determineScope(document) {
+    // TODO vscode.workspace.getWorkspaceFolder ?
     return vscode.workspace.workspaceFolders.find(scope => document.uri.fsPath.includes(scope.uri.fsPath));
 }
 
