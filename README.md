@@ -10,7 +10,7 @@ A Visual Studio Code symbols provider based on Ctags. This extension provides th
 
 First of all, make sure you have [Universal Ctags](https://github.com/universal-ctags/ctags) installed.
 
-In order to provide symbol definitions a `tags` file must be present. You can generate it using the "rebuild ctags" task (Terminal > Run Task... and select "Ctags Companion: rebuild ctags"). It will run [ctags](https://docs.ctags.io/en/latest/man/ctags.1.html) and generate a `tags` file inside your project directory. The extension will then use [readtags](https://docs.ctags.io/en/latest/man/readtags.1.html) to perform symbol definition lookup.
+In order to provide symbol definitions a `tags` file must be present. You can generate it using the "Ctags Companion: Rebuild Ctags" command (⇧⌘P and search for "Ctags Companion: Rebuild Ctags"). It will run [ctags](https://docs.ctags.io/en/latest/man/ctags.1.html) and generate a `tags` file inside your project directory. The extension will then use [readtags](https://docs.ctags.io/en/latest/man/readtags.1.html) to perform symbol definition lookup.
 
 ## Settings
 
@@ -18,7 +18,7 @@ In order to provide symbol definitions a `tags` file must be present. You can ge
 
 Default: `"ctags -R --fields=+nKz"`
 
-Command to generate the tags file. This command is used by the `Terminal > Run Task... > Ctags Companion: rebuild tags` task.
+Command to generate the tags file. This command is used by the `Ctags Companion: Rebuild Ctags` command.
 
 ```json
 "ctags-companion.command": "ctags -R --fields=+nKz"

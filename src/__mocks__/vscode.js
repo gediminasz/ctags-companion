@@ -35,7 +35,18 @@ const mockOutputChannel = {
 
 const window = {
     showErrorMessage: jest.fn(),
+    showInformationMessage: jest.fn(),
     createOutputChannel: () => mockOutputChannel
+};
+
+const commands = {
+    registerCommand: jest.fn(() => ({ dispose: jest.fn() }))
+};
+
+const languages = {
+    registerDefinitionProvider: jest.fn(() => ({ dispose: jest.fn() })),
+    registerWorkspaceSymbolProvider: jest.fn(() => ({ dispose: jest.fn() })),
+    registerDocumentSymbolProvider: jest.fn(() => ({ dispose: jest.fn() }))
 };
 
 function Position(line, character) {
@@ -61,6 +72,8 @@ module.exports = {
     SymbolInformation,
     SymbolKind,
     Uri,
+    commands,
+    languages,
     window,
     workspace,
 };

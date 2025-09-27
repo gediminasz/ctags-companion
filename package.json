@@ -25,6 +25,13 @@
     ],
     "main": "./src/extension.js",
     "contributes": {
+        "commands": [
+            {
+                "command": "ctags-companion.rebuildCtags",
+                "title": "Rebuild Ctags",
+                "category": "Ctags Companion"
+            }
+        ],
         "configuration": {
             "type": "object",
             "title": "Ctags Companion",
@@ -32,7 +39,7 @@
                 "ctags-companion.command": {
                     "type": "string",
                     "default": "ctags -R --fields=+nKz",
-                    "description": "Command to generate the tags file. This command is used by the `Terminal > Run Task... > Ctags Companion: rebuild tags` task.",
+                    "description": "Command to generate the tags file. This command is used by the `Ctags Companion: Rebuild Ctags` command.",
                     "scope": "resource"
                 },
                 "ctags-companion.documentSelector": {
