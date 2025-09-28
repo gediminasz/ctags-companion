@@ -1,10 +1,9 @@
 const vscode = require('vscode');
-const { exec } = require('child_process');
-const { promisify } = require('util');
 
 const { ReadtagsProvider } = require("./readtags");
 const { EXTENSION_NAME, TASK_NAME } = require("./constants");
-const { getConfiguration, commandGuard, wrapExec } = require("./helpers");
+const { getConfiguration, commandGuard, tryExec } = require("./helpers");
+const { rebuildCtags } = require("./ctags");
 
 function activate(context) {
     console.time("[Ctags Companion] activate");
@@ -34,7 +33,9 @@ function activate(context) {
             ));
     }
 
-    const provider = new ReadtagsProvider(wrapExec(promisify(exec)));
+    context.subscriptions.push(vscode.commands.registerCommand("ctags-companion.rebuildCtags", rebuildCtags));
+
+    const provider = new ReadtagsProvider(tryExec);
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(documentSelector, provider));
     context.subscriptions.push(vscode.languages.registerWorkspaceSymbolProvider(provider));
     context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(documentSelector, provider, { label: EXTENSION_NAME }));

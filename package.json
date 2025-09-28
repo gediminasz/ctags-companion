@@ -60,7 +60,14 @@
                     "scope": "resource"
                 }
             }
-        }
+        },
+        "commands": [
+            {
+                "category": "Ctags Companion",
+                "title": "Rebuild Ctags",
+                "command": "ctags-companion.rebuildCtags"
+            }
+        ]
     },
     "scripts": {
         "test": "jest"

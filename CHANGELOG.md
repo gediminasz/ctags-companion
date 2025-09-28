@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Added "Rebuild Ctags" editor Command. The old method of building ctags via a Task is going to be deprecated.
+
 ## 2023.11.0
 
 - `readtags` and `ctags` execution errors are now logged to "Ctags Companion" output channel instead of toast notifications.
