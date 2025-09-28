@@ -25,7 +25,7 @@ function getCurrentWorkspaceScope() {
     }
 
     vscode.window.showErrorMessage(
-        `${EXTENSION_NAME}: Unable to determine active directory in a multi-root workspace. Please open some file and try agan.`
+        `${EXTENSION_NAME}: Unable to determine active directory in a multi-root workspace. Please open some file and try again.`
     );
 }
 

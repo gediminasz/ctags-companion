@@ -31,7 +31,7 @@ describe(rebuildCtags, () => {
 
         expect(exec).not.toHaveBeenCalled();
         expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-            'Ctags Companion: Unable to determine active directory in a multi-root workspace. Please open some file and try agan.'
+            'Ctags Companion: Unable to determine active directory in a multi-root workspace. Please open some file and try again.'
         );
     });
 });
