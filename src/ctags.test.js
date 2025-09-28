@@ -21,4 +21,17 @@ describe(rebuildCtags, () => {
         expect(exec.mock.calls.length).toBe(1);
         expect(exec.mock.calls[0]).toStrictEqual(["mock-ctags-command", { cwd: "/test" }]);
     });
+
+    it("shows error message when no file is open in a multi root workspace", () => {
+        vscode.window.activeTextEditor = undefined;
+        vscode.workspace.workspaceFolders = [{ uri: { fsPath: "/backend" } }, { uri: { fsPath: "/frontend" } }];
+
+        const exec = jest.fn();
+        rebuildCtags(exec);
+
+        expect(exec).not.toHaveBeenCalled();
+        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+            'Ctags Companion: Unable to determine active directory in a multi-root workspace. Please open some file and try agan.'
+        );
+    });
 });
