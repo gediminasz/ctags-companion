@@ -1,18 +1,18 @@
 const vscode = require('vscode');
-const { getConfiguration, tryExec } = require("./helpers");
+const helpers = require('./helpers');
 
 const { EXTENSION_NAME } = require("./constants");
 
-function rebuildCtags(exec = tryExec) {
+function rebuildCtags(tryExec = helpers.tryExec) {
     const scope = getCurrentWorkspaceScope();
     if (scope === undefined) {
         return;
     }
 
-    const command = getConfiguration(scope).get("command");
+    const command = helpers.getConfiguration(scope).get("command");
     const cwd = scope.uri.fsPath;
 
-    exec(command, { cwd });
+    tryExec(command, { cwd });
 }
 
 function getCurrentWorkspaceScope() {
