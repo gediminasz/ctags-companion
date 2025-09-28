@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added "rebuild ctags" editor Command. It should be more convenient to use. The old Task is now deprecated.
+- Added "Rebuild Ctags" editor Command. The old method of building ctags via a Task is going to be deprecated.
 
 ## 2023.11.0
 
