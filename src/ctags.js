@@ -3,7 +3,7 @@ const { getConfiguration, tryExec } = require("./helpers");
 
 const { EXTENSION_NAME } = require("./constants");
 
-function rebuildCtags() {
+function rebuildCtags(exec = tryExec) {
     const scope = getCurrentWorkspaceScope();
     if (scope === undefined) {
         return;
@@ -12,7 +12,7 @@ function rebuildCtags() {
     const command = getConfiguration(scope).get("command");
     const cwd = scope.uri.fsPath;
 
-    tryExec(command, { cwd });
+    exec(command, { cwd });
 }
 
 function getCurrentWorkspaceScope() {

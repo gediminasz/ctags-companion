@@ -15,15 +15,21 @@ const workspace = {
     getConfiguration: () => ({
         get: (key) => {
             switch (key) {
+                case "command":
+                    return "mock-ctags-command";
                 default:
-                    return "MOCK_SETTING_VALUE";
+                    return "mock-setting-value";
             }
         }
     }),
 
     asRelativePath: ({ fsPath }) => {
         return fsPath.replace(/^(\/test\/)/, "");
-    }
+    },
+
+    getWorkspaceFolder: (_uri) => {
+        return _scope;
+    },
 };
 
 console.assert(workspace.asRelativePath({ fsPath: "/test/foo" }) == "foo");
