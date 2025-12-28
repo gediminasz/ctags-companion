@@ -4,15 +4,29 @@ const { promisify } = require('util');
 
 const { EXTENSION_ID, EXTENSION_NAME } = require("./constants");
 
+/**
+ * @param {vscode.TextDocument} document
+ * @returns {vscode.WorkspaceFolder | undefined}
+ */
 function determineScope(document) {
-    // TODO vscode.workspace.getWorkspaceFolder ?
+    // TODO FIXME workspaceFolders may be undefined when no workspace has been opened
+    // @ts-expect-error
     return vscode.workspace.workspaceFolders.find(scope => document.uri.fsPath.includes(scope.uri.fsPath));
+    // TODO vscode.workspace.getWorkspaceFolder ?
 }
 
+/**
+ * @param {vscode.WorkspaceFolder | null} scope
+ * @returns {vscode.WorkspaceConfiguration}
+ */
 function getConfiguration(scope = null) {
     return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
 }
 
+/**
+ * @param {string} command
+ * @returns {boolean}
+ */
 function commandGuard(command) {
     if (typeof command !== 'string' || command.trim() === '') {
         vscode.window.showErrorMessage(
@@ -24,11 +38,14 @@ function commandGuard(command) {
     return false;
 }
 
+/**
+ * @type {Object.<string, vscode.SymbolKind>}
+ */
 const SYMBOL_KINDS = {
     class: vscode.SymbolKind.Class,
     const: vscode.SymbolKind.Constant,
     constant: vscode.SymbolKind.Constant,
-    constractor: vscode.SymbolKind.Constractor,
+    constructor: vscode.SymbolKind.Constructor,
     define: vscode.SymbolKind.Constant,
     enum: vscode.SymbolKind.Enum,
     enumConstant: vscode.SymbolKind.EnumMember,
@@ -79,6 +96,11 @@ const SYMBOL_KINDS = {
     variable: vscode.SymbolKind.Variable,
 };
 
+/**
+ * @param {string} definition
+ * @param {vscode.WorkspaceFolder} scope
+ * @returns {vscode.SymbolInformation}
+ */
 function definitionToSymbolInformation(definition, scope) {
     const [symbol, path, ...fields] = definition.split("\t");
 
@@ -87,16 +109,21 @@ function definitionToSymbolInformation(definition, scope) {
     const lineStr = findField(fields, "line:");
     const line = lineStr ? parseInt(lineStr, 10) - 1 : 0;
     const kind = findField(fields, "kind:");
-    const container = findField(fields, "class:");
+    const container = findField(fields, "class:") || "";
 
     return new vscode.SymbolInformation(
         symbol,
-        kind && SYMBOL_KINDS[kind],
+        kind === undefined ? vscode.SymbolKind.Variable : SYMBOL_KINDS[kind],
         container,
         new vscode.Location(file, new vscode.Position(line, 0))
     );
 }
 
+/**
+ * @param {string[]} tags
+ * @param {string} prefix
+ * @returns {string | undefined}
+ */
 function findField(tags, prefix) {
     const tag = tags.find(value => value.startsWith(prefix));
     return tag && tag.substring(prefix.length);
@@ -104,6 +131,11 @@ function findField(tags, prefix) {
 
 const outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
 
+/**
+ * @param {function} exec
+ * @param {string} platform
+ * @returns {function(string, object): Promise<string[]>}
+ */
 function wrapExec(exec, platform = process.platform) {
     return async (command, options) => {
         try {
@@ -117,9 +149,12 @@ function wrapExec(exec, platform = process.platform) {
             const { stdout } = await exec(command, options);
             const output = stdout.trim();
             return output ? output.split('\n') : [];
-        } catch ({ message }) {
-            outputChannel.appendLine(message);
-            return [];
+        } catch (e) {
+            if (e instanceof Error) {
+                outputChannel.appendLine(e.message);
+                return [];
+            }
+            throw e;
         }
     };
 }

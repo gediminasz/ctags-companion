@@ -59,8 +59,8 @@ describe("definitionToSymbolInformation", () => {
 
         expect(symbolInformation).toEqual({
             name: "fizz",
-            kind: undefined,
-            containerName: undefined,
+            kind: vscode.SymbolKind.Variable,
+            containerName: "",
             location: {
                 uri: "/path/to/scope/relative/path/to/definition.py",
                 rangeOrPosition: { line: 0, character: 0 }

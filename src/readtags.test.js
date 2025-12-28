@@ -54,7 +54,7 @@ describe(ReadtagsProvider, () => {
                 {
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
-                    containerName: undefined,
+                    containerName: "",
                     location: {
                         uri: "/test/include/linux/bitmap.h",
                         rangeOrPosition: {
@@ -88,7 +88,7 @@ describe(ReadtagsProvider, () => {
                 {
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
-                    containerName: undefined,
+                    containerName: "",
                     location: {
                         uri: "/test/include/linux/bitmap.h",
                         rangeOrPosition: {

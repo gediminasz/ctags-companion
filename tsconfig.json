@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "module": "NodeNext"
+  },
+  "include": [
+    "src/**/*.js"
+  ],
+  "exclude": [
+    "src/**/*.test.js",
+    "src/__mocks__",
+  ]
+}
