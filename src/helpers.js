@@ -108,15 +108,17 @@ function definitionToSymbolInformation(definition, scope) {
 
     const lineStr = findField(fields, "line:");
     const line = lineStr ? parseInt(lineStr, 10) - 1 : 0;
-    const kind = findField(fields, "kind:");
+
+    const kindStr = findField(fields, "kind:");
+    const kind = (kindStr === undefined || !Object.hasOwn(SYMBOL_KINDS, kindStr))
+        ? vscode.SymbolKind.Variable
+        : SYMBOL_KINDS[kindStr];
+
     const container = findField(fields, "class:") || "";
 
-    return new vscode.SymbolInformation(
-        symbol,
-        kind === undefined ? vscode.SymbolKind.Variable : SYMBOL_KINDS[kind],
-        container,
-        new vscode.Location(file, new vscode.Position(line, 0))
-    );
+    const location = new vscode.Location(file, new vscode.Position(line, 0));
+
+    return new vscode.SymbolInformation(symbol, kind, container, location);
 }
 
 /**

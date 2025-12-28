@@ -42,8 +42,8 @@ describe("definitionToSymbolInformation", () => {
         ["func", vscode.SymbolKind.Function],
         ["function", vscode.SymbolKind.Function],
         ["globalVar", vscode.SymbolKind.Variable],
-        ["GlobalVar", undefined],
-        ["unknown", undefined],
+        ["GlobalVar", vscode.SymbolKind.Variable],
+        ["unknown", vscode.SymbolKind.Variable],
     ])("maps ctags symbol kind to vscode symbol kind", (ctagsKind, vscodeKind) => {
         const definition = `fizz	fizz.py	/^fizz = "fizz"$/;"	kind:${ctagsKind}	line:100`;
 
