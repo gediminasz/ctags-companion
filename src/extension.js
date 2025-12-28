@@ -5,6 +5,10 @@ const { EXTENSION_NAME, TASK_NAME } = require("./constants");
 const { getConfiguration, commandGuard, tryExec } = require("./helpers");
 const { rebuildCtags } = require("./ctags");
 
+/**
+ *
+ * @param {vscode.ExtensionContext} context
+ */
 function activate(context) {
     console.time("[Ctags Companion] activate");
 
@@ -25,7 +29,7 @@ function activate(context) {
                             new vscode.ShellExecution(command),
                             []
                         );
-                        task.presentationOptions.reveal = false;
+                        task.presentationOptions.reveal = vscode.TaskRevealKind.Silent;
                         return [task];
                     },
                     resolveTask: (task) => task
@@ -43,5 +47,4 @@ function activate(context) {
     console.timeEnd("[Ctags Companion] activate");
 }
 
-exports.activate = activate;
 module.exports = { activate };

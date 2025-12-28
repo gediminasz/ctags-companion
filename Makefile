@@ -1,3 +1,6 @@
+lint:
+	npm run --silent typecheck
+
 test:
 	npm test
 
@@ -19,6 +22,7 @@ publish: package
 ci:
 	npm audit
 	npm install
+	npm run --silent typecheck
 	npm run test -- --ci --coverage --verbose
 
 docs:

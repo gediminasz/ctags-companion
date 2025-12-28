@@ -3,6 +3,9 @@ const helpers = require('./helpers');
 
 const { EXTENSION_NAME } = require("./constants");
 
+/**
+ * @param {function} tryExec
+ */
 function rebuildCtags(tryExec = helpers.tryExec) {
     const scope = getCurrentWorkspaceScope();
     if (scope === undefined) {
@@ -15,8 +18,12 @@ function rebuildCtags(tryExec = helpers.tryExec) {
     tryExec(command, { cwd });
 }
 
+/**
+ * @returns {vscode.WorkspaceFolder | undefined}
+ */
 function getCurrentWorkspaceScope() {
     if (vscode.window.activeTextEditor !== undefined) {
+        // TODO do not return undefined here
         return vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
     }
 

@@ -70,12 +70,15 @@
         ]
     },
     "scripts": {
-        "test": "jest"
+        "test": "jest",
+        "typecheck": "tsc"
     },
     "devDependencies": {
+        "@types/vscode": "*",
         "@vscode/vsce": "*",
         "jest": "*",
-        "ovsx": "*"
+        "ovsx": "*",
+        "typescript": "*"
     },
     "jest": {
         "coverageThreshold": {

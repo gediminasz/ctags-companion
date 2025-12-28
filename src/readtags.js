@@ -5,25 +5,43 @@ const { determineScope, getConfiguration, definitionToSymbolInformation } = requ
 // Definitions provider based on readtags command line utility
 // https://docs.ctags.io/en/latest/man/readtags.1.html
 class ReadtagsProvider {
+    /**
+     * @param {function(string, object): Promise<string[]>} exec
+     */
     constructor(exec) {
         this.exec = exec;
     }
 
+    /**
+     * @param {vscode.TextDocument} document
+     * @param {vscode.Position} position
+     * @returns {Promise<vscode.Location[]>}
+     */
     async provideDefinition(document, position) {
-        const symbol = document.getText(document.getWordRangeAtPosition(position));
         const scope = determineScope(document);
+        const symbol = document.getText(document.getWordRangeAtPosition(position));
         const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
+
+        // TODO FIXME scope is undefined when editing a file that is outside of workspace, e.g. it is on desktop or so
+        // @ts-expect-error
         const cwd = scope.uri.fsPath;
 
         const definitions = await this.exec(`${command} '${symbol}'`, { cwd });
         return definitions
+            // @ts-expect-error
             .map(d => definitionToSymbolInformation(d, scope))
             .map(({ location }) => location);
     }
 
+    /**
+     * @param {string} query
+     * @returns {Promise<vscode.SymbolInformation[] | undefined>}
+     */
     async provideWorkspaceSymbols(query) {
         if (!query) return;
 
+        // TODO FIXME handle vscode.workspace.workspaceFolders being undefined when no workspace folder is open
+        // @ts-expect-error
         const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;
@@ -33,13 +51,20 @@ class ReadtagsProvider {
         return results.flat();
     }
 
+    /**
+     * @param {vscode.TextDocument} document
+     * @returns {Promise<vscode.SymbolInformation[]>}
+     */
     async provideDocumentSymbols(document) {
         const scope = determineScope(document);
         const command = getConfiguration(scope).get("ctagsGoToSymbolInEditorCommand");
         const relativePath = vscode.workspace.asRelativePath(document.uri, false);
+        // TODO FIXME scope is undefined when editing a file that is outside of workspace, e.g. it is on desktop or so
+        // @ts-expect-error
         const cwd = scope.uri.fsPath;
 
         const definitions = await this.exec(`${command} '${relativePath}'`, { cwd });
+        // @ts-expect-error
         return definitions.map(d => definitionToSymbolInformation(d, scope));
     }
 }
