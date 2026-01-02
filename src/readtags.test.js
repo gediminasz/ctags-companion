@@ -80,7 +80,10 @@ describe(ReadtagsProvider, () => {
     });
 
     describe("provideDocumentSymbols", () => {
-        it("returns symbol location", async () => {
+        it.each([
+            document,  // document within workspace
+            { uri: { fsPath: "/tmp/test.txt" } }  // document outside workspace
+        ])("returns symbol location", async (document) => {
             const provider = new ReadtagsProvider(exec);
             const definitions = await provider.provideDocumentSymbols(document);
 
@@ -90,7 +93,7 @@ describe(ReadtagsProvider, () => {
                     kind: vscode.SymbolKind.Function,
                     containerName: "",
                     location: {
-                        uri: "/test/include/linux/bitmap.h",
+                        uri: "include/linux/bitmap.h",
                         rangeOrPosition: {
                             line: 353,
                             character: 0
