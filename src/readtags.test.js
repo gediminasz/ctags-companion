@@ -81,9 +81,9 @@ describe(ReadtagsProvider, () => {
 
     describe("provideDocumentSymbols", () => {
         it.each([
-            document,  // document within workspace
-            { uri: { fsPath: "/tmp/test.txt" } }  // document outside workspace
-        ])("returns symbol location", async (document) => {
+            ["document within workspace", document],
+            ["document outside workspace", { uri: { fsPath: "/tmp/test.txt" } }],
+        ])("returns symbol location for %s", async (_, document) => {
             const provider = new ReadtagsProvider(exec);
             const definitions = await provider.provideDocumentSymbols(document);
 
