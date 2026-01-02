@@ -19,12 +19,10 @@ class ReadtagsProvider {
      */
     async provideDefinition(document, position) {
         const scope = vscode.workspace.getWorkspaceFolder(document.uri);
+        if (scope === undefined) return [];
 
         const symbol = document.getText(document.getWordRangeAtPosition(position));
         const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
-
-        // TODO FIXME scope is undefined when editing a file that is outside of workspace, e.g. it is on desktop or so
-        // @ts-expect-error
         const cwd = scope.uri.fsPath;
 
         const definitions = await this.exec(`${command} '${symbol}'`, { cwd });

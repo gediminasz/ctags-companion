@@ -40,7 +40,15 @@ describe(ReadtagsProvider, () => {
 
         it("returns an empty list when readtags output is blank", async () => {
             const provider = new ReadtagsProvider(() => []);
-            const definitions = await provider.provideWorkspaceSymbols("foobar");
+            const definitions = await provider.provideDefinition(document, position);
+            expect(definitions).toEqual([]);
+        });
+
+        it("returns an empty list when document is outside workspace", async () => {
+            const document = makeDocumentWithSymbol("bitmap_complement");
+            document.uri.fsPath = "/tmp/test.txt";
+            const provider = new ReadtagsProvider(undefined);
+            const definitions = await provider.provideDefinition(document, position);
             expect(definitions).toEqual([]);
         });
     });

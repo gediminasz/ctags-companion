@@ -2,8 +2,7 @@
 
 ## Unreleased
 
-- Fixed an error in document symbol provider when viewing a file located outside of current workspace.
-- Fixed an error in workspace symbol provider when no workspace is open.
+- Fixed unhandled errors when current file does not match any open workspace folder.
 
 ## 2025.9.0
 
