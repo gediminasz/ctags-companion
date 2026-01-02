@@ -66,10 +66,10 @@ describe(ReadtagsProvider, () => {
             ]);
         });
 
-        it.each([undefined, null, ""])("returns nothing when query is falsy", async (query) => {
+        it.each([undefined, null, ""])("returns an empty list when query is falsy", async (query) => {
             const provider = new ReadtagsProvider(undefined);
             const definitions = await provider.provideWorkspaceSymbols(query);
-            expect(definitions).toBe(undefined);
+            expect(definitions).toEqual([]);
         });
 
         it("returns an empty list when readtags output is blank", async () => {

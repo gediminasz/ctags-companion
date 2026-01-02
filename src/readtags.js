@@ -35,10 +35,10 @@ class ReadtagsProvider {
 
     /**
      * @param {string} query
-     * @returns {Promise<vscode.SymbolInformation[] | undefined>}
+     * @returns {Promise<vscode.SymbolInformation[]>}
      */
     async provideWorkspaceSymbols(query) {
-        if (!query) return;
+        if (!query) return [];
 
         // TODO FIXME handle vscode.workspace.workspaceFolders being undefined when no workspace folder is open
         // @ts-expect-error
