@@ -39,9 +39,8 @@ class ReadtagsProvider {
      */
     async provideWorkspaceSymbols(query) {
         if (!query) return [];
+        if (vscode.workspace.workspaceFolders === undefined) return [];
 
-        // TODO FIXME handle vscode.workspace.workspaceFolders being undefined when no workspace folder is open
-        // @ts-expect-error
         const results = await Promise.all(vscode.workspace.workspaceFolders.map(async scope => {
             const command = getConfiguration(scope).get("readtagsGoToSymbolInWorkspaceCommand");
             const cwd = scope.uri.fsPath;

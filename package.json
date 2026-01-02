@@ -88,6 +88,7 @@
                 "functions": 90,
                 "lines": 90
             }
-        }
+        },
+        "restoreMocks": true
     }
 }

@@ -77,6 +77,13 @@ describe(ReadtagsProvider, () => {
             const definitions = await provider.provideWorkspaceSymbols("foobar");
             expect(definitions).toEqual([]);
         });
+
+        it("returns an empty list when no workspace is open", async () => {
+            jest.replaceProperty(vscode.workspace, 'workspaceFolders', undefined);
+            const provider = new ReadtagsProvider(undefined);
+            const definitions = await provider.provideWorkspaceSymbols("foobar");
+            expect(definitions).toEqual([]);
+        });
     });
 
     describe("provideDocumentSymbols", () => {
