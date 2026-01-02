@@ -5,17 +5,6 @@ const { promisify } = require('util');
 const { EXTENSION_ID, EXTENSION_NAME } = require("./constants");
 
 /**
- * @param {vscode.TextDocument} document
- * @returns {vscode.WorkspaceFolder | undefined}
- */
-function determineScope(document) {
-    // TODO FIXME workspaceFolders may be undefined when no workspace has been opened
-    // @ts-expect-error
-    return vscode.workspace.workspaceFolders.find(scope => document.uri.fsPath.includes(scope.uri.fsPath));
-    // TODO vscode.workspace.getWorkspaceFolder ?
-}
-
-/**
  * @param {vscode.WorkspaceFolder | null} scope
  * @returns {vscode.WorkspaceConfiguration}
  */
@@ -163,4 +152,4 @@ function wrapExec(exec, platform = process.platform) {
 
 const tryExec = wrapExec(promisify(exec));
 
-module.exports = { determineScope, getConfiguration, commandGuard, definitionToSymbolInformation, wrapExec, tryExec };
+module.exports = { getConfiguration, commandGuard, definitionToSymbolInformation, wrapExec, tryExec };

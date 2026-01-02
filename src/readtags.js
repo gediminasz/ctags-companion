@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { determineScope, getConfiguration, definitionToSymbolInformation } = require("./helpers");
+const { getConfiguration, definitionToSymbolInformation } = require("./helpers");
 
 // Definitions provider based on readtags command line utility
 // https://docs.ctags.io/en/latest/man/readtags.1.html
@@ -18,7 +18,8 @@ class ReadtagsProvider {
      * @returns {Promise<vscode.Location[]>}
      */
     async provideDefinition(document, position) {
-        const scope = determineScope(document);
+        const scope = vscode.workspace.getWorkspaceFolder(document.uri);
+
         const symbol = document.getText(document.getWordRangeAtPosition(position));
         const command = getConfiguration(scope).get("readtagsGoToDefinitionCommand");
 
@@ -56,7 +57,7 @@ class ReadtagsProvider {
      * @returns {Promise<vscode.SymbolInformation[]>}
      */
     async provideDocumentSymbols(document) {
-        const scope = determineScope(document);
+        const scope = vscode.workspace.getWorkspaceFolder(document.uri);
         const command = getConfiguration(scope).get("ctagsGoToSymbolInEditorCommand");
         const relativePath = vscode.workspace.asRelativePath(document.uri, false);
         // TODO FIXME scope is undefined when editing a file that is outside of workspace, e.g. it is on desktop or so
