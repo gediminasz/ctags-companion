@@ -1,14 +1,15 @@
 const vscode = require("vscode");
 const { exec } = require('child_process');
 const { promisify } = require('util');
+const { isAbsolute } = require('path');
 
 const { EXTENSION_ID, EXTENSION_NAME } = require("./constants");
 
 /**
- * @param {vscode.WorkspaceFolder | null} scope
+ * @param {vscode.WorkspaceFolder | undefined} scope
  * @returns {vscode.WorkspaceConfiguration}
  */
-function getConfiguration(scope = null) {
+function getConfiguration(scope = undefined) {
     return vscode.workspace.getConfiguration(EXTENSION_ID, scope);
 }
 
@@ -87,13 +88,15 @@ const SYMBOL_KINDS = {
 
 /**
  * @param {string} definition
- * @param {vscode.WorkspaceFolder} scope
+ * @param {vscode.WorkspaceFolder | undefined} scope
  * @returns {vscode.SymbolInformation}
  */
-function definitionToSymbolInformation(definition, scope) {
+function definitionToSymbolInformation(definition, scope = undefined) {
     const [symbol, path, ...fields] = definition.split("\t");
 
-    const file = path.startsWith('/') ? vscode.Uri.parse(path) : vscode.Uri.joinPath(scope.uri, path);
+    const file = isAbsolute(path) || scope === undefined
+        ? vscode.Uri.parse(path)
+        : vscode.Uri.joinPath(scope.uri, path);
 
     const lineStr = findField(fields, "line:");
     const line = lineStr ? parseInt(lineStr, 10) - 1 : 0;

@@ -28,7 +28,9 @@ const workspace = {
     },
 
     getWorkspaceFolder: (_uri) => {
-        return _scope;
+        if (_uri.fsPath.startsWith(_scope.uri.fsPath)) {
+            return _scope;
+        }
     },
 };
 
