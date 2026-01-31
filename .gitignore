@@ -4,3 +4,4 @@
 *.vsix
 coverage
 node_modules
+tags
