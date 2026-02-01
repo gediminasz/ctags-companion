@@ -43,7 +43,8 @@ const mockOutputChannel = {
 
 const window = {
     showErrorMessage: jest.fn(),
-    createOutputChannel: () => mockOutputChannel
+    createOutputChannel: () => mockOutputChannel,
+    showQuickPick: (options) => options[0],
 };
 
 function Position(line, character) {
