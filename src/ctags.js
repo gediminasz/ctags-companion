@@ -3,17 +3,22 @@ const helpers = require('./helpers');
 
 const { EXTENSION_NAME } = require("./constants");
 
+class Cancel extends Error { }
+
 /**
  * @param {function} tryExec
  */
-function rebuildCtags(tryExec = helpers.tryExec) {
+async function rebuildCtags(tryExec = helpers.tryExec) {
     try {
-        const scope = getCurrentWorkspaceScope();
+        const scope = await getCurrentWorkspaceScope();
         const command = helpers.getConfiguration(scope).get("command");
         const cwd = scope.uri.fsPath;
         tryExec(command, { cwd });
-    } catch (error) {
-        vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${error}`);
+    } catch (e) {
+        if (e instanceof Cancel) {
+            return;
+        }
+        vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${e}`);
     }
 }
 
@@ -22,29 +27,50 @@ function rebuildCtags(tryExec = helpers.tryExec) {
  * |----------------------|------------------ |--------|
  * | 0                    | (any)             | error  |
  * | 1                    | (any)             | OK     |
- * | N                    | undefined         | error  |
- * | N                    | outside workspace | error  |
+ * | N                    | undefined         | pick   |
+ * | N                    | outside workspace | pick   |
  * | N                    | within workspace  | OK     |
  *
- * @returns {vscode.WorkspaceFolder}
+ * @returns {Promise<vscode.WorkspaceFolder>}
  */
-function getCurrentWorkspaceScope() {
+async function getCurrentWorkspaceScope() {
     if (vscode.workspace.workspaceFolders === undefined || vscode.workspace.workspaceFolders.length === 0) {
         throw "No workspace folders open.";
     } else if (vscode.workspace.workspaceFolders.length === 1) {
         return vscode.workspace.workspaceFolders[0];
     } else {
         if (vscode.window.activeTextEditor === undefined) {
-            // TODO maybe showQuickPick from workspaceFolders
-            throw "Unable to determine active directory in a multi-root workspace. Please open some file and try again.";
+            return pickWorkspaceFolder(vscode.workspace.workspaceFolders);
         }
         const workspace = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
-        if (workspace === undefined) {
-            // TODO maybe showQuickPick from workspaceFolders
-            throw "Unable to determine active workspace directory for the currently open file.";
+        if (workspace === undefined) {  // active file is outside of workspace
+            return pickWorkspaceFolder(vscode.workspace.workspaceFolders);
         }
         return workspace;
     }
+}
+
+/**
+ * @param {readonly vscode.WorkspaceFolder[]} workspaceFolders
+ * @returns {Promise<vscode.WorkspaceFolder>}
+ */
+async function pickWorkspaceFolder(workspaceFolders) {
+    const workspaces = new Map(workspaceFolders.map(w => [w.name, w]));
+    const choice = await vscode.window.showQuickPick(
+        Array.from(workspaces.keys()),
+        { placeHolder: "Select a workspace folder" }
+    );
+
+    if (choice === undefined) {
+        throw new Cancel();
+    }
+
+    const workspace = workspaces.get(choice);
+    if (workspace === undefined) {
+        throw new Cancel();
+    }
+
+    return workspace;
 }
 
 module.exports = { rebuildCtags };
