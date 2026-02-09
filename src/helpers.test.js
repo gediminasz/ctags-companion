@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { definitionToSymbolInformation, commandGuard, wrapExec } = require("./helpers");
+const { definitionToSymbolInformation, commandGuard, wrapExec, resolveSymbolInformation } = require("./helpers");
 
 describe("definitionToSymbolInformation", () => {
     const scope = { uri: vscode.Uri.parse("/path/to/scope") };
@@ -78,6 +78,182 @@ describe("definitionToSymbolInformation", () => {
                 }
             }
         });
+    });
+});
+
+describe("resolveSymbolInformation", () => {
+    it("searches the file for the pattern", async () => {
+        const symbolInformation = {
+            _pattern: `^    fizz = "fizz"$`,
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/matching.py"
+                },
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
+            }
+        }
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual({
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/matching.py"
+                },
+                range: {
+                    start: { line: 1, character: 0 },
+                    end: { line: 1, character: 0 }
+                }
+            }
+        });
+    });
+
+    it("searches the file for the symbol name if the pattern has no match", async () => {
+        const symbolInformation = {
+            _pattern: `^    fizz = "fizz"$`,
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/only_symbol_match.py"
+                },
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
+            }
+        }
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual({
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/only_symbol_match.py"
+                },
+                range: {
+                    start: { line: 2, character: 0 },
+                    end: { line: 2, character: 0 }
+                }
+            }
+        });
+    });
+
+    it("searches the file for the symbol name if the pattern is bad", async () => {
+        const symbolInformation = {
+            _pattern: "\\",
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: vscode.Uri.parse("/patterns/matching.py"),
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
+            }
+        }
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual({
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: vscode.Uri.parse("/patterns/matching.py"),
+                range: {
+                    start: { line: 1, character: 4 },
+                    end: { line: 1, character: 4 }
+                }
+            }
+        });
+    });
+
+    it("searches open documents first to provide locations for dirty files", async () => {
+        const symbolInformation = {
+            _pattern: `^foo`,
+            name: "foo",
+            kind: vscode.SymbolKind.Variable,
+            containerName: null,
+            location: {
+                uri: vscode.Uri.parse("/test/dirty_file.py"),
+                range: {
+                    start: { line: 0, character: 0 },
+                    end: { line: 0, character: 0 }
+                }
+            }
+        }
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual({
+            name: "foo",
+            kind: vscode.SymbolKind.Variable,
+            containerName: null,
+            location: {
+                uri: vscode.Uri.parse("/test/dirty_file.py"),
+                range: {
+                    start: { line: 2, character: 0 },
+                    end: { line: 2, character: 0 }
+                }
+            }
+        });
+    });
+
+    it("leaves symbol information as is if the file is not readable", async () => {
+        const symbolInformation = {
+            _pattern: `^    fizz = "fizz"$`,
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/nonexistent.py"
+                },
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
+            }
+        }
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual(symbolInformation);
+    });
+
+    it("leaves symbol information as is if neither pattern nor name is found", async () => {
+        const symbolInformation = {
+            _pattern: `^    wrong_name = "wrong_name"$`,
+            name: "wrong_name",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: vscode.Uri.parse("/patterns/matching.py"),
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
+            }
+        }
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual(symbolInformation);
     });
 });
 
