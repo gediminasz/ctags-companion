@@ -63,6 +63,7 @@ describe(ReadtagsProvider, () => {
 
             expect(definitions).toEqual([
                 {
+                    _pattern: "^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$",
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
                     containerName: "",
@@ -107,6 +108,7 @@ describe(ReadtagsProvider, () => {
 
             expect(definitions).toEqual([
                 {
+                    _pattern: "^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$",
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
                     containerName: "",

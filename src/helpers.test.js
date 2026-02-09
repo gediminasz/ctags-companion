@@ -11,6 +11,7 @@ describe("definitionToSymbolInformation", () => {
         const symbolInformation = definitionToSymbolInformation(definition, scope);
 
         expect(symbolInformation).toEqual({
+            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -30,6 +31,7 @@ describe("definitionToSymbolInformation", () => {
         const symbolInformation = definitionToSymbolInformation(definition, scope);
 
         expect(symbolInformation).toEqual({
+            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -64,6 +66,7 @@ describe("definitionToSymbolInformation", () => {
         const symbolInformation = definitionToSymbolInformation(definition, scope);
 
         expect(symbolInformation).toEqual({
+            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "",
