@@ -33,7 +33,10 @@ describe(ReadtagsProvider, () => {
             expect(definitions).toEqual([
                 {
                     uri: "/test/include/linux/bitmap.h",
-                    rangeOrPosition: { character: 0, line: 353 },
+                    range: {
+                        start: { character: 0, line: 353 },
+                        end: { character: 0, line: 353 }
+                    },
                 }
             ]);
         });
@@ -65,9 +68,9 @@ describe(ReadtagsProvider, () => {
                     containerName: "",
                     location: {
                         uri: "/test/include/linux/bitmap.h",
-                        rangeOrPosition: {
-                            line: 353,
-                            character: 0
+                        range: {
+                            start: { line: 353, character: 0 },
+                            end: { line: 353, character: 0 }
                         }
                     }
                 }
@@ -109,9 +112,9 @@ describe(ReadtagsProvider, () => {
                     containerName: "",
                     location: {
                         uri: "include/linux/bitmap.h",
-                        rangeOrPosition: {
-                            line: 353,
-                            character: 0
+                        range: {
+                            start: { line: 353, character: 0 },
+                            end: { line: 353, character: 0 }
                         }
                     }
                 }

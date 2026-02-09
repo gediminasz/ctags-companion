@@ -16,7 +16,10 @@ describe("definitionToSymbolInformation", () => {
             containerName: "Buzz",
             location: {
                 uri: "/path/to/scope/relative/path/to/definition.py",
-                rangeOrPosition: { line: 63, character: 0 }
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
             }
         });
     });
@@ -32,7 +35,10 @@ describe("definitionToSymbolInformation", () => {
             containerName: "Buzz",
             location: {
                 uri: "/absolute/path/to/definition.py",
-                rangeOrPosition: { line: 63, character: 0 }
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
             }
         });
     });
@@ -63,7 +69,10 @@ describe("definitionToSymbolInformation", () => {
             containerName: "",
             location: {
                 uri: "/path/to/scope/relative/path/to/definition.py",
-                rangeOrPosition: { line: 0, character: 0 }
+                range: {
+                    start: { line: 0, character: 0 },
+                    end: { line: 0, character: 0 }
+                }
             }
         });
     });

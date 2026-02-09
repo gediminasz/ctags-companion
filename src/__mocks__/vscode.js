@@ -50,8 +50,8 @@ function Position(line, character) {
     return { line, character };
 }
 
-function Location(uri, rangeOrPosition) {
-    return { uri, rangeOrPosition };
+function Location(uri, position) {
+    return { uri, range: { start: position, end: position } };
 }
 
 function SymbolInformation(name, kind, containerName, location) {
