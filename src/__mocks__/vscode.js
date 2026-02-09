@@ -7,7 +7,22 @@ const SymbolKind = {
     Variable: 12,
 };
 
-const _scope = { uri: { fsPath: "/test" } };
+class Uri {
+    constructor(path) {
+        this.fsPath = path;
+    }
+    toString() {
+        return "file://" + this.fsPath;
+    }
+    static parse(path) {
+        return new Uri(path);
+    }
+    static joinPath(left, right) {
+        return Uri.parse(path.join(left.fsPath, right));
+    }
+}
+
+const _scope = { uri: Uri.parse("/test") };
 
 const workspace = {
     workspaceFolders: [_scope],
@@ -57,11 +72,6 @@ function Location(uri, position) {
 function SymbolInformation(name, kind, containerName, location) {
     return { name, kind, containerName, location };
 }
-
-const Uri = {
-    parse: (path) => path,
-    joinPath: (left, right) => path.join(left.fsPath, right)
-};
 
 module.exports = {
     Location,

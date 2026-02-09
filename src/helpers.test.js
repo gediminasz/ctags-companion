@@ -3,7 +3,7 @@ const vscode = require("vscode");
 const { definitionToSymbolInformation, commandGuard, wrapExec } = require("./helpers");
 
 describe("definitionToSymbolInformation", () => {
-    const scope = { uri: { fsPath: "/path/to/scope" } };
+    const scope = { uri: vscode.Uri.parse("/path/to/scope") };
 
     it("parses symbol information from ctags string", () => {
         const definition = 'fizz	relative/path/to/definition.py	/^    fizz = "fizz"$/;"	kind:variable	line:64	class:Buzz';
@@ -15,7 +15,7 @@ describe("definitionToSymbolInformation", () => {
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
             location: {
-                uri: "/path/to/scope/relative/path/to/definition.py",
+                uri: vscode.Uri.parse("/path/to/scope/relative/path/to/definition.py"),
                 range: {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
@@ -34,7 +34,7 @@ describe("definitionToSymbolInformation", () => {
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
             location: {
-                uri: "/absolute/path/to/definition.py",
+                uri: vscode.Uri.parse("/absolute/path/to/definition.py"),
                 range: {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
@@ -68,7 +68,7 @@ describe("definitionToSymbolInformation", () => {
             kind: vscode.SymbolKind.Variable,
             containerName: "",
             location: {
-                uri: "/path/to/scope/relative/path/to/definition.py",
+                uri: vscode.Uri.parse("/path/to/scope/relative/path/to/definition.py"),
                 range: {
                     start: { line: 0, character: 0 },
                     end: { line: 0, character: 0 }
