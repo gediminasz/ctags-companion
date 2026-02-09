@@ -26,6 +26,7 @@ const _scope = { uri: Uri.parse("/test") };
 
 const workspace = {
     workspaceFolders: [_scope],
+    textDocuments: [],
 
     getConfiguration: () => ({
         get: (key) => {
@@ -47,6 +48,12 @@ const workspace = {
             return _scope;
         }
     },
+
+    fs: {
+        readFile: (uri) => {
+            throw new FileSystemError();
+        }
+    }
 };
 
 console.assert(workspace.asRelativePath({ fsPath: "/test/foo" }) == "foo");
@@ -73,10 +80,14 @@ function SymbolInformation(name, kind, containerName, location) {
     return { name, kind, containerName, location };
 }
 
+function FileSystemError() {
+}
+
 module.exports = {
     Location,
     Position,
     SymbolInformation,
+    FileSystemError,
     SymbolKind,
     Uri,
     window,
