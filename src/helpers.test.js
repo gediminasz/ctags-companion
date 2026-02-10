@@ -1,6 +1,106 @@
 const vscode = require("vscode");
 
-const { definitionToSymbolInformation, commandGuard, wrapExec, resolveSymbolInformation } = require("./helpers");
+const { parseDefinitionLine, definitionToSymbolInformation, commandGuard, wrapExec, resolveSymbolInformation } = require("./helpers");
+
+describe("parseDefinitionLine", () => {
+    it("parses a ctags line with line number", () => {
+        const definition = `fizz	/path/to/fizz.py	3`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed).toEqual({
+            symbol: "fizz",
+            path: "/path/to/fizz.py",
+            line: 3,
+            pattern: null,
+            fields: [],
+        });
+    });
+
+    it("parses a ctags line with line number and extension fields", () => {
+        const definition = `fizz	/path/to/fizz.py	3;"	kind:variable`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed).toEqual({
+            symbol: "fizz",
+            path: "/path/to/fizz.py",
+            line: 3,
+            pattern: null,
+            fields: ["kind:variable"],
+        });
+    });
+
+    it("parses a ctags line with pattern", () => {
+        const definition = `fizz	/path/to/fizz.py	/^    fizz = "fizz"$/`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed).toEqual({
+            symbol: "fizz",
+            path: "/path/to/fizz.py",
+            line: null,
+            pattern: `^    fizz = "fizz"$`,
+            fields: [],
+        });
+    });
+
+    it("parses a ctags line with pattern and extension fields", () => {
+        const definition = `fizz	/path/to/fizz.py	/^    fizz = "fizz"$/;"	kind:variable`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed).toEqual({
+            symbol: "fizz",
+            path: "/path/to/fizz.py",
+            line: null,
+            pattern: `^    fizz = "fizz"$`,
+            fields: ["kind:variable"],
+        });
+    });
+
+    it("parses a ctags line with line number and pattern", () => {
+        const definition = `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed).toEqual({
+            symbol: "fizz",
+            path: "/path/to/fizz.py",
+            line: 3,
+            pattern: `^    fizz = "fizz"$`,
+            fields: [],
+        });
+    });
+
+    it("parses a ctags line with line number and pattern and extension fields", () => {
+        const definition = `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/;"	kind:variable`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed).toEqual({
+            symbol: "fizz",
+            path: "/path/to/fizz.py",
+            line: 3,
+            pattern: `^    fizz = "fizz"$`,
+            fields: ["kind:variable"],
+        });
+    });
+
+    it("parses a ctags line with line number and pattern and extension fields", () => {
+        const definition = `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/;"	kind:variable`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed).toEqual({
+            symbol: "fizz",
+            path: "/path/to/fizz.py",
+            line: 3,
+            pattern: `^    fizz = "fizz"$`,
+            fields: ["kind:variable"],
+        });
+    });
+
+    it("parses a bad ctags line gracefully", () => {
+        const definition = `fizz	/path/to/fizz.py`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed.symbol).toEqual("fizz");
+        expect(parsed.path).toEqual("/path/to/fizz.py");
+    });
+
+    it("parses a bad ctags line with extension fields gracefully", () => {
+        const definition = `fizz	/path/to/fizz.py	3	kind:variable`;
+        const parsed = parseDefinitionLine(definition);
+        expect(parsed.symbol).toEqual("fizz");
+        expect(parsed.path).toEqual("/path/to/fizz.py");
+    });
+});
 
 describe("definitionToSymbolInformation", () => {
     const scope = { uri: vscode.Uri.parse("/path/to/scope") };

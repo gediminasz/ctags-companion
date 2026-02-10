@@ -379,4 +379,12 @@ function wrapExec(exec, platform = process.platform) {
 
 const tryExec = wrapExec(promisify(exec));
 
-module.exports = { getConfiguration, commandGuard, definitionToSymbolInformation, resolveSymbolInformation, wrapExec, tryExec };
+module.exports = {
+    getConfiguration,
+    commandGuard,
+    parseDefinitionLine,
+    definitionToSymbolInformation,
+    resolveSymbolInformation,
+    wrapExec,
+    tryExec
+};
