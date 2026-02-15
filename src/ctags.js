@@ -12,8 +12,8 @@ async function rebuildCtags(tryExec = helpers.tryExec) {
     try {
         const scope = await getCurrentWorkspaceScope();
         const command = helpers.getConfiguration(scope).get("command");
-        const cwd = scope.uri.fsPath;
-        tryExec(command, { cwd });
+        // TODO commandGuard
+        await tryExec(command, { cwd: scope.uri.fsPath });
     } catch (e) {
         if (e instanceof Cancel) {
             return;
