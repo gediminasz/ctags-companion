@@ -24,6 +24,16 @@ Command to generate the tags file. This command is used by the `Terminal > Run T
 "ctags-companion.command": "ctags -R --fields=+nKz"
 ```
 
+### `ctags-companion.usePatternField`
+
+Default: `true`
+
+Make use of the pattern field to search files and check for moved lines. Slower but more robust against file changes.
+
+```json
+"ctags-companion.usePatternField": true
+```
+
 ### `ctags-companion.documentSelector`
 
 Default: `{"scheme": "file"}`

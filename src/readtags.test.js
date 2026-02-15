@@ -7,7 +7,7 @@ const wordRange = Symbol("wordRange");
 
 function makeDocumentWithSymbol(detectedSymbol) {
     return {
-        uri: { fsPath: "/test/test.txt" },
+        uri: vscode.Uri.parse("/test/test.txt"),
         getWordRangeAtPosition: (p) => {
             expect(p).toBe(position);
             return wordRange;
@@ -32,8 +32,11 @@ describe(ReadtagsProvider, () => {
 
             expect(definitions).toEqual([
                 {
-                    uri: "/test/include/linux/bitmap.h",
-                    rangeOrPosition: { character: 0, line: 353 },
+                    uri: vscode.Uri.parse("/test/include/linux/bitmap.h"),
+                    range: {
+                        start: { character: 0, line: 353 },
+                        end: { character: 0, line: 353 }
+                    },
                 }
             ]);
         });
@@ -60,14 +63,15 @@ describe(ReadtagsProvider, () => {
 
             expect(definitions).toEqual([
                 {
+                    _pattern: "^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$",
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
                     containerName: "",
                     location: {
-                        uri: "/test/include/linux/bitmap.h",
-                        rangeOrPosition: {
-                            line: 353,
-                            character: 0
+                        uri: vscode.Uri.parse("/test/include/linux/bitmap.h"),
+                        range: {
+                            start: { line: 353, character: 0 },
+                            end: { line: 353, character: 0 }
                         }
                     }
                 }
@@ -97,21 +101,22 @@ describe(ReadtagsProvider, () => {
     describe("provideDocumentSymbols", () => {
         it.each([
             ["document within workspace", document],
-            ["document outside workspace", { uri: { fsPath: "/tmp/test.txt" } }],
+            ["document outside workspace", { uri: vscode.Uri.parse("/tmp/test.txt") }],
         ])("returns symbol location for %s", async (_, document) => {
             const provider = new ReadtagsProvider(exec);
             const definitions = await provider.provideDocumentSymbols(document);
 
             expect(definitions).toEqual([
                 {
+                    _pattern: "^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$",
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
                     containerName: "",
                     location: {
-                        uri: "include/linux/bitmap.h",
-                        rangeOrPosition: {
-                            line: 353,
-                            character: 0
+                        uri: vscode.Uri.parse("include/linux/bitmap.h"),
+                        range: {
+                            start: { line: 353, character: 0 },
+                            end: { line: 353, character: 0 }
                         }
                     }
                 }

@@ -3,7 +3,7 @@ const { rebuildCtags } = require("./ctags");
 
 describe(rebuildCtags, () => {
     it("runs ctags on the open file's workspace directory", () => {
-        vscode.window.activeTextEditor = { document: { uri: { fsPath: "/test/foo" } } };
+        vscode.window.activeTextEditor = { document: { uri: vscode.Uri.parse("/test/foo") } };
 
         const exec = jest.fn();
         rebuildCtags(exec);
@@ -24,7 +24,7 @@ describe(rebuildCtags, () => {
 
     it("shows error message when no file is open in a multi root workspace", () => {
         vscode.window.activeTextEditor = undefined;
-        vscode.workspace.workspaceFolders = [{ uri: { fsPath: "/backend" } }, { uri: { fsPath: "/frontend" } }];
+        vscode.workspace.workspaceFolders = [{ uri: vscode.Uri.parse("/backend") }, { uri: vscode.Uri.parse("/frontend") }];
 
         const exec = jest.fn();
         rebuildCtags(exec);

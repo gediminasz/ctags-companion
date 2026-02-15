@@ -41,6 +41,11 @@
                     },
                     "description": "Document selector object used when registering symbol providers, read more at https://code.visualstudio.com/api/references/vscode-api#DocumentSelector."
                 },
+                "ctags-companion.usePatternField": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Make use of the pattern field to search files and check for moved lines. Slower but more robust against file changes."
+                },
                 "ctags-companion.readtagsGoToDefinitionCommand": {
                     "type": "string",
                     "default": "readtags -en",
