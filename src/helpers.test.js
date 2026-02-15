@@ -11,7 +11,6 @@ describe("definitionToSymbolInformation", () => {
         const symbolInformation = definitionToSymbolInformation(definition, scope);
 
         expect(symbolInformation).toEqual({
-            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -21,7 +20,8 @@ describe("definitionToSymbolInformation", () => {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
                 }
-            }
+            },
+            pattern: `^    fizz = "fizz"$`,
         });
     });
 
@@ -31,7 +31,6 @@ describe("definitionToSymbolInformation", () => {
         const symbolInformation = definitionToSymbolInformation(definition, scope);
 
         expect(symbolInformation).toEqual({
-            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -41,7 +40,8 @@ describe("definitionToSymbolInformation", () => {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
                 }
-            }
+            },
+            pattern: `^    fizz = "fizz"$`,
         });
     });
 
@@ -66,7 +66,6 @@ describe("definitionToSymbolInformation", () => {
         const symbolInformation = definitionToSymbolInformation(definition, scope);
 
         expect(symbolInformation).toEqual({
-            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "",
@@ -76,7 +75,8 @@ describe("definitionToSymbolInformation", () => {
                     start: { line: 0, character: 0 },
                     end: { line: 0, character: 0 }
                 }
-            }
+            },
+            pattern: `^    fizz = "fizz"$`,
         });
     });
 
@@ -97,6 +97,7 @@ describe("definitionToSymbolInformation", () => {
                 uri: { fsPath: "/path/to/fizz.py" },
             },
             name: "fizz",
+            pattern: null,
         });
     });
 
@@ -107,7 +108,6 @@ describe("definitionToSymbolInformation", () => {
     ])("parses a ctags line with pattern", (definition, expectedKind, expectedLine) => {
         const parsed = definitionToSymbolInformation(definition, scope);
         expect(parsed).toEqual({
-            _pattern: `^    fizz = "fizz"$`,
             containerName: "",
             kind: expectedKind,
             location: {
@@ -118,6 +118,7 @@ describe("definitionToSymbolInformation", () => {
                 uri: { fsPath: "/path/to/fizz.py" },
             },
             name: "fizz",
+            pattern: `^    fizz = "fizz"$`,
         });
     });
 
@@ -128,7 +129,6 @@ describe("definitionToSymbolInformation", () => {
     ])("parses a ctags line with line number and pattern", (definition, expectedKind, expectedLine) => {
         const parsed = definitionToSymbolInformation(definition, scope);
         expect(parsed).toEqual({
-            _pattern: `^    fizz = "fizz"$`,
             containerName: "",
             kind: expectedKind,
             location: {
@@ -139,6 +139,7 @@ describe("definitionToSymbolInformation", () => {
                 uri: { fsPath: "/path/to/fizz.py" },
             },
             name: "fizz",
+            pattern: `^    fizz = "fizz"$`,
         });
     });
 
@@ -158,6 +159,7 @@ describe("definitionToSymbolInformation", () => {
                 uri: { fsPath: "/path/to/fizz.py" },
             },
             name: "fizz",
+            pattern: null,
         });
     });
 });
@@ -165,7 +167,6 @@ describe("definitionToSymbolInformation", () => {
 describe("resolveSymbolInformation", () => {
     it("searches the file for the pattern", async () => {
         const symbolInformation = {
-            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -177,7 +178,8 @@ describe("resolveSymbolInformation", () => {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
                 }
-            }
+            },
+            pattern: `^    fizz = "fizz"$`,
         };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
@@ -200,7 +202,6 @@ describe("resolveSymbolInformation", () => {
 
     it("searches the file for the symbol name if the pattern has no match", async () => {
         const symbolInformation = {
-            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -212,7 +213,8 @@ describe("resolveSymbolInformation", () => {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
                 }
-            }
+            },
+            pattern: `^    fizz = "fizz"$`,
         };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
@@ -235,7 +237,6 @@ describe("resolveSymbolInformation", () => {
 
     it("searches the file for the symbol name if the pattern is bad", async () => {
         const symbolInformation = {
-            _pattern: "\\",
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -245,7 +246,8 @@ describe("resolveSymbolInformation", () => {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
                 }
-            }
+            },
+            pattern: "\\",
         };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
@@ -266,7 +268,6 @@ describe("resolveSymbolInformation", () => {
 
     it("searches open documents first to provide locations for dirty files", async () => {
         const symbolInformation = {
-            _pattern: `^foo`,
             name: "foo",
             kind: vscode.SymbolKind.Variable,
             containerName: null,
@@ -276,7 +277,8 @@ describe("resolveSymbolInformation", () => {
                     start: { line: 0, character: 0 },
                     end: { line: 0, character: 0 }
                 }
-            }
+            },
+            pattern: `^foo`,
         };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
@@ -297,7 +299,6 @@ describe("resolveSymbolInformation", () => {
 
     it("leaves symbol information as is if the file is not readable", async () => {
         const symbolInformation = {
-            _pattern: `^    fizz = "fizz"$`,
             name: "fizz",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -309,7 +310,8 @@ describe("resolveSymbolInformation", () => {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
                 }
-            }
+            },
+            pattern: `^    fizz = "fizz"$`,
         };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
@@ -319,7 +321,6 @@ describe("resolveSymbolInformation", () => {
 
     it("leaves symbol information as is if neither pattern nor name is found", async () => {
         const symbolInformation = {
-            _pattern: `^    wrong_name = "wrong_name"$`,
             name: "wrong_name",
             kind: vscode.SymbolKind.Variable,
             containerName: "Buzz",
@@ -329,7 +330,8 @@ describe("resolveSymbolInformation", () => {
                     start: { line: 63, character: 0 },
                     end: { line: 63, character: 0 }
                 }
-            }
+            },
+            pattern: `^    wrong_name = "wrong_name"$`,
         };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);

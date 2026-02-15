@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { getConfiguration, definitionToSymbolInformation, resolveSymbolInformation } = require("./helpers");
+const { getConfiguration, definitionToSymbolInformation, resolveSymbolInformation, CtagsSymbolInformation } = require("./helpers");
 
 // Definitions provider based on readtags command line utility
 // https://docs.ctags.io/en/latest/man/readtags.1.html
@@ -33,7 +33,7 @@ class ReadtagsProvider {
 
     /**
      * @param {string} query
-     * @returns {Promise<(vscode.SymbolInformation & { _pattern?: string })[]>}
+     * @returns {Promise<CtagsSymbolInformation[]>}
      */
     async provideWorkspaceSymbols(query) {
         if (!query) return [];
@@ -49,7 +49,7 @@ class ReadtagsProvider {
     }
 
     /**
-     * @param {vscode.SymbolInformation & { _pattern?: string }} symbol
+     * @param {CtagsSymbolInformation} symbol
      * @param {vscode.CancellationToken} _token
      * @returns {Promise<vscode.SymbolInformation>}
      */
@@ -59,7 +59,7 @@ class ReadtagsProvider {
 
     /**
      * @param {vscode.TextDocument} document
-     * @returns {Promise<vscode.SymbolInformation[]>}
+     * @returns {Promise<CtagsSymbolInformation[]>}
      */
     async provideDocumentSymbols(document) {
         const scope = vscode.workspace.getWorkspaceFolder(document.uri);

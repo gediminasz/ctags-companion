@@ -63,7 +63,6 @@ describe(ReadtagsProvider, () => {
 
             expect(definitions).toEqual([
                 {
-                    _pattern: "^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$",
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
                     containerName: "",
@@ -73,7 +72,8 @@ describe(ReadtagsProvider, () => {
                             start: { line: 353, character: 0 },
                             end: { line: 353, character: 0 }
                         }
-                    }
+                    },
+                    pattern: "^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$",
                 }
             ]);
         });
@@ -108,7 +108,6 @@ describe(ReadtagsProvider, () => {
 
             expect(definitions).toEqual([
                 {
-                    _pattern: "^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$",
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
                     containerName: "",
@@ -118,7 +117,8 @@ describe(ReadtagsProvider, () => {
                             start: { line: 353, character: 0 },
                             end: { line: 353, character: 0 }
                         }
-                    }
+                    },
+                    pattern: "^static inline void bitmap_complement(unsigned long *dst, const unsigned long *src,$",
                 }
             ]);
         });

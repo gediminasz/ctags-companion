@@ -168,10 +168,24 @@ function parseDefinitionLine(definition) {
     };
 }
 
+class CtagsSymbolInformation extends vscode.SymbolInformation {
+    /**
+     * @param {string} symbol
+     * @param {vscode.SymbolKind} kind
+     * @param {string} container
+     * @param {vscode.Location} location
+     * @param {string | null} pattern
+     */
+    constructor(symbol, kind, container, location, pattern) {
+        super(symbol, kind, container, location);
+        this.pattern = pattern;
+    }
+}
+
 /**
  * @param {string} definition
  * @param {vscode.WorkspaceFolder | undefined} scope
- * @returns {vscode.SymbolInformation & { _pattern?: string }}
+ * @returns {CtagsSymbolInformation}
  */
 function definitionToSymbolInformation(definition, scope = undefined) {
     const { symbol, path, line, pattern, fields } = parseDefinitionLine(definition);
@@ -195,12 +209,7 @@ function definitionToSymbolInformation(definition, scope = undefined) {
 
     const location = new vscode.Location(file, new vscode.Position(lineNum, 0));
 
-    /** @type {vscode.SymbolInformation & { _pattern?: string }} */
-    const info = new vscode.SymbolInformation(symbol, kind, container, location);
-
-    if (pattern !== null)
-        info._pattern = pattern;
-
+    const info = new CtagsSymbolInformation(symbol, kind, container, location, pattern);
     return info;
 }
 
@@ -255,7 +264,7 @@ function tryMakeRegexp(string) {
 }
 
 /**
- * @param {vscode.SymbolInformation & { _pattern?: string }} symbol
+ * @param {CtagsSymbolInformation} symbol
  * @returns {Promise<vscode.SymbolInformation>}
  */
 async function resolveSymbolInformation(symbol) {
@@ -303,12 +312,11 @@ async function resolveSymbolInformation(symbol) {
 
     let found = null;
 
-    const pattern = symbol._pattern;
-    if (pattern !== undefined) {
+    if (symbol.pattern !== null) {
         // Try searching the specified pattern first
 
         // XXX: Somehow actually parse a "nomagic" pattern here
-        const procPattern = pattern.replaceAll(/[^\w\s$^.\\]/g, (s) => '\\' + s);
+        const procPattern = symbol.pattern.replaceAll(/[^\w\s$^.\\]/g, (s) => '\\' + s);
 
         const regex = tryMakeRegexp(procPattern);
 
@@ -382,8 +390,9 @@ const tryExec = wrapExec(promisify(exec));
 module.exports = {
     getConfiguration,
     commandGuard,
+    CtagsSymbolInformation,
     definitionToSymbolInformation,
     resolveSymbolInformation,
     wrapExec,
-    tryExec
+    tryExec,
 };
