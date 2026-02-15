@@ -81,17 +81,18 @@ describe("definitionToSymbolInformation", () => {
     });
 
     it.each([
-        `fizz	/path/to/fizz.py	3`,
-        `fizz	/path/to/fizz.py	3;"	kind:variable`
-    ])("parses a ctags line with line number", (definition) => {
+        [`fizz	/path/to/fizz.py	3`, vscode.SymbolKind.Variable, 3],
+        [`fizz	/path/to/fizz.py	3;"	kind:constant`, vscode.SymbolKind.Constant, 3],
+        [`fizz	/path/to/fizz.py	3;"	line:55`, vscode.SymbolKind.Variable, 3],
+    ])("parses a ctags line with line number", (definition, expectedKind, expectedLine) => {
         const parsed = definitionToSymbolInformation(definition, scope);
         expect(parsed).toEqual({
             containerName: "",
-            kind: vscode.SymbolKind.Variable,
+            kind: expectedKind,
             location: {
                 range: {
-                    end: { character: 0, line: 3 },
-                    start: { character: 0, line: 3 },
+                    end: { character: 0, line: expectedLine },
+                    start: { character: 0, line: expectedLine },
                 },
                 uri: { fsPath: "/path/to/fizz.py" },
             },
@@ -100,18 +101,19 @@ describe("definitionToSymbolInformation", () => {
     });
 
     it.each([
-        `fizz	/path/to/fizz.py	/^    fizz = "fizz"$/`,
-        `fizz	/path/to/fizz.py	/^    fizz = "fizz"$/;"	kind:variable`,
-    ])("parses a ctags line with pattern", (definition) => {
+        [`fizz	/path/to/fizz.py	/^    fizz = "fizz"$/`, vscode.SymbolKind.Variable, 0],
+        [`fizz	/path/to/fizz.py	/^    fizz = "fizz"$/;"	kind:constant`, vscode.SymbolKind.Constant, 0],
+        [`fizz	/path/to/fizz.py	/^    fizz = "fizz"$/;"	line:55`, vscode.SymbolKind.Variable, 54],
+    ])("parses a ctags line with pattern", (definition, expectedKind, expectedLine) => {
         const parsed = definitionToSymbolInformation(definition, scope);
         expect(parsed).toEqual({
             _pattern: `^    fizz = "fizz"$`,
             containerName: "",
-            kind: vscode.SymbolKind.Variable,
+            kind: expectedKind,
             location: {
                 range: {
-                    end: { character: 0, line: 0 },
-                    start: { character: 0, line: 0 },
+                    end: { character: 0, line: expectedLine },
+                    start: { character: 0, line: expectedLine },
                 },
                 uri: { fsPath: "/path/to/fizz.py" },
             },
@@ -120,18 +122,19 @@ describe("definitionToSymbolInformation", () => {
     });
 
     it.each([
-        `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/`,
-        `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/;"	kind:variable`
-    ])("parses a ctags line with line number and pattern", (definition) => {
+        [`fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/`, vscode.SymbolKind.Variable, 3],
+        [`fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/;"	kind:constant`, vscode.SymbolKind.Constant, 3],
+        [`fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/;"	kind:constant	line:55`, vscode.SymbolKind.Constant, 3],
+    ])("parses a ctags line with line number and pattern", (definition, expectedKind, expectedLine) => {
         const parsed = definitionToSymbolInformation(definition, scope);
         expect(parsed).toEqual({
             _pattern: `^    fizz = "fizz"$`,
             containerName: "",
-            kind: vscode.SymbolKind.Variable,
+            kind: expectedKind,
             location: {
                 range: {
-                    end: { character: 0, line: 3 },
-                    start: { character: 0, line: 3 },
+                    end: { character: 0, line: expectedLine },
+                    start: { character: 0, line: expectedLine },
                 },
                 uri: { fsPath: "/path/to/fizz.py" },
             },
@@ -140,13 +143,13 @@ describe("definitionToSymbolInformation", () => {
     });
 
     it.each([
-        `fizz	/path/to/fizz.py`,
-        `fizz	/path/to/fizz.py	3	kind:variable`,
-    ])("parses a bad ctags line gracefully", (definition) => {
+        [`fizz	/path/to/fizz.py`, vscode.SymbolKind.Variable],
+        [`fizz	/path/to/fizz.py	3	kind:constant`, vscode.SymbolKind.Constant],
+    ])("parses a bad ctags line gracefully", (definition, expectedKind) => {
         const parsed = definitionToSymbolInformation(definition, scope);
         expect(parsed).toEqual({
             containerName: "",
-            kind: vscode.SymbolKind.Variable,
+            kind: expectedKind,
             location: {
                 range: {
                     end: { character: 0, line: 0 },
