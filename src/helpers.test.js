@@ -1,106 +1,6 @@
 const vscode = require("vscode");
 
-const { parseDefinitionLine, definitionToSymbolInformation, commandGuard, wrapExec, resolveSymbolInformation } = require("./helpers");
-
-describe("parseDefinitionLine", () => {
-    it("parses a ctags line with line number", () => {
-        const definition = `fizz	/path/to/fizz.py	3`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed).toEqual({
-            symbol: "fizz",
-            path: "/path/to/fizz.py",
-            line: 3,
-            pattern: null,
-            fields: [],
-        });
-    });
-
-    it("parses a ctags line with line number and extension fields", () => {
-        const definition = `fizz	/path/to/fizz.py	3;"	kind:variable`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed).toEqual({
-            symbol: "fizz",
-            path: "/path/to/fizz.py",
-            line: 3,
-            pattern: null,
-            fields: ["kind:variable"],
-        });
-    });
-
-    it("parses a ctags line with pattern", () => {
-        const definition = `fizz	/path/to/fizz.py	/^    fizz = "fizz"$/`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed).toEqual({
-            symbol: "fizz",
-            path: "/path/to/fizz.py",
-            line: null,
-            pattern: `^    fizz = "fizz"$`,
-            fields: [],
-        });
-    });
-
-    it("parses a ctags line with pattern and extension fields", () => {
-        const definition = `fizz	/path/to/fizz.py	/^    fizz = "fizz"$/;"	kind:variable`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed).toEqual({
-            symbol: "fizz",
-            path: "/path/to/fizz.py",
-            line: null,
-            pattern: `^    fizz = "fizz"$`,
-            fields: ["kind:variable"],
-        });
-    });
-
-    it("parses a ctags line with line number and pattern", () => {
-        const definition = `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed).toEqual({
-            symbol: "fizz",
-            path: "/path/to/fizz.py",
-            line: 3,
-            pattern: `^    fizz = "fizz"$`,
-            fields: [],
-        });
-    });
-
-    it("parses a ctags line with line number and pattern and extension fields", () => {
-        const definition = `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/;"	kind:variable`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed).toEqual({
-            symbol: "fizz",
-            path: "/path/to/fizz.py",
-            line: 3,
-            pattern: `^    fizz = "fizz"$`,
-            fields: ["kind:variable"],
-        });
-    });
-
-    it("parses a ctags line with line number and pattern and extension fields", () => {
-        const definition = `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/;"	kind:variable`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed).toEqual({
-            symbol: "fizz",
-            path: "/path/to/fizz.py",
-            line: 3,
-            pattern: `^    fizz = "fizz"$`,
-            fields: ["kind:variable"],
-        });
-    });
-
-    it("parses a bad ctags line gracefully", () => {
-        const definition = `fizz	/path/to/fizz.py`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed.symbol).toEqual("fizz");
-        expect(parsed.path).toEqual("/path/to/fizz.py");
-    });
-
-    it("parses a bad ctags line with extension fields gracefully", () => {
-        const definition = `fizz	/path/to/fizz.py	3	kind:variable`;
-        const parsed = parseDefinitionLine(definition);
-        expect(parsed.symbol).toEqual("fizz");
-        expect(parsed.path).toEqual("/path/to/fizz.py");
-    });
-});
+const { definitionToSymbolInformation, commandGuard, wrapExec, resolveSymbolInformation } = require("./helpers");
 
 describe("definitionToSymbolInformation", () => {
     const scope = { uri: vscode.Uri.parse("/path/to/scope") };
@@ -179,6 +79,84 @@ describe("definitionToSymbolInformation", () => {
             }
         });
     });
+
+    it.each([
+        `fizz	/path/to/fizz.py	3`,
+        `fizz	/path/to/fizz.py	3;"	kind:variable`
+    ])("parses a ctags line with line number", (definition) => {
+        const parsed = definitionToSymbolInformation(definition, scope);
+        expect(parsed).toEqual({
+            containerName: "",
+            kind: vscode.SymbolKind.Variable,
+            location: {
+                range: {
+                    end: { character: 0, line: 3 },
+                    start: { character: 0, line: 3 },
+                },
+                uri: { fsPath: "/path/to/fizz.py" },
+            },
+            name: "fizz",
+        });
+    });
+
+    it.each([
+        `fizz	/path/to/fizz.py	/^    fizz = "fizz"$/`,
+        `fizz	/path/to/fizz.py	/^    fizz = "fizz"$/;"	kind:variable`,
+    ])("parses a ctags line with pattern", (definition) => {
+        const parsed = definitionToSymbolInformation(definition, scope);
+        expect(parsed).toEqual({
+            _pattern: `^    fizz = "fizz"$`,
+            containerName: "",
+            kind: vscode.SymbolKind.Variable,
+            location: {
+                range: {
+                    end: { character: 0, line: 0 },
+                    start: { character: 0, line: 0 },
+                },
+                uri: { fsPath: "/path/to/fizz.py" },
+            },
+            name: "fizz",
+        });
+    });
+
+    it.each([
+        `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/`,
+        `fizz	/path/to/fizz.py	3;/^    fizz = "fizz"$/;"	kind:variable`
+    ])("parses a ctags line with line number and pattern", (definition) => {
+        const parsed = definitionToSymbolInformation(definition, scope);
+        expect(parsed).toEqual({
+            _pattern: `^    fizz = "fizz"$`,
+            containerName: "",
+            kind: vscode.SymbolKind.Variable,
+            location: {
+                range: {
+                    end: { character: 0, line: 3 },
+                    start: { character: 0, line: 3 },
+                },
+                uri: { fsPath: "/path/to/fizz.py" },
+            },
+            name: "fizz",
+        });
+    });
+
+    it.each([
+        `fizz	/path/to/fizz.py`,
+        `fizz	/path/to/fizz.py	3	kind:variable`,
+    ])("parses a bad ctags line gracefully", (definition) => {
+        const parsed = definitionToSymbolInformation(definition, scope);
+        expect(parsed).toEqual({
+            containerName: "",
+            kind: vscode.SymbolKind.Variable,
+            location: {
+                range: {
+                    end: { character: 0, line: 0 },
+                    start: { character: 0, line: 0 },
+                },
+                uri: { fsPath: "/path/to/fizz.py" },
+            },
+            name: "fizz",
+        });
+    });
 });
 
 describe("resolveSymbolInformation", () => {
@@ -197,7 +175,7 @@ describe("resolveSymbolInformation", () => {
                     end: { line: 63, character: 0 }
                 }
             }
-        }
+        };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
 
@@ -232,7 +210,7 @@ describe("resolveSymbolInformation", () => {
                     end: { line: 63, character: 0 }
                 }
             }
-        }
+        };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
 
@@ -265,7 +243,7 @@ describe("resolveSymbolInformation", () => {
                     end: { line: 63, character: 0 }
                 }
             }
-        }
+        };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
 
@@ -296,7 +274,7 @@ describe("resolveSymbolInformation", () => {
                     end: { line: 0, character: 0 }
                 }
             }
-        }
+        };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
 
@@ -329,7 +307,7 @@ describe("resolveSymbolInformation", () => {
                     end: { line: 63, character: 0 }
                 }
             }
-        }
+        };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
 
@@ -349,7 +327,7 @@ describe("resolveSymbolInformation", () => {
                     end: { line: 63, character: 0 }
                 }
             }
-        }
+        };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
 

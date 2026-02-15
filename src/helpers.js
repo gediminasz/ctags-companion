@@ -111,7 +111,7 @@ function parseDefinitionLine(definition) {
             line: null,
             pattern: null,
             fields: []
-        }
+        };
     }
 
     const [basicAll, symbol, path] = basicMatch;
@@ -382,7 +382,6 @@ const tryExec = wrapExec(promisify(exec));
 module.exports = {
     getConfiguration,
     commandGuard,
-    parseDefinitionLine,
     definitionToSymbolInformation,
     resolveSymbolInformation,
     wrapExec,
