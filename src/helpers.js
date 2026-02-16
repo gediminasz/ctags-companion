@@ -252,15 +252,42 @@ async function findDocumentOrReadFile(uri) {
 }
 
 /**
- * @param {string} string
+ * @param {string} pattern
  * @returns {RegExp | null}
  */
-function tryMakeRegexp(string) {
-    try {
-        return RegExp(string);
-    } catch {
+function patternToRegexp(pattern) {
+    // Parses a superset of universal-ctags patterns
+    //
+    // See https://docs.ctags.io/en/stable/man/ctags-client-tools.7.html#make-use-of-the-pattern-field
+
+    // Parses:
+    // - An optional starting ^ anchor
+    // - The pattern body, consisting of zero or more of:
+    //   - Backslash (\) then any char, as an escape sequence
+    //   - Unescaped dollar sign ($), which cannot be at the end of the pattern
+    //   - Any character other than backslash or dollar sign
+    // - An optional ending $ anchor
+    //
+    // The pattern body is extracted in its original form for now, without
+    // unescaping. For example, writing patterns with delimiters for clarity:
+    // - /^\$$/ has both ^ and $ anchors, and pattern body \$
+    // - /^\$/ has ^ anchor, no $ anchor, and pattern body \$
+    // - /^$foo$/ has both ^ and $ anchors, and pattern body $foo
+    const match = /^(\^?)((?:[^\\$]|\\.|\$(?!$))*)(\$?)$/.exec(pattern);
+    if (match === null)
         return null;
-    }
+
+    const [ _matchAll, anchorPre, middle, anchorPost ] = match;
+
+    // Further escape special chars in the pattern body:
+    // - Non-special chars ([\w\s]): Don't escape
+    // - Existing escape sequences: Don't escape
+    // - Anything else: Escape by prefixing with backslash
+    const escapedMiddle = middle.replaceAll(/([^\w\s\\])|([\w\s]|\\.)/g,
+        (_str, doEscape, dontEscape) =>
+            doEscape !== undefined ? '\\' + doEscape : dontEscape);
+
+    return RegExp(anchorPre + escapedMiddle + anchorPost);
 }
 
 /**
@@ -313,12 +340,7 @@ async function resolveSymbolInformation(symbol) {
     let found = null;
 
     if (symbol.pattern !== null) {
-        // Try searching the specified pattern first
-
-        // XXX: Somehow actually parse a "nomagic" pattern here
-        const procPattern = symbol.pattern.replaceAll(/[^\w\s$^.\\]/g, (s) => '\\' + s);
-
-        const regex = tryMakeRegexp(procPattern);
+        const regex = patternToRegexp(symbol.pattern);
 
         if (regex !== null)
             found = doSearch((s) => {
