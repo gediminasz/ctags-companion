@@ -179,7 +179,7 @@ describe("resolveSymbolInformation", () => {
                     end: { line: 63, character: 0 }
                 }
             },
-            pattern: `^    fizz = "fizz"$`,
+            pattern: `    fizz = "fizz"`,
         };
 
         const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
@@ -191,6 +191,111 @@ describe("resolveSymbolInformation", () => {
             location: {
                 uri: {
                     fsPath: "/patterns/matching.py"
+                },
+                range: {
+                    start: { line: 1, character: 0 },
+                    end: { line: 1, character: 0 }
+                }
+            }
+        });
+    });
+
+    it("searches the file for the pattern with starting anchor", async () => {
+        const symbolInformation = {
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/matching.py"
+                },
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
+            },
+            pattern: `^    fizz = "fizz"`,
+        };
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual({
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/matching.py"
+                },
+                range: {
+                    start: { line: 1, character: 0 },
+                    end: { line: 1, character: 0 }
+                }
+            }
+        });
+    });
+
+    it("searches the file for the pattern with ending anchor", async () => {
+        const symbolInformation = {
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/matching.py"
+                },
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
+            },
+            pattern: `    fizz = "fizz"$`,
+        };
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual({
+            name: "fizz",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/matching.py"
+                },
+                range: {
+                    start: { line: 1, character: 0 },
+                    end: { line: 1, character: 0 }
+                }
+            }
+        });
+    });
+
+    it("searches the file for the pattern with dollar sign", async () => {
+        const symbolInformation = {
+            name: "dollar",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/dollar.py"
+                },
+                range: {
+                    start: { line: 63, character: 0 },
+                    end: { line: 63, character: 0 }
+                }
+            },
+            pattern: `    dollar = "$"`,
+        };
+
+        const newSymbolInformation = await resolveSymbolInformation(symbolInformation);
+
+        expect(newSymbolInformation).toEqual({
+            name: "dollar",
+            kind: vscode.SymbolKind.Variable,
+            containerName: "Buzz",
+            location: {
+                uri: {
+                    fsPath: "/patterns/dollar.py"
                 },
                 range: {
                     start: { line: 1, character: 0 },

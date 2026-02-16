@@ -71,6 +71,11 @@ const workspace = {
                     `    fizz = "fizz"`,
                     ``
                 ].join('\n'),
+                "/patterns/dollar.py": [
+                    `class Buzz:`,
+                    `    dollar = "$"`,
+                    ``
+                ].join('\n'),
                 "/patterns/only_symbol_match.py": [
                     `foo = 3`,
                     `bar = 4`,
