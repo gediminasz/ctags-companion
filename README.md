@@ -69,5 +69,5 @@ The command used for the outline and the "go to symbol in editor" feature (i.e. 
 ### How to install Universal Ctags?
 
 * macOS: `brew install universal-ctags`
-* Ubuntu: `apt install universal-ctags`
+* Ubuntu: `apt install universal-ctags` or `brew install universal-ctags`
 * Windows: `winget install 'Universal Ctags'`
