@@ -162,6 +162,12 @@ describe("definitionToSymbolInformation", () => {
             pattern: null,
         });
     });
+
+    it("handles patterns containing tabs", () => {
+        const definition = `fizz	/path/to/fizz.py	/^	fizz = "fizz"$/;"	kind:constant	line:55`;
+        const parsed = definitionToSymbolInformation(definition, scope);
+        expect(parsed.pattern).toEqual(`^	fizz = "fizz"$`);
+    });
 });
 
 describe("resolveSymbolInformation", () => {
