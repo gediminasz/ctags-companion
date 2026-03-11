@@ -8,6 +8,7 @@ update:
 	rm -rf node_modules
 	rm package-lock.json
 	npm install
+	npm audit
 
 lock:
 	npm install --package-lock-only
