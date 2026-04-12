@@ -28,9 +28,7 @@ const workspace = {
     },
 
     getWorkspaceFolder: (_uri) => {
-        if (_uri.fsPath.startsWith(_scope.uri.fsPath)) {
-            return _scope;
-        }
+        return workspace.workspaceFolders.find(f => _uri.fsPath.startsWith(f.uri.fsPath));
     },
 };
 
@@ -43,8 +41,7 @@ const mockOutputChannel = {
 
 const window = {
     showErrorMessage: jest.fn(),
-    createOutputChannel: () => mockOutputChannel,
-    showQuickPick: (options) => options[0],
+    createOutputChannel: () => mockOutputChannel
 };
 
 function Position(line, character) {

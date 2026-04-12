@@ -35,34 +35,38 @@ describe(rebuildCtags, () => {
             ];
         });
 
-        it("shows picker when there is no active text editor", async () => {
+        it("shows error when there is no active text editor", async () => {
             vscode.window.activeTextEditor = undefined;
             const exec = jest.fn();
 
             await rebuildCtags(exec);
 
-            expect(exec).toHaveBeenCalledTimes(1);
-            expect(exec).toHaveBeenLastCalledWith("mock-ctags-command", { cwd: "/backend" });
+            expect(exec).not.toHaveBeenCalled();
+            expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+                'Ctags Companion: Unable to determine current workspace folder with no files open.'
+            );
         });
 
-        it("shows picker when active text editor is outside of workspace", async () => {
+        it("shows error when active text editor is outside of workspace", async () => {
             vscode.window.activeTextEditor = { document: { uri: { fsPath: "/file/outside/workspace" } } };
             const exec = jest.fn();
 
             await rebuildCtags(exec);
 
-            expect(exec).toHaveBeenCalledTimes(1);
-            expect(exec).toHaveBeenLastCalledWith("mock-ctags-command", { cwd: "/backend" });
+            expect(exec).not.toHaveBeenCalled();
+            expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+                'Ctags Companion: Current file is outside of your workspace.'
+            );
         });
 
-        it("runs ctags on the open file's workspace directory", async () => {
-            vscode.window.activeTextEditor = { document: { uri: { fsPath: "/test/foo" } } };
+        it.each(["/backend", "/frontend"])("runs ctags on the open file's workspace directory", async (folder) => {
+            vscode.window.activeTextEditor = { document: { uri: { fsPath: `${folder}/foo.js` } } };
             const exec = jest.fn();
 
             await rebuildCtags(exec);
 
             expect(exec).toHaveBeenCalledTimes(1);
-            expect(exec).toHaveBeenLastCalledWith("mock-ctags-command", { cwd: "/test" });
+            expect(exec).toHaveBeenLastCalledWith("mock-ctags-command", { cwd: folder });
         });
     });
 });
