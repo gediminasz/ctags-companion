@@ -5,10 +5,8 @@ test:
 	npm test
 
 update:
-	rm -rf node_modules
-	rm package-lock.json
+	rm -r node_modules package-lock.json
 	npm install
-	npm audit
 
 lock:
 	npm install --package-lock-only
