@@ -6,34 +6,40 @@ const { EXTENSION_NAME } = require("./constants");
 /**
  * @param {function} tryExec
  */
-function rebuildCtags(tryExec = helpers.tryExec) {
-    const scope = getCurrentWorkspaceScope();
-    if (scope === undefined) {
-        return;
+async function rebuildCtags(tryExec = helpers.tryExec) {
+    try {
+        const scope = getCurrentWorkspaceScope();
+        const command = helpers.getConfiguration(scope).get("command");
+        // TODO commandGuard
+        await tryExec(command, { cwd: scope.uri.fsPath });
+    } catch (e) {
+        vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${e.message}`);
     }
-
-    const command = helpers.getConfiguration(scope).get("command");
-    const cwd = scope.uri.fsPath;
-
-    tryExec(command, { cwd });
 }
 
 /**
- * @returns {vscode.WorkspaceFolder | undefined}
+ * @returns {vscode.WorkspaceFolder}
  */
 function getCurrentWorkspaceScope() {
-    if (vscode.window.activeTextEditor !== undefined) {
-        // TODO do not return undefined here
-        return vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
+    if (vscode.workspace.workspaceFolders === undefined || vscode.workspace.workspaceFolders.length === 0) {
+        throw new Error("No workspace folders open.");
     }
 
-    if (vscode.workspace.workspaceFolders !== undefined && vscode.workspace.workspaceFolders.length === 1) {
+    if (vscode.workspace.workspaceFolders.length === 1) {
         return vscode.workspace.workspaceFolders[0];
     }
 
-    vscode.window.showErrorMessage(
-        `${EXTENSION_NAME}: Unable to determine active directory in a multi-root workspace. Please open some file and try again.`
-    );
+    // from here we're dealing with a multi root workspace
+
+    if (vscode.window.activeTextEditor === undefined) {
+        throw new Error("Unable to determine current workspace folder with no files open.");
+    }
+
+    const workspace = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
+    if (workspace === undefined) {
+        throw new Error("Current file is outside of your workspace.");
+    }
+    return workspace;
 }
 
 module.exports = { rebuildCtags };
