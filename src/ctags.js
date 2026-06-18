@@ -17,7 +17,8 @@ async function rebuildCtags(tryExec = helpers.tryExec) {
 
         await tryExec(command, { cwd: scope.uri.fsPath });
     } catch (e) {
-        vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${e.message}`);
+        const message = e instanceof Error ? e.message : String(e);
+        vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${message}`);
     }
 }
 
