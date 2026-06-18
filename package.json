@@ -89,6 +89,7 @@
                 "lines": 90
             }
         },
-        "restoreMocks": true
+        "restoreMocks": true,
+        "clearMocks": true
     }
 }
