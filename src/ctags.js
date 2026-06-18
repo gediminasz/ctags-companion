@@ -9,8 +9,12 @@ const { EXTENSION_NAME } = require("./constants");
 async function rebuildCtags(tryExec = helpers.tryExec) {
     try {
         const scope = getCurrentWorkspaceScope();
+
         const command = helpers.getConfiguration(scope).get("command");
-        // TODO commandGuard
+        if (helpers.commandGuard(command)) {
+            return;
+        }
+
         await tryExec(command, { cwd: scope.uri.fsPath });
     } catch (e) {
         vscode.window.showErrorMessage(`${EXTENSION_NAME}: ${e.message}`);

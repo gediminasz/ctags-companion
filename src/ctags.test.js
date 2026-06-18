@@ -1,15 +1,30 @@
 const vscode = require('vscode');
 const { rebuildCtags } = require("./ctags");
+const { patch } = require("./testHelpers");
 
 describe(rebuildCtags, () => {
     it.each([undefined, []])("shows error when no workspace folders are open", async (workspaceFolders) => {
-        vscode.workspace.workspaceFolders = workspaceFolders;
-        const exec = jest.fn();
+        await patch(vscode.workspace, "workspaceFolders", workspaceFolders, async () => {
+            const exec = jest.fn();
 
-        await rebuildCtags(exec);
+            await rebuildCtags(exec);
 
-        expect(exec).not.toHaveBeenCalled();
-        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith('Ctags Companion: No workspace folders open.');
+            expect(exec).not.toHaveBeenCalled();
+            expect(vscode.window.showErrorMessage).toHaveBeenCalledWith('Ctags Companion: No workspace folders open.');
+        });
+    });
+
+    it("shows error when command setting is missing", async () => {
+        await patch(vscode.workspace, "getConfiguration", () => ({ get: () => undefined }), async () => {
+            const exec = jest.fn();
+
+            await rebuildCtags(exec);
+
+            expect(exec).not.toHaveBeenCalled();
+            expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+                'Ctags Companion: The "Command" preference is not set. Please check your configuration.'
+            );
+        });
     });
 
     it.each([
