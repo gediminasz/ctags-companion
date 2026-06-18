@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 2026.6.0
 
 - Fixed unhandled errors when current file does not match any open workspace folder.
 
