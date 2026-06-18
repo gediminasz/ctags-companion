@@ -9,5 +9,8 @@ assets
 coverage
 format_settings.py
 Makefile
+node_modules
+src/__mocks__
 src/testHelpers.js
 test_projects
+tsconfig.json
