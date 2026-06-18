@@ -9,4 +9,5 @@ assets
 coverage
 format_settings.py
 Makefile
+src/testHelpers.js
 test_projects
