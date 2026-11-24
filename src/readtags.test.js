@@ -98,7 +98,7 @@ describe(ReadtagsProvider, () => {
         it.each([
             ["document within workspace", document],
             ["document outside workspace", { uri: { fsPath: "/tmp/test.txt" } }],
-        ])("returns symbol location for %s", async (_, document) => {
+        ])("returns a DocumentSymbol tree for %s", async (_, document) => {
             const provider = new ReadtagsProvider(exec);
             const definitions = await provider.provideDocumentSymbols(document);
 
@@ -106,16 +106,26 @@ describe(ReadtagsProvider, () => {
                 {
                     name: "bitmap_complement",
                     kind: vscode.SymbolKind.Function,
-                    containerName: "",
-                    location: {
-                        uri: "include/linux/bitmap.h",
-                        rangeOrPosition: {
-                            line: 353,
-                            character: 0
-                        }
-                    }
+                    detail: "typename:void",
+                    range: { start: { line: 353, character: 0 }, end: { line: 353, character: 0 } },
+                    selectionRange: { start: { line: 353, character: 0 }, end: { line: 353, character: 0 } },
+                    children: [],
                 }
             ]);
+        });
+
+        it("nests struct members below their parent", async () => {
+            const execWithStruct = () => [
+                'evt_context\tsrc/vos/evt_priv.h\t/^struct evt_context {$/;"\tkind:struct\tline:73',
+                'tc_root\tsrc/vos/evt_priv.h\t/^\tstruct evt_root *tc_root;$/;"\tm\tline:75\tstruct:evt_context',
+            ];
+            const provider = new ReadtagsProvider(execWithStruct);
+
+            const definitions = await provider.provideDocumentSymbols(document);
+
+            expect(definitions).toHaveLength(1);
+            expect(definitions[0].name).toEqual("evt_context");
+            expect(definitions[0].children.map(s => s.name)).toEqual(["tc_root"]);
         });
 
         it("returns an empty list when readtags output is blank", async () => {

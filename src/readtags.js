@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-const { getConfiguration, definitionToSymbolInformation } = require("./helpers");
+const { getConfiguration, definitionToSymbolInformation, buildDocumentSymbolTree } = require("./helpers");
 
 // Definitions provider based on readtags command line utility
 // https://docs.ctags.io/en/latest/man/readtags.1.html
@@ -50,13 +50,15 @@ class ReadtagsProvider {
 
     /**
      * @param {vscode.TextDocument} document
-     * @returns {Promise<vscode.SymbolInformation[]>}
+     * @returns {Promise<vscode.DocumentSymbol[]>}
      */
     async provideDocumentSymbols(document) {
         const scope = vscode.workspace.getWorkspaceFolder(document.uri);
         const command = getConfiguration(scope).get("ctagsGoToSymbolInEditorCommand");
         const definitions = await this.exec(`${command} '${document.uri.fsPath}'`, {});
-        return definitions.map(d => definitionToSymbolInformation(d));
+        // Return a DocumentSymbol tree so the Outline view can nest struct
+        // members under their parent struct (SymbolInformation is always flat).
+        return buildDocumentSymbolTree(definitions);
     }
 }
 

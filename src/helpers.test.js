@@ -1,6 +1,12 @@
 const vscode = require("vscode");
 
-const { definitionToSymbolInformation, commandGuard, wrapExec } = require("./helpers");
+const {
+    definitionToSymbolInformation,
+    definitionToDocumentSymbol,
+    buildDocumentSymbolTree,
+    commandGuard,
+    wrapExec,
+} = require("./helpers");
 
 describe("definitionToSymbolInformation", () => {
     const scope = { uri: { fsPath: "/path/to/scope" } };
@@ -66,6 +72,79 @@ describe("definitionToSymbolInformation", () => {
                 rangeOrPosition: { line: 0, character: 0 }
             }
         });
+    });
+});
+
+describe("definitionToDocumentSymbol", () => {
+    it("maps a single-letter kind, sets detail from typeref and records the struct scope", () => {
+        const definition = 'tc_magic	src/vos/evt_priv.h	/^    unsigned int tc_magic;$/;"	kind:m	line:77	struct:evt_context	typeref:typename:unsigned int';
+
+        const symbol = definitionToDocumentSymbol(definition);
+
+        expect(symbol.name).toEqual("tc_magic");
+        expect(symbol.detail).toEqual("typename:unsigned int");
+        expect(symbol.kind).toEqual(vscode.SymbolKind.Property);
+        expect(symbol.range).toEqual({ start: { line: 76, character: 0 }, end: { line: 76, character: 0 } });
+        expect(symbol.selectionRange).toEqual(symbol.range);
+        expect(symbol.children).toEqual([]);
+        expect(symbol._container).toEqual("evt_context");
+    });
+
+    it("maps ctags long kind names and recognizes every scope prefix", () => {
+        const definition = 'evt_context	src/vos/evt_priv.h	/^struct evt_context {$/;"	kind:struct	line:73	union:outer';
+
+        const symbol = definitionToDocumentSymbol(definition);
+
+        expect(symbol.kind).toEqual(vscode.SymbolKind.Struct);
+        expect(symbol._container).toEqual("outer");
+    });
+
+    it("falls back to Variable for an unknown kind and clamps a missing line to zero", () => {
+        const definition = 'fizz	fizz.py	/^fizz = "fizz"$/;"	kind:unknown';
+
+        const symbol = definitionToDocumentSymbol(definition);
+
+        expect(symbol.kind).toEqual(vscode.SymbolKind.Variable);
+        expect(symbol.detail).toEqual("");
+        expect(symbol.selectionRange.start.line).toEqual(0);
+        expect(symbol._container).toEqual("");
+    });
+});
+
+describe("buildDocumentSymbolTree", () => {
+    it("nests members under their parent struct and sorts children by line", () => {
+        const definitions = [
+            'evt_context	src/vos/evt_priv.h	/^struct evt_context {$/;"	kind:struct	line:73',
+            'tc_ref	src/vos/evt_priv.h	/^    int tc_ref;$/;"	m	line:79	struct:evt_context',
+            'tc_root	src/vos/evt_priv.h	/^    struct evt_root *tc_root;$/;"	m	line:75	struct:evt_context',
+            "",
+            "!_TAG_FILE_FORMAT	2	/extended format/",
+        ];
+
+        const tree = buildDocumentSymbolTree(definitions);
+
+        expect(tree).toHaveLength(1);
+        expect(tree[0].name).toEqual("evt_context");
+        expect(tree[0].children.map(s => s.name)).toEqual(["tc_root", "tc_ref"]);
+        expect(tree[0].children.map(s => s.selectionRange.start.line)).toEqual([74, 78]);
+    });
+
+    it("keeps symbols whose container is missing, self-referential, or duplicated as roots", () => {
+        const definitions = [
+            'orphan	a.h	/^int orphan;$/;"	m	line:1	struct:missing_parent',
+            'self	a.h	/^struct self {$/;"	kind:struct	line:2	struct:self',
+            'dup	a.h	/^int dup;$/;"	v	line:3',
+            'dup	b.h	/^int dup;$/;"	v	line:4',
+        ];
+
+        const tree = buildDocumentSymbolTree(definitions);
+
+        expect(tree.map(s => s.name)).toEqual(["orphan", "self", "dup", "dup"]);
+        expect(tree.every(s => s.children.length === 0)).toBe(true);
+    });
+
+    it("returns an empty array for no definitions", () => {
+        expect(buildDocumentSymbolTree([])).toEqual([]);
     });
 });
 
